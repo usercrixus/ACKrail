@@ -25,6 +25,13 @@ make run      # build and launch
 make clean    # remove generated files
 ```
 
+Build files default to `/tmp/ackrail-build` because CMake build trees can be
+unreliable on VirtualBox shared folders. Override the location when needed:
+
+```bash
+make BUILD_DIR=$HOME/.cache/ackrail/build
+```
+
 The embedded Paris and Île-de-France Métro + RER topology is loaded by
 default. It contains all Métro services and RER A-E from the official
 Île-de-France Mobilités GTFS feed. To load another topology JSON file:
