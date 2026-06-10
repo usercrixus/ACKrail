@@ -13,6 +13,6 @@ public:
     static ProjectedPosition webMercator(double latitude, double longitude);
 
 private:
-    static constexpr double EarthRadiusKilometers = 6371.0088;
-    static constexpr double MaximumMercatorLatitude = 85.05112878;
+    static const double EarthRadiusKilometers;
+    static const double MaximumMercatorLatitude;
 };

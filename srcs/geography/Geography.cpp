@@ -4,13 +4,16 @@
 #include <cmath>
 #include <numbers>
 
+const double Geography::EarthRadiusKilometers = 6371.0088;
+const double Geography::MaximumMercatorLatitude = 85.05112878;
+
 double Geography::distanceKilometers(
     double latitude1,
     double longitude1,
     double latitude2,
     double longitude2)
 {
-    constexpr double DegreesToRadians = std::numbers::pi / 180.0;
+    const double DegreesToRadians = std::numbers::pi / 180.0;
 
     const double latitude1Radians = latitude1 * DegreesToRadians;
     const double latitude2Radians = latitude2 * DegreesToRadians;
@@ -36,7 +39,7 @@ Geography::ProjectedPosition Geography::webMercator(
     double latitude,
     double longitude)
 {
-    constexpr double DegreesToRadians = std::numbers::pi / 180.0;
+    const double DegreesToRadians = std::numbers::pi / 180.0;
 
     const double boundedLatitude = std::clamp(
         latitude,
