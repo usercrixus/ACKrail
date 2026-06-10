@@ -13,6 +13,7 @@ public:
     const Node &getToNode() const;
     const QString &getLineName() const;
     const QString &getColor() const;
+    double getDistanceKilometers() const;
 
 private:
     int id;
@@ -20,4 +21,5 @@ private:
     Node toNode;
     QString lineName;
     QString color;
+    double distanceKilometers;
 };

@@ -1,5 +1,7 @@
 #include "TopologyWidget.hpp"
 
+#include "../geography/Geography.hpp"
+
 #include <QColor>
 #include <QFont>
 #include <QMouseEvent>
@@ -9,7 +11,6 @@
 #include <QWheelEvent>
 #include <algorithm>
 #include <cmath>
-#include <numbers>
 
 TopologyWidget::TopologyWidget(const Topology &topology, QWidget *parent)
     : QWidget(parent),
@@ -159,20 +160,30 @@ void TopologyWidget::wheelEvent(QWheelEvent *event)
 
 QPointF TopologyWidget::mapPosition(double latitude, double longitude) const
 {
-    const double longitudeScale = std::cos(48.86 * std::numbers::pi / 180.0);
-    const double geographicWidth = (topology.getMaximumLongitude() - topology.getMinimumLongitude()) * longitudeScale;
-    const double geographicHeight = topology.getMaximumLatitude() - topology.getMinimumLatitude();
+    const Geography::ProjectedPosition minimumPosition =
+        Geography::webMercator(
+            topology.getMinimumLatitude(),
+            topology.getMinimumLongitude());
+    const Geography::ProjectedPosition maximumPosition =
+        Geography::webMercator(
+            topology.getMaximumLatitude(),
+            topology.getMaximumLongitude());
+    const Geography::ProjectedPosition projectedPosition =
+        Geography::webMercator(latitude, longitude);
+
+    const double projectedWidth = maximumPosition.x - minimumPosition.x;
+    const double projectedHeight = maximumPosition.y - minimumPosition.y;
     const double usableWidth = std::max(1.0, width() - Margin * 2.0);
     const double usableHeight = std::max(1.0, height() - HeaderHeight - Margin * 2.0);
-    const double scale = std::min(usableWidth / std::max(geographicWidth, 0.000001), usableHeight / std::max(geographicHeight, 0.000001));
-    const double mapWidth = geographicWidth * scale;
-    const double mapHeight = geographicHeight * scale;
+    const double scale = std::min(usableWidth / std::max(projectedWidth, 0.000001), usableHeight / std::max(projectedHeight, 0.000001));
+    const double mapWidth = projectedWidth * scale;
+    const double mapHeight = projectedHeight * scale;
     const double left = (width() - mapWidth) / 2.0;
     const double top = HeaderHeight + (height() - HeaderHeight - mapHeight) / 2.0;
 
     const QPointF fittedPosition{
-        left + (longitude - topology.getMinimumLongitude()) * longitudeScale * scale,
-        top + (topology.getMaximumLatitude() - latitude) * scale};
+        left + (projectedPosition.x - minimumPosition.x) * scale,
+        top + (maximumPosition.y - projectedPosition.y) * scale};
     const QPointF mapCenter(
         width() / 2.0,
         HeaderHeight + (height() - HeaderHeight) / 2.0);

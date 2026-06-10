@@ -1,5 +1,7 @@
 #include "Link.hpp"
 
+#include "../geography/Geography.hpp"
+
 #include <utility>
 
 Link::Link(int id, const Node &fromNode, const Node &toNode, QString lineName, QString color)
@@ -7,7 +9,8 @@ Link::Link(int id, const Node &fromNode, const Node &toNode, QString lineName, Q
       fromNode(fromNode),
       toNode(toNode),
       lineName(std::move(lineName)),
-      color(std::move(color))
+      color(std::move(color)),
+      distanceKilometers(Geography::distanceKilometers(fromNode.getLatitude(), fromNode.getLongitude(), toNode.getLatitude(), toNode.getLongitude()))
 {
 }
 
@@ -34,4 +37,9 @@ const QString &Link::getLineName() const
 const QString &Link::getColor() const
 {
     return color;
+}
+
+double Link::getDistanceKilometers() const
+{
+    return distanceKilometers;
 }

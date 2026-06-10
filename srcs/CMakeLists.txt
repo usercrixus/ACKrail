@@ -12,6 +12,8 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(ackrail
+    geography/Geography.cpp
+    geography/Geography.hpp
     main.cpp
     topology/Link.cpp
     topology/Link.hpp
