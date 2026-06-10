@@ -2,9 +2,11 @@
 
 #include <QColor>
 #include <QFont>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
+#include <QWheelEvent>
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -13,6 +15,8 @@ namespace
 {
     constexpr double margin = 70.0;
     constexpr double headerHeight = 64.0;
+    constexpr double minimumZoom = 0.25;
+    constexpr double maximumZoom = 20.0;
 }
 
 TopologyWidget::TopologyWidget(const Topology &topology, QWidget *parent)
@@ -47,6 +51,9 @@ void TopologyWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
+    painter.save();
+    painter.setClipRect(QRectF(0, headerHeight, width(), height() - headerHeight));
+
     painter.setPen(Qt::NoPen);
     for (const Link &link : topology.getLinks())
     {
@@ -73,26 +80,105 @@ void TopologyWidget::paintEvent(QPaintEvent *event)
         painter.setFont(QFont(QStringLiteral("Sans Serif"), 8));
         painter.drawText(position + QPointF(11, 4), node.getName());
     }
+
+    painter.restore();
+}
+
+void TopologyWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && event->position().y() >= headerHeight)
+    {
+        isPanning = true;
+        lastMousePosition = event->position();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+
+    QWidget::mousePressEvent(event);
+}
+
+void TopologyWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (isPanning)
+    {
+        panOffset += event->position() - lastMousePosition;
+        lastMousePosition = event->position();
+        update();
+        event->accept();
+        return;
+    }
+
+    QWidget::mouseMoveEvent(event);
+}
+
+void TopologyWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && isPanning)
+    {
+        isPanning = false;
+        unsetCursor();
+        event->accept();
+        return;
+    }
+
+    QWidget::mouseReleaseEvent(event);
+}
+
+void TopologyWidget::wheelEvent(QWheelEvent *event)
+{
+    if (event->position().y() < headerHeight)
+    {
+        QWidget::wheelEvent(event);
+        return;
+    }
+
+    const QPoint scrollDelta =
+        event->pixelDelta().isNull() ? event->angleDelta() : event->pixelDelta();
+    if (scrollDelta.y() == 0)
+    {
+        QWidget::wheelEvent(event);
+        return;
+    }
+
+    const double step = event->pixelDelta().isNull() ? scrollDelta.y() / 120.0
+                                                     : scrollDelta.y() / 40.0;
+    const double oldZoom = zoomFactor;
+    zoomFactor = std::clamp(
+        zoomFactor * std::pow(1.2, step),
+        minimumZoom,
+        maximumZoom);
+
+    const double appliedFactor = zoomFactor / oldZoom;
+    const QPointF mapCenter(
+        width() / 2.0,
+        headerHeight + (height() - headerHeight) / 2.0);
+    panOffset +=
+        (1.0 - appliedFactor) * (event->position() - mapCenter - panOffset);
+
+    update();
+    event->accept();
 }
 
 QPointF TopologyWidget::mapPosition(double latitude, double longitude) const
 {
     const double longitudeScale = std::cos(48.86 * std::numbers::pi / 180.0);
-    const double geographicWidth =
-        (topology.getMaximumLongitude() - topology.getMinimumLongitude()) * longitudeScale;
-    const double geographicHeight =
-        topology.getMaximumLatitude() - topology.getMinimumLatitude();
+    const double geographicWidth = (topology.getMaximumLongitude() - topology.getMinimumLongitude()) * longitudeScale;
+    const double geographicHeight = topology.getMaximumLatitude() - topology.getMinimumLatitude();
     const double usableWidth = std::max(1.0, width() - margin * 2.0);
     const double usableHeight = std::max(1.0, height() - headerHeight - margin * 2.0);
-    const double scale = std::min(
-        usableWidth / std::max(geographicWidth, 0.000001),
-        usableHeight / std::max(geographicHeight, 0.000001));
+    const double scale = std::min(usableWidth / std::max(geographicWidth, 0.000001), usableHeight / std::max(geographicHeight, 0.000001));
     const double mapWidth = geographicWidth * scale;
     const double mapHeight = geographicHeight * scale;
     const double left = (width() - mapWidth) / 2.0;
     const double top = headerHeight + (height() - headerHeight - mapHeight) / 2.0;
 
-    return {
+    const QPointF fittedPosition{
         left + (longitude - topology.getMinimumLongitude()) * longitudeScale * scale,
         top + (topology.getMaximumLatitude() - latitude) * scale};
+    const QPointF mapCenter(
+        width() / 2.0,
+        headerHeight + (height() - headerHeight) / 2.0);
+
+    return mapCenter + (fittedPosition - mapCenter) * zoomFactor + panOffset;
 }
