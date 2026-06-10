@@ -1,7 +1,5 @@
 #include "Link.hpp"
-
 #include "../geography/Geography.hpp"
-
 #include <utility>
 
 Link::Link(int id, const Node &fromNode, const Node &toNode, QString lineName, QString color)

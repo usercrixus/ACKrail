@@ -1,12 +1,10 @@
 #include "Topology.hpp"
-
 #include <QFile>
 #include <QHash>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSet>
-
 #include <limits>
 #include <utility>
 

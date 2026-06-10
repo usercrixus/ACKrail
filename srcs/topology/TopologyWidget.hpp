@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Topology.hpp"
-
 #include <QPointF>
 #include <QWidget>
 

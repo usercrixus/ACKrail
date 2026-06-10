@@ -1,7 +1,5 @@
 #include "TopologyWidget.hpp"
-
 #include "../geography/Geography.hpp"
-
 #include <QColor>
 #include <QFont>
 #include <QMouseEvent>
@@ -82,6 +80,25 @@ void TopologyWidget::drawNodes(QPainter &painter) const
     }
 }
 
+QPointF TopologyWidget::mapPosition(double latitude, double longitude) const
+{
+    const Geography::ProjectedPosition minimumPosition = Geography::webMercator(topology.getMinimumLatitude(), topology.getMinimumLongitude());
+    const Geography::ProjectedPosition maximumPosition = Geography::webMercator(topology.getMaximumLatitude(), topology.getMaximumLongitude());
+    const Geography::ProjectedPosition projectedPosition = Geography::webMercator(latitude, longitude);
+    const double projectedWidth = maximumPosition.x - minimumPosition.x;
+    const double projectedHeight = maximumPosition.y - minimumPosition.y;
+    const double usableWidth = std::max(1.0, width() - Margin * 2.0);
+    const double usableHeight = std::max(1.0, height() - HeaderHeight - Margin * 2.0);
+    const double scale = std::min(usableWidth / std::max(projectedWidth, 0.000001), usableHeight / std::max(projectedHeight, 0.000001));
+    const double mapWidth = projectedWidth * scale;
+    const double mapHeight = projectedHeight * scale;
+    const double left = (width() - mapWidth) / 2.0;
+    const double top = HeaderHeight + (height() - HeaderHeight - mapHeight) / 2.0;
+    const QPointF fittedPosition{left + (projectedPosition.x - minimumPosition.x) * scale, top + (maximumPosition.y - projectedPosition.y) * scale};
+    const QPointF mapCenter(width() / 2.0, HeaderHeight + (height() - HeaderHeight) / 2.0);
+    return mapCenter + (fittedPosition - mapCenter) * zoomFactor + panOffset;
+}
+
 void TopologyWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && event->position().y() >= HeaderHeight)
@@ -90,10 +107,11 @@ void TopologyWidget::mousePressEvent(QMouseEvent *event)
         lastMousePosition = event->position();
         setCursor(Qt::ClosedHandCursor);
         event->accept();
-        return;
     }
-
-    QWidget::mousePressEvent(event);
+    else
+    {
+        QWidget::mousePressEvent(event);
+    }
 }
 
 void TopologyWidget::mouseMoveEvent(QMouseEvent *event)
@@ -104,10 +122,11 @@ void TopologyWidget::mouseMoveEvent(QMouseEvent *event)
         lastMousePosition = event->position();
         update();
         event->accept();
-        return;
     }
-
-    QWidget::mouseMoveEvent(event);
+    else
+    {
+        QWidget::mouseMoveEvent(event);
+    }
 }
 
 void TopologyWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -117,76 +136,29 @@ void TopologyWidget::mouseReleaseEvent(QMouseEvent *event)
         isPanning = false;
         unsetCursor();
         event->accept();
-        return;
     }
-
-    QWidget::mouseReleaseEvent(event);
+    else
+    {
+        QWidget::mouseReleaseEvent(event);
+    }
 }
 
 void TopologyWidget::wheelEvent(QWheelEvent *event)
 {
-    if (event->position().y() < HeaderHeight)
+    const QPoint scrollDelta = event->pixelDelta().isNull() ? event->angleDelta() : event->pixelDelta();
+    if (event->position().y() > HeaderHeight && scrollDelta.y() != 0)
+    {
+        const double step = event->pixelDelta().isNull() ? scrollDelta.y() / 120.0 : scrollDelta.y() / 40.0;
+        const double oldZoom = zoomFactor;
+        zoomFactor = std::clamp(zoomFactor * std::pow(1.2, step), MinimumZoom, MaximumZoom);
+        const double appliedFactor = zoomFactor / oldZoom;
+        const QPointF mapCenter(width() / 2.0, HeaderHeight + (height() - HeaderHeight) / 2.0);
+        panOffset += (1.0 - appliedFactor) * (event->position() - mapCenter - panOffset);
+        update();
+        event->accept();
+    }
+    else
     {
         QWidget::wheelEvent(event);
-        return;
     }
-
-    const QPoint scrollDelta =
-        event->pixelDelta().isNull() ? event->angleDelta() : event->pixelDelta();
-    if (scrollDelta.y() == 0)
-    {
-        QWidget::wheelEvent(event);
-        return;
-    }
-
-    const double step = event->pixelDelta().isNull() ? scrollDelta.y() / 120.0
-                                                     : scrollDelta.y() / 40.0;
-    const double oldZoom = zoomFactor;
-    zoomFactor = std::clamp(
-        zoomFactor * std::pow(1.2, step),
-        MinimumZoom,
-        MaximumZoom);
-
-    const double appliedFactor = zoomFactor / oldZoom;
-    const QPointF mapCenter(
-        width() / 2.0,
-        HeaderHeight + (height() - HeaderHeight) / 2.0);
-    panOffset +=
-        (1.0 - appliedFactor) * (event->position() - mapCenter - panOffset);
-
-    update();
-    event->accept();
-}
-
-QPointF TopologyWidget::mapPosition(double latitude, double longitude) const
-{
-    const Geography::ProjectedPosition minimumPosition =
-        Geography::webMercator(
-            topology.getMinimumLatitude(),
-            topology.getMinimumLongitude());
-    const Geography::ProjectedPosition maximumPosition =
-        Geography::webMercator(
-            topology.getMaximumLatitude(),
-            topology.getMaximumLongitude());
-    const Geography::ProjectedPosition projectedPosition =
-        Geography::webMercator(latitude, longitude);
-
-    const double projectedWidth = maximumPosition.x - minimumPosition.x;
-    const double projectedHeight = maximumPosition.y - minimumPosition.y;
-    const double usableWidth = std::max(1.0, width() - Margin * 2.0);
-    const double usableHeight = std::max(1.0, height() - HeaderHeight - Margin * 2.0);
-    const double scale = std::min(usableWidth / std::max(projectedWidth, 0.000001), usableHeight / std::max(projectedHeight, 0.000001));
-    const double mapWidth = projectedWidth * scale;
-    const double mapHeight = projectedHeight * scale;
-    const double left = (width() - mapWidth) / 2.0;
-    const double top = HeaderHeight + (height() - HeaderHeight - mapHeight) / 2.0;
-
-    const QPointF fittedPosition{
-        left + (projectedPosition.x - minimumPosition.x) * scale,
-        top + (maximumPosition.y - projectedPosition.y) * scale};
-    const QPointF mapCenter(
-        width() / 2.0,
-        HeaderHeight + (height() - HeaderHeight) / 2.0);
-
-    return mapCenter + (fittedPosition - mapCenter) * zoomFactor + panOffset;
 }

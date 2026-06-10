@@ -1,5 +1,4 @@
 #include "Node.hpp"
-
 #include <utility>
 
 Node::Node(int id, QString name, double latitude, double longitude)
