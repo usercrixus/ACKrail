@@ -11,6 +11,7 @@ sudo apt-get update
 sudo apt-get install -y \
     build-essential \
     cmake \
+    libboost-graph-dev \
     ninja-build \
     qt6-base-dev
 

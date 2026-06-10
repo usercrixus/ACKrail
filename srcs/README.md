@@ -1,6 +1,6 @@
 # Development
 
-The simulator uses C++20, Qt 6 Widgets, and CMake. The map is rendered
+The simulator uses C++20, Qt 6 Widgets, Boost Graph, and CMake. The map is rendered
 directly in C++ with `QPainter`. The `Makefile` is a small convenience wrapper
 around CMake.
 

@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
+find_package(Boost REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.4)
 
@@ -41,7 +42,10 @@ qt_add_resources(ackrail "maps"
         map/paris_metro.json
 )
 
-target_link_libraries(ackrail PRIVATE Qt6::Widgets)
+target_link_libraries(ackrail PRIVATE
+    Boost::headers
+    Qt6::Widgets
+)
 
 install(TARGETS ackrail
     BUNDLE DESTINATION .
