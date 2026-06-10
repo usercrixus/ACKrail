@@ -12,6 +12,12 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(ackrail
+    engin/Biplace.cpp
+    engin/Biplace.hpp
+    engin/Engine.cpp
+    engin/Engine.hpp
+    engin/EngineFactory.cpp
+    engin/EngineFactory.hpp
     geography/Geography.cpp
     geography/Geography.hpp
     main.cpp
