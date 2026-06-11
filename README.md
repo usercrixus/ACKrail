@@ -34,13 +34,7 @@ The images in this repository are concept references only. They communicate the 
   <img src="asset/more/station.png" alt="Station concept">
 </p>
 
-## First Research Goal: A 10 km x 10 km Algorithmic City
-
-The first study area is a square city of **10 km by 10 km**. The objective is to determine how a rail-module network could provide the best possible mobility service inside that city while minimizing infrastructure and operating cost.
-
-The first simulation should use only **biplace passenger modules**.
-
-### Optimization Objectives
+## Research Objectives
 
 The simulation should search for network designs and operating strategies that minimize:
 
@@ -76,7 +70,7 @@ These scenarios create temporary, highly directional flows. The study should mea
 
 The simulation should help answer practical design questions such as:
 
-- What rail topology works best for a 10 km x 10 km city: grid, rings, diagonals, hierarchy, or hybrid network?
+- What rail topology works best for a given territory: grid, rings, diagonals, hierarchy, or a hybrid network?
 - How dense should stations or boarding points be?
 - How many modules are required for peak and off-peak operation?
 - How much parking or staging space is needed for idle modules?
@@ -102,13 +96,13 @@ The project assumes a fully automated rail management system responsible for:
 
 The simulation should make these decisions explicit so that different strategies can be compared.
 
-## Second Research Goal: Connecting Territories
+## Longer-Term Goal: Connecting Territories
 
-After studying one algorithmic square city, the next goal is to connect multiple territories together.
+After validating the core simulator on individual rail topologies, the next goal is to study connections between multiple territories.
 
 This includes:
 
-- Linking several 10 km x 10 km rail-module cities.
+- Linking several rail-module cities.
 - Connecting new planned areas to existing towns.
 - Serving legacy urban zones that were not designed around the system.
 - Serving countryside zones with lower density and longer distances.
@@ -120,13 +114,13 @@ The objective is to minimize both **infrastructure cost** and **operating cost**
 
 This project should progressively produce:
 
-- A demand model for a 10 km x 10 km city.
-- Several candidate rail-network layouts.
-- A simulator for biplace module circulation.
-- Metrics for average travel time, worst-case travel time, waiting time, fleet utilization, energy use, and cost.
-- Peak, off-peak, and event-day comparisons.
-- Visualizations of module movement, station load, congestion, and unused capacity.
-- Recommendations for infrastructure density, fleet size, station design, and operating rules.
+- A reusable representation of stations, links, and real or experimental rail topologies.
+- Shortest-route calculation between connected stations.
+- A biplace-module fleet simulator with trip dispatch and movement along the network.
+- An interactive visualization of the topology, active modules, and fleet utilization.
+- Configurable traffic generation for repeatable demand and fleet-size experiments.
+- Basic performance metrics such as trip distance, travel time, completed trips, and module utilization.
+- Later extensions for station queues, congestion, operating constraints, energy estimates, and cost comparisons.
 
 ## Design Freedom
 
