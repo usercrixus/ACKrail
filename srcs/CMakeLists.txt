@@ -27,6 +27,8 @@ qt_add_executable(ackrail
     garage/Garage.hpp
     geography/Geography.cpp
     geography/Geography.hpp
+    geography/Point.cpp
+    geography/Point.hpp
     main.cpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
@@ -70,6 +72,8 @@ if(BUILD_TESTING)
         garage/engine/EngineTest.cpp
         geography/Geography.cpp
         geography/Geography.hpp
+        geography/Point.cpp
+        geography/Point.hpp
         topology/Link.cpp
         topology/Link.hpp
         topology/Node.cpp
@@ -90,6 +94,8 @@ if(BUILD_TESTING)
         algorithm/RouteFinderTest.cpp
         geography/Geography.cpp
         geography/Geography.hpp
+        geography/Point.cpp
+        geography/Point.hpp
         topology/Link.cpp
         topology/Link.hpp
         topology/Node.cpp

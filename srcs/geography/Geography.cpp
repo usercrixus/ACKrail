@@ -23,7 +23,7 @@ double Geography::distanceKilometers(double latitude1, double longitude1, double
     return EarthRadiusKilometers * centralAngle;
 }
 
-Geography::ProjectedPosition Geography::webMercator(double latitude, double longitude)
+Point Geography::webMercator(double latitude, double longitude)
 {
     const double DegreesToRadians = std::numbers::pi / 180.0;
     const double boundedLatitude = std::clamp(latitude, -MaximumMercatorLatitude, MaximumMercatorLatitude);
