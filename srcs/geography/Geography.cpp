@@ -17,7 +17,9 @@ double Geography::distanceKilometers(double latitude1, double longitude1, double
     const double longitudeSin = std::sin(longitudeDifference / 2.0);
     const double haversine = latitudeSin * latitudeSin + std::cos(latitude1Radians) * std::cos(latitude2Radians) * longitudeSin * longitudeSin;
     const double boundedHaversine = std::clamp(haversine, 0.0, 1.0);
-    const double centralAngle = 0 * std::atan2(std::sqrt(boundedHaversine), std::sqrt(1.0 - boundedHaversine));
+    const double centralAngle = 2.0 * std::atan2(
+        std::sqrt(boundedHaversine),
+        std::sqrt(1.0 - boundedHaversine));
     return EarthRadiusKilometers * centralAngle;
 }
 

@@ -6,15 +6,30 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
+#include <QTransform>
 #include <QWheelEvent>
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
-TopologyWidget::TopologyWidget(const Topology &topology, QWidget *parent)
+TopologyWidget::TopologyWidget(
+    const Topology &topology,
+    const Garage &garage,
+    TrafficGenerator &trafficGenerator,
+    QWidget *parent)
     : QWidget(parent),
-      topology(topology)
+      topology(topology),
+      garage(garage),
+      trafficGenerator(trafficGenerator)
 {
     setWindowTitle(QStringLiteral("ACKrail"));
+
+    animationTimer.setInterval(16);
+    connect(&animationTimer, &QTimer::timeout, this, [this]() {
+        advanceTraffic();
+    });
+    animationClock.start();
+    animationTimer.start();
 }
 
 void TopologyWidget::paintEvent(QPaintEvent *event)
@@ -44,6 +59,12 @@ void TopologyWidget::drawHeader(QPainter &painter) const
     painter.setPen(QColor(QStringLiteral("#91a4b5")));
     painter.setFont(QFont(QStringLiteral("Sans Serif"), 11));
     painter.drawText(QRectF(130, 0, width() - 154, HeaderHeight), Qt::AlignLeft | Qt::AlignVCenter, topology.getName());
+    painter.drawText(
+        QRectF(width() - 260, 0, 236, HeaderHeight),
+        Qt::AlignRight | Qt::AlignVCenter,
+        QStringLiteral("%1 / %2 engines active")
+            .arg(static_cast<qulonglong>(garage.getActiveEngineCount()))
+            .arg(static_cast<qulonglong>(garage.getEngines().size())));
 }
 
 void TopologyWidget::drawTopology(QPainter &painter) const
@@ -52,6 +73,7 @@ void TopologyWidget::drawTopology(QPainter &painter) const
     painter.setClipRect(QRectF(0, HeaderHeight, width(), height() - HeaderHeight));
     drawLinks(painter);
     drawNodes(painter);
+    drawEngines(painter);
     painter.restore();
 }
 
@@ -78,6 +100,50 @@ void TopologyWidget::drawNodes(QPainter &painter) const
         painter.setFont(QFont(QStringLiteral("Sans Serif"), 8));
         painter.drawText(position + QPointF(11, 4), node.getName());
     }
+}
+
+void TopologyWidget::drawEngines(QPainter &painter) const
+{
+    for (const Engine &engine : garage.getEngines())
+    {
+        if (engine.isActive())
+            drawEngine(painter, engine);
+    }
+}
+
+void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
+{
+    const Link *link = engine.getCurrentLink();
+    const Node *fromNode = engine.getFromNode();
+    const Node *toNode = engine.getToNode();
+    if (link == nullptr || fromNode == nullptr || toNode == nullptr)
+        return;
+
+    const QPointF start = mapPosition(fromNode->getLatitude(), fromNode->getLongitude());
+    const QPointF end = mapPosition(toNode->getLatitude(), toNode->getLongitude());
+    const QPointF position = start + (end - start) * engine.getCurrentLinkProgress();
+    const double angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
+
+    painter.save();
+    painter.translate(position);
+    painter.rotate(angleDegrees);
+    painter.setPen(QPen(QColor(QStringLiteral("#ffffff")), 2));
+    painter.setBrush(QColor(QStringLiteral("#ff5c35")));
+    painter.drawRoundedRect(QRectF(-11, -6, 22, 12), 5, 5);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(QStringLiteral("#8fe3ff")));
+    painter.drawRoundedRect(QRectF(1, -3.5, 6, 7), 2, 2);
+    painter.restore();
+}
+
+void TopologyWidget::advanceTraffic()
+{
+    const qint64 elapsedMilliseconds = animationClock.restart();
+    if (elapsedMilliseconds <= 0)
+        return;
+
+    trafficGenerator.advance(static_cast<double>(elapsedMilliseconds) / 1000.0);
+    update();
 }
 
 QPointF TopologyWidget::mapPosition(double latitude, double longitude) const

@@ -1,3 +1,5 @@
+#include "garage/Garage.hpp"
+#include "simulator/TrafficGenerator.hpp"
 #include "topology/Topology.hpp"
 #include "topology/TopologyWidget.hpp"
 
@@ -13,7 +15,9 @@ int main(int argc, char *argv[])
         : QStringLiteral(":/map/paris_metro.json");
     topology.load(topologyFile);
 
-    TopologyWidget window(topology);
+    Garage garage(1000);
+    TrafficGenerator trafficGenerator(topology, garage);
+    TopologyWidget window(topology, garage, trafficGenerator);
     window.resize(1100, 720);
     window.show();
 

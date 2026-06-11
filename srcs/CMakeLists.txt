@@ -13,15 +13,21 @@ find_package(Boost REQUIRED)
 qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(ackrail
-    engin/Biplace.cpp
-    engin/Biplace.hpp
-    engin/Engine.cpp
-    engin/Engine.hpp
-    engin/EngineFactory.cpp
-    engin/EngineFactory.hpp
+    algorithm/RouteFinder.cpp
+    algorithm/RouteFinder.hpp
+    garage/engine/Biplace.cpp
+    garage/engine/Biplace.hpp
+    garage/engine/Engine.cpp
+    garage/engine/Engine.hpp
+    garage/engine/EngineFactory.cpp
+    garage/engine/EngineFactory.hpp
+    garage/Garage.cpp
+    garage/Garage.hpp
     geography/Geography.cpp
     geography/Geography.hpp
     main.cpp
+    simulator/TrafficGenerator.cpp
+    simulator/TrafficGenerator.hpp
     topology/Link.cpp
     topology/Link.hpp
     topology/Node.cpp
@@ -46,6 +52,50 @@ target_link_libraries(ackrail PRIVATE
     Boost::headers
     Qt6::Widgets
 )
+
+include(CTest)
+
+if(BUILD_TESTING)
+    add_executable(engine_tests
+        garage/engine/Biplace.cpp
+        garage/engine/Biplace.hpp
+        garage/engine/Engine.cpp
+        garage/engine/Engine.hpp
+        garage/engine/EngineFactory.cpp
+        garage/engine/EngineFactory.hpp
+        garage/engine/EngineTest.cpp
+        geography/Geography.cpp
+        geography/Geography.hpp
+        topology/Link.cpp
+        topology/Link.hpp
+        topology/Node.cpp
+        topology/Node.hpp
+    )
+
+    target_link_libraries(engine_tests PRIVATE Qt6::Core)
+    add_test(NAME engine_tests COMMAND engine_tests)
+
+    add_executable(route_finder_tests
+        algorithm/RouteFinder.cpp
+        algorithm/RouteFinder.hpp
+        algorithm/RouteFinderTest.cpp
+        geography/Geography.cpp
+        geography/Geography.hpp
+        topology/Link.cpp
+        topology/Link.hpp
+        topology/Node.cpp
+        topology/Node.hpp
+        topology/Topology.cpp
+        topology/Topology.hpp
+    )
+
+    target_link_libraries(route_finder_tests PRIVATE
+        Boost::headers
+        Qt6::Core
+    )
+
+    add_test(NAME route_finder_tests COMMAND route_finder_tests)
+endif()
 
 install(TARGETS ackrail
     BUNDLE DESTINATION .
