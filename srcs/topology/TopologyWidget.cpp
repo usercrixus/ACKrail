@@ -113,15 +113,18 @@ void TopologyWidget::drawEngines(QPainter &painter) const
 
 void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
 {
-    const Link *link = engine.getCurrentLink();
-    const Node *fromNode = engine.getFromNode();
-    const Node *toNode = engine.getToNode();
-    if (link == nullptr || fromNode == nullptr || toNode == nullptr)
+    const auto enginePosition = trafficGenerator.getEnginePosition(engine);
+    if (!enginePosition.has_value())
         return;
 
-    const QPointF start = mapPosition(fromNode->getLatitude(), fromNode->getLongitude());
-    const QPointF end = mapPosition(toNode->getLatitude(), toNode->getLongitude());
-    const QPointF position = start + (end - start) * engine.getCurrentLinkProgress();
+    const QPointF start = this->mapPosition(
+        enginePosition->fromNode->getLatitude(),
+        enginePosition->fromNode->getLongitude());
+    const QPointF end = this->mapPosition(
+        enginePosition->toNode->getLatitude(),
+        enginePosition->toNode->getLongitude());
+    const QPointF position =
+        start + (end - start) * enginePosition->linkProgress;
     const double angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
 
     painter.save();

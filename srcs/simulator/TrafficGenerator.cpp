@@ -1,6 +1,5 @@
 #include "TrafficGenerator.hpp"
 
-#include <algorithm>
 #include <chrono>
 
 TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage)
@@ -26,6 +25,37 @@ void TrafficGenerator::advance(double elapsedSeconds)
         dispatchRandomEngines();
         secondsUntilDispatch += 1.0;
     }
+}
+
+std::optional<TrafficGenerator::EnginePosition>
+TrafficGenerator::getEnginePosition(const Engine &engine) const
+{
+    const Route *trajectory = engine.getTrajectory();
+    if (trajectory == nullptr)
+        return std::nullopt;
+
+    const double travelledDistance =
+        engine.getAverageSpeedKilometersPerHour()
+        * engine.getElapsedTrajectorySeconds() / 3600.0;
+    double distanceBeforeLink = 0.0;
+    const QVector<const Link *> &links = trajectory->getLinks();
+    const QVector<Node> &stations = trajectory->getStations();
+
+    for (qsizetype index = 0; index < links.size(); ++index)
+    {
+        const Link *link = links[index];
+        const double linkDistance = link->getDistanceKilometers();
+        if (travelledDistance < distanceBeforeLink + linkDistance)
+        {
+            return EnginePosition{
+                &stations[index],
+                &stations[index + 1],
+                (travelledDistance - distanceBeforeLink) / linkDistance};
+        }
+        distanceBeforeLink += linkDistance;
+    }
+
+    return std::nullopt;
 }
 
 void TrafficGenerator::dispatchRandomEngines()
@@ -65,40 +95,10 @@ bool TrafficGenerator::dispatchEngine(Biplace &engine)
         if (!route.has_value())
             continue;
 
-        const QVector<const Link *> routeLinks = linksForRoute(*route);
-        if (routeLinks.size() != route->stations.size() - 1)
-            continue;
-
         engine.setCurrentSpeedKilometersPerHour(
             engine.getMaximumSpeedKilometersPerHour());
-        return engine.assignRoute(routeLinks, fromStation.getId());
+        return engine.startTrajectory(*route);
     }
 
     return false;
-}
-
-QVector<const Link *> TrafficGenerator::linksForRoute(const RouteFinder::Route &route) const
-{
-    QVector<const Link *> routeLinks;
-    routeLinks.reserve(std::max<qsizetype>(0, route.stations.size() - 1));
-
-    for (qsizetype index = 1; index < route.stations.size(); ++index)
-    {
-        const int fromStationId = route.stations[index - 1].getId();
-        const int toStationId = route.stations[index].getId();
-        const auto link = std::find_if(
-            topology.getLinks().begin(),
-            topology.getLinks().end(),
-            [fromStationId, toStationId](const Link &candidate) {
-                const int candidateFromId = candidate.getFromNode().getId();
-                const int candidateToId = candidate.getToNode().getId();
-                return (candidateFromId == fromStationId && candidateToId == toStationId)
-                    || (candidateFromId == toStationId && candidateToId == fromStationId);
-            });
-        if (link == topology.getLinks().end())
-            return {};
-        routeLinks.append(&*link);
-    }
-
-    return routeLinks;
 }

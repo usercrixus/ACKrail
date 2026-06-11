@@ -13,6 +13,8 @@ find_package(Boost REQUIRED)
 qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(ackrail
+    algorithm/Route.cpp
+    algorithm/Route.hpp
     algorithm/RouteFinder.cpp
     algorithm/RouteFinder.hpp
     garage/engine/Biplace.cpp
@@ -57,6 +59,8 @@ include(CTest)
 
 if(BUILD_TESTING)
     add_executable(engine_tests
+        algorithm/Route.cpp
+        algorithm/Route.hpp
         garage/engine/Biplace.cpp
         garage/engine/Biplace.hpp
         garage/engine/Engine.cpp
@@ -72,10 +76,15 @@ if(BUILD_TESTING)
         topology/Node.hpp
     )
 
-    target_link_libraries(engine_tests PRIVATE Qt6::Core)
+    target_link_libraries(engine_tests PRIVATE
+        Boost::headers
+        Qt6::Core
+    )
     add_test(NAME engine_tests COMMAND engine_tests)
 
     add_executable(route_finder_tests
+        algorithm/Route.cpp
+        algorithm/Route.hpp
         algorithm/RouteFinder.cpp
         algorithm/RouteFinder.hpp
         algorithm/RouteFinderTest.cpp

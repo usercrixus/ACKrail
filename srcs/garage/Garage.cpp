@@ -1,7 +1,6 @@
 #include "Garage.hpp"
 
 #include "engine/EngineFactory.hpp"
-
 #include <algorithm>
 
 Garage::Garage(std::size_t engineCount)
@@ -23,21 +22,19 @@ std::vector<Biplace> &Garage::getEngines()
 
 Biplace *Garage::getIdleEngine()
 {
-    const auto engine = std::find_if(
-        engines.begin(),
-        engines.end(),
-        [](const Biplace &candidate) {
-            return !candidate.isActive();
-        });
-    return engine == engines.end() ? nullptr : &*engine;
+    for (Biplace &engine : engines) {
+        if (!engine.isActive())
+            return &engine;
+    }
+    return nullptr;
 }
 
 std::size_t Garage::getActiveEngineCount() const
 {
-    return static_cast<std::size_t>(std::count_if(
-        engines.begin(),
-        engines.end(),
-        [](const Biplace &engine) {
-            return engine.isActive();
-        }));
+    std::size_t count = 0;
+    for (const Biplace &engine : engines) {
+        if (engine.isActive())
+            ++count;
+    }
+    return count;
 }

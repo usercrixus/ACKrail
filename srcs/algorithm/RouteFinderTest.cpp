@@ -20,21 +20,31 @@ int main()
 
     const auto route = routeFinder.findShortestRoute(1, 3);
     assert(route.has_value());
-    assert(route->stations.size() == 3);
-    assert(route->stations[0].getId() == 1);
-    assert(route->stations[1].getId() == 2);
-    assert(route->stations[2].getId() == 3);
-    assert(route->totalDistanceKilometers > 0.0);
+    assert(route->isValid());
+    assert(route->getStations().size() == 3);
+    assert(route->getStations()[0].getId() == 1);
+    assert(route->getStations()[1].getId() == 2);
+    assert(route->getStations()[2].getId() == 3);
+    assert(route->getLinks().size() == 2);
+    assert(route->getLinks()[0]->getId() == 1);
+    assert(route->getLinks()[1]->getId() == 2);
+    assert(route->getTotalDistanceKilometers() > 0.0);
 
     const auto reverseRoute = routeFinder.findShortestRoute(3, 1);
     assert(reverseRoute.has_value());
-    assert(reverseRoute->stations[0].getId() == 3);
-    assert(reverseRoute->stations[2].getId() == 1);
+    assert(reverseRoute->isValid());
+    assert(reverseRoute->getStations()[0].getId() == 3);
+    assert(reverseRoute->getStations()[2].getId() == 1);
+    assert(reverseRoute->getLinks().size() == 2);
+    assert(reverseRoute->getLinks()[0]->getId() == 2);
+    assert(reverseRoute->getLinks()[1]->getId() == 1);
 
     const auto sameStationRoute = routeFinder.findShortestRoute(2, 2);
     assert(sameStationRoute.has_value());
-    assert(sameStationRoute->stations.size() == 1);
-    assert(sameStationRoute->totalDistanceKilometers == 0.0);
+    assert(!sameStationRoute->isValid());
+    assert(sameStationRoute->getStations().size() == 1);
+    assert(sameStationRoute->getLinks().isEmpty());
+    assert(sameStationRoute->getTotalDistanceKilometers() == 0.0);
 
     assert(!routeFinder.findShortestRoute(1, 5).has_value());
     assert(!routeFinder.findShortestRoute(1, 999).has_value());

@@ -1,23 +1,19 @@
 #pragma once
 
+#include "Route.hpp"
 #include "../topology/Link.hpp"
 #include "../topology/Node.hpp"
 #include "../topology/Topology.hpp"
 
 #include <QVector>
 #include <boost/graph/adjacency_list.hpp>
+#include <cstdint>
 #include <optional>
 #include <unordered_map>
 
 class RouteFinder
 {
 public:
-    struct Route
-    {
-        QVector<Node> stations;
-        double totalDistanceKilometers;
-    };
-
     explicit RouteFinder(const Topology &topology);
     RouteFinder(const QVector<Node> &nodes, const QVector<Link> &links);
 
@@ -35,4 +31,5 @@ private:
     Graph graph;
     std::unordered_map<int, Vertex> verticesByStationId;
     std::unordered_map<int, Node> stationsById;
+    std::unordered_map<std::uint64_t, const Link *> linksByStationPair;
 };

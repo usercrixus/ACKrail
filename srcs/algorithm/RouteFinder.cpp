@@ -1,9 +1,21 @@
 #include "RouteFinder.hpp"
 
 #include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <limits>
+#include <utility>
 #include <vector>
+
+static std::uint64_t stationPairKey(int firstStationId, int secondStationId)
+{
+    const auto first = static_cast<std::uint32_t>(
+        std::min(firstStationId, secondStationId));
+    const auto second = static_cast<std::uint32_t>(
+        std::max(firstStationId, secondStationId));
+    return (static_cast<std::uint64_t>(first) << 32) | second;
+}
 
 RouteFinder::RouteFinder(const Topology &topology)
     : RouteFinder(topology.getNodes(), topology.getLinks())
@@ -34,10 +46,21 @@ RouteFinder::RouteFinder(const QVector<Node> &nodes, const QVector<Link> &links)
             to->second,
             boost::property<boost::edge_weight_t, double>(link.getDistanceKilometers()),
             graph);
+
+        const std::uint64_t key = stationPairKey(
+            link.getFromNode().getId(),
+            link.getToNode().getId());
+        const auto existingLink = linksByStationPair.find(key);
+        if (existingLink == linksByStationPair.end()
+            || link.getDistanceKilometers()
+                < existingLink->second->getDistanceKilometers())
+        {
+            linksByStationPair[key] = &link;
+        }
     }
 }
 
-std::optional<RouteFinder::Route> RouteFinder::findShortestRoute(
+std::optional<Route> RouteFinder::findShortestRoute(
     int fromStationId,
     int toStationId) const
 {
@@ -75,11 +98,24 @@ std::optional<RouteFinder::Route> RouteFinder::findShortestRoute(
     }
     reversedPath.push_back(from->second);
 
-    Route route{{}, totalDistance};
-    route.stations.reserve(static_cast<qsizetype>(reversedPath.size()));
+    QVector<Node> routeStations;
+    routeStations.reserve(static_cast<qsizetype>(reversedPath.size()));
     const auto stationIdMap = boost::get(boost::vertex_name, graph);
     for (auto vertex = reversedPath.rbegin(); vertex != reversedPath.rend(); ++vertex)
-        route.stations.append(stationsById.at(stationIdMap[*vertex]));
+        routeStations.append(stationsById.at(stationIdMap[*vertex]));
 
-    return route;
+    QVector<const Link *> routeLinks;
+    routeLinks.reserve(std::max<qsizetype>(0, routeStations.size() - 1));
+    for (qsizetype index = 1; index < routeStations.size(); ++index)
+    {
+        const std::uint64_t key = stationPairKey(
+            routeStations[index - 1].getId(),
+            routeStations[index].getId());
+        const auto link = linksByStationPair.find(key);
+        if (link == linksByStationPair.end())
+            return std::nullopt;
+        routeLinks.append(link->second);
+    }
+
+    return Route(std::move(routeStations), std::move(routeLinks));
 }

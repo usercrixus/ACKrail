@@ -3,11 +3,19 @@
 #include "../algorithm/RouteFinder.hpp"
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
+#include <optional>
 #include <random>
 
 class TrafficGenerator
 {
 public:
+    struct EnginePosition
+    {
+        const Node *fromNode;
+        const Node *toNode;
+        double linkProgress;
+    };
+
     /**
      * Creates a traffic generator for a topology and engine garage.
      *
@@ -23,6 +31,14 @@ public:
      */
     void advance(double elapsedSeconds);
 
+    /**
+     * Calculates an engine position along its current trajectory.
+     *
+     * @param engine Engine whose position should be calculated.
+     * @return Current route segment and progress, or an empty optional.
+     */
+    std::optional<EnginePosition> getEnginePosition(const Engine &engine) const;
+
 private:
     /**
      * Sends between 5 and 20 idle engines on random trips.
@@ -36,14 +52,6 @@ private:
      * @return true when a route was assigned; otherwise false.
      */
     bool dispatchEngine(Biplace &engine);
-
-    /**
-     * Converts a station route into topology links.
-     *
-     * @param route Ordered station route returned by RouteFinder.
-     * @return Ordered links to traverse, or an empty vector if conversion fails.
-     */
-    QVector<const Link *> linksForRoute(const RouteFinder::Route &route) const;
 
     const Topology &topology;
     Garage &garage;

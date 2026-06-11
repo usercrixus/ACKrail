@@ -7,18 +7,76 @@ Engine::Engine()
 {
 }
 
+Engine::Engine(Engine &&other) noexcept
+    : modelName(std::move(other.modelName)),
+      maximumSpeedKilometersPerHour(other.maximumSpeedKilometersPerHour),
+      currentSpeedKilometersPerHour(other.currentSpeedKilometersPerHour),
+      elapsedTrajectorySeconds(other.elapsedTrajectorySeconds),
+      averageSpeedKilometersPerHour(other.averageSpeedKilometersPerHour),
+      trajectory(other.trajectory)
+{
+    other.trajectory = nullptr;
+}
+
+Engine &Engine::operator=(Engine &&other) noexcept
+{
+    if (this == &other)
+        return *this;
+
+    delete trajectory;
+    modelName = std::move(other.modelName);
+    maximumSpeedKilometersPerHour = other.maximumSpeedKilometersPerHour;
+    currentSpeedKilometersPerHour = other.currentSpeedKilometersPerHour;
+    elapsedTrajectorySeconds = other.elapsedTrajectorySeconds;
+    averageSpeedKilometersPerHour = other.averageSpeedKilometersPerHour;
+    trajectory = other.trajectory;
+    other.trajectory = nullptr;
+    return *this;
+}
+
 Engine::~Engine()
 {
+    delete trajectory;
 }
 
-void Engine::setModelName(QString modelName)
+bool Engine::startTrajectory(const Route &route)
 {
-    this->modelName = std::move(modelName);
+    if (isActive() || !route.isValid())
+        return false;
+    trajectory = new Route(route);
+    elapsedTrajectorySeconds = 0.0;
+    averageSpeedKilometersPerHour = 0.0;
+    return true;
 }
 
-void Engine::setMaximumSpeedKilometersPerHour(double maximumSpeedKilometersPerHour)
+void Engine::advance(double elapsedSeconds)
 {
-    this->maximumSpeedKilometersPerHour = maximumSpeedKilometersPerHour;
+    if (!isActive() || elapsedSeconds <= 0.0)
+        return;
+    const double currentDistanceKilometers = averageSpeedKilometersPerHour * elapsedTrajectorySeconds / 3600.0;
+    const double remainingDistanceKilometers = trajectory->getTotalDistanceKilometers() - currentDistanceKilometers;
+    double activeSeconds = elapsedSeconds;
+    bool reachesDestination = false;
+    if (currentSpeedKilometersPerHour > 0.0)
+    {
+        const double secondsToDestination = remainingDistanceKilometers / currentSpeedKilometersPerHour * 3600.0;
+        activeSeconds = std::min(elapsedSeconds, secondsToDestination);
+        reachesDestination = elapsedSeconds >= secondsToDestination;
+    }
+    const double newDistanceKilometers = currentDistanceKilometers + currentSpeedKilometersPerHour * activeSeconds / 3600.0;
+    elapsedTrajectorySeconds += activeSeconds;
+    averageSpeedKilometersPerHour = elapsedTrajectorySeconds > 0.0 ? newDistanceKilometers / elapsedTrajectorySeconds * 3600.0 : 0.0;
+    if (reachesDestination)
+    {
+        averageSpeedKilometersPerHour = trajectory->getTotalDistanceKilometers() / elapsedTrajectorySeconds * 3600.0;
+        delete trajectory;
+        trajectory = nullptr;
+    }
+}
+
+bool Engine::isActive() const
+{
+    return trajectory != nullptr;
 }
 
 const QString &Engine::getModelName() const
@@ -36,133 +94,32 @@ double Engine::getCurrentSpeedKilometersPerHour() const
     return currentSpeedKilometersPerHour;
 }
 
-const Link *Engine::getCurrentLink() const
+double Engine::getElapsedTrajectorySeconds() const
 {
-    if (!isActive())
-        return nullptr;
-    return route[currentSegmentIndex].link;
+    return elapsedTrajectorySeconds;
 }
 
-const Node *Engine::getFromNode() const
+double Engine::getAverageSpeedKilometersPerHour() const
 {
-    return isActive()
-        ? nodeOnCurrentLink(route[currentSegmentIndex].fromStationId)
-        : nullptr;
+    return averageSpeedKilometersPerHour;
 }
 
-const Node *Engine::getToNode() const
+const Route *Engine::getTrajectory() const
 {
-    return isActive()
-        ? nodeOnCurrentLink(route[currentSegmentIndex].toStationId)
-        : nullptr;
-}
-
-double Engine::getDistanceOnCurrentLinkKilometers() const
-{
-    return distanceOnCurrentLinkKilometers;
-}
-
-double Engine::getCurrentLinkProgress() const
-{
-    const Link *currentLink = getCurrentLink();
-    if (currentLink == nullptr || currentLink->getDistanceKilometers() <= 0.0)
-        return 0.0;
-    return distanceOnCurrentLinkKilometers / currentLink->getDistanceKilometers();
-}
-
-bool Engine::isActive() const
-{
-    return currentSegmentIndex >= 0 && currentSegmentIndex < route.size();
+    return trajectory;
 }
 
 void Engine::setCurrentSpeedKilometersPerHour(double speedKilometersPerHour)
 {
-    currentSpeedKilometersPerHour = std::clamp(
-        speedKilometersPerHour,
-        0.0,
-        maximumSpeedKilometersPerHour);
+    currentSpeedKilometersPerHour = std::clamp(speedKilometersPerHour, 0.0, maximumSpeedKilometersPerHour);
 }
 
-void Engine::placeOnLink(const Link &link)
+void Engine::setModelName(QString modelName)
 {
-    assignRoute(QVector<const Link *>{&link}, link.getFromNode().getId());
+    this->modelName = std::move(modelName);
 }
 
-bool Engine::assignRoute(const QVector<const Link *> &links, int startStationId)
+void Engine::setMaximumSpeedKilometersPerHour(double maximumSpeedKilometersPerHour)
 {
-    QVector<RouteSegment> newRoute;
-    newRoute.reserve(links.size());
-    int currentStationId = startStationId;
-
-    for (const Link *link : links)
-    {
-        if (link == nullptr)
-            return false;
-
-        int nextStationId = -1;
-        if (link->getFromNode().getId() == currentStationId)
-            nextStationId = link->getToNode().getId();
-        else if (link->getToNode().getId() == currentStationId)
-            nextStationId = link->getFromNode().getId();
-        else
-            return false;
-
-        newRoute.append({link, currentStationId, nextStationId});
-        currentStationId = nextStationId;
-    }
-
-    route = std::move(newRoute);
-    currentSegmentIndex = route.isEmpty() ? -1 : 0;
-    distanceOnCurrentLinkKilometers = 0.0;
-    return isActive();
-}
-
-void Engine::advance(double elapsedSeconds)
-{
-    if (!isActive() || elapsedSeconds <= 0.0)
-        return;
-
-    double distanceToTravel = currentSpeedKilometersPerHour * elapsedSeconds / 3600.0;
-    while (distanceToTravel > 0.0 && isActive())
-    {
-        const double linkDistance = getCurrentLink()->getDistanceKilometers();
-        if (linkDistance <= 0.0)
-        {
-            finishCurrentSegment();
-            continue;
-        }
-
-        const double remainingDistance = linkDistance - distanceOnCurrentLinkKilometers;
-        if (distanceToTravel < remainingDistance)
-        {
-            distanceOnCurrentLinkKilometers += distanceToTravel;
-            return;
-        }
-
-        distanceToTravel -= remainingDistance;
-        finishCurrentSegment();
-    }
-}
-
-const Node *Engine::nodeOnCurrentLink(int stationId) const
-{
-    const Link *currentLink = getCurrentLink();
-    if (currentLink == nullptr)
-        return nullptr;
-    if (currentLink->getFromNode().getId() == stationId)
-        return &currentLink->getFromNode();
-    if (currentLink->getToNode().getId() == stationId)
-        return &currentLink->getToNode();
-    return nullptr;
-}
-
-void Engine::finishCurrentSegment()
-{
-    distanceOnCurrentLinkKilometers = 0.0;
-    ++currentSegmentIndex;
-    if (currentSegmentIndex >= route.size())
-    {
-        route.clear();
-        currentSegmentIndex = -1;
-    }
+    this->maximumSpeedKilometersPerHour = maximumSpeedKilometersPerHour;
 }
