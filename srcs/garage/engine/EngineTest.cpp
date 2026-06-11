@@ -59,4 +59,12 @@ int main()
         engine.getAverageSpeedKilometersPerHour()
             * engine.getElapsedTrajectorySeconds() / 3600.0
         - 0.2) < 0.000001);
+
+    const double remainingSecondsAtReducedSpeed =
+        (returnRoute.getTotalDistanceKilometers() - 0.2) / 18.0 * 3600.0;
+    engine.advance(remainingSecondsAtReducedSpeed - 0.001);
+    assert(engine.isActive());
+
+    engine.advance(0.002);
+    assert(!engine.isActive());
 }

@@ -1,10 +1,12 @@
 #pragma once
 
 #include "engine/Biplace.hpp"
-
 #include <cstddef>
 #include <vector>
 
+/**
+ * Owns the simulated rail-module fleet and provides access to its engines.
+ */
 class Garage
 {
 public:

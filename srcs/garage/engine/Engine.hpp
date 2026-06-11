@@ -3,14 +3,15 @@
 #include "../../algorithm/Route.hpp"
 #include <QString>
 
+/**
+ * Represents a rail engine and manages its movement along an assigned route.
+ *
+ * An engine stores its model specifications, current speed, trajectory, and
+ * travel progress. Derived classes define specific rail module models.
+ */
 class Engine
 {
 public:
-    Engine(const Engine &) = delete;
-    Engine &operator=(const Engine &) = delete;
-    Engine(Engine &&other) noexcept;
-    Engine &operator=(Engine &&other) noexcept;
-
     /**
      * Destroys the engine.
      */
@@ -108,10 +109,13 @@ protected:
     Engine();
 
 private:
+    double calculateSecondsToDestinationAtCurrentSpeed() const;
+
     QString modelName;
     double maximumSpeedKilometersPerHour = 0.0;
     double currentSpeedKilometersPerHour = 0.0;
     double elapsedTrajectorySeconds = 0.0;
     double averageSpeedKilometersPerHour = 0.0;
+    double secondsToDestinationAtCurrentSpeed = 0.0;
     Route *trajectory = nullptr;
 };
