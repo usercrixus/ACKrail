@@ -32,6 +32,8 @@ qt_add_executable(ackrail
     main.cpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
+    simulator/TrafficManager.cpp
+    simulator/TrafficManager.hpp
     topology/Link.cpp
     topology/Link.hpp
     topology/Node.cpp

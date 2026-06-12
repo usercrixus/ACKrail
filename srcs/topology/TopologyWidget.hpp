@@ -2,6 +2,7 @@
 
 #include "../garage/Garage.hpp"
 #include "../simulator/TrafficGenerator.hpp"
+#include "../simulator/TrafficManager.hpp"
 #include "Topology.hpp"
 #include <QElapsedTimer>
 #include <QPointF>
@@ -18,6 +19,7 @@ public:
     explicit TopologyWidget(
         const Topology &topology,
         const Garage &garage,
+        TrafficManager &trafficManager,
         TrafficGenerator &trafficGenerator,
         QWidget *parent = nullptr);
 
@@ -29,6 +31,13 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
+    struct EnginePosition
+    {
+        const Node *fromNode;
+        const Node *toNode;
+        double linkProgress;
+    };
+
     const double Margin = 70.0;
     const double HeaderHeight = 64.0;
     const double MinimumZoom = 0.25;
@@ -40,11 +49,13 @@ private:
     void drawNodes(QPainter &painter) const;
     void drawEngines(QPainter &painter) const;
     void drawEngine(QPainter &painter, const Engine &engine) const;
+    bool setEnginePosition(const Engine &engine, EnginePosition &position) const;
     void advanceTraffic();
     QPointF mapPosition(double latitude, double longitude) const;
 
     const Topology &topology;
     const Garage &garage;
+    TrafficManager &trafficManager;
     TrafficGenerator &trafficGenerator;
     QTimer animationTimer;
     QElapsedTimer animationClock;

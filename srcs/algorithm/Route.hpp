@@ -2,7 +2,6 @@
 
 #include "../topology/Link.hpp"
 #include "../topology/Node.hpp"
-
 #include <QVector>
 
 class Route

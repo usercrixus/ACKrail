@@ -15,11 +15,13 @@
 TopologyWidget::TopologyWidget(
     const Topology &topology,
     const Garage &garage,
+    TrafficManager &trafficManager,
     TrafficGenerator &trafficGenerator,
     QWidget *parent)
     : QWidget(parent),
       topology(topology),
       garage(garage),
+      trafficManager(trafficManager),
       trafficGenerator(trafficGenerator)
 {
     setWindowTitle(QStringLiteral("ACKrail"));
@@ -113,18 +115,18 @@ void TopologyWidget::drawEngines(QPainter &painter) const
 
 void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
 {
-    const auto enginePosition = trafficGenerator.getEnginePosition(engine);
-    if (!enginePosition.has_value())
+    EnginePosition positionStorage;
+    if (!setEnginePosition(engine, positionStorage))
         return;
 
     const QPointF start = this->mapPosition(
-        enginePosition->fromNode->getLatitude(),
-        enginePosition->fromNode->getLongitude());
+        positionStorage.fromNode->getLatitude(),
+        positionStorage.fromNode->getLongitude());
     const QPointF end = this->mapPosition(
-        enginePosition->toNode->getLatitude(),
-        enginePosition->toNode->getLongitude());
+        positionStorage.toNode->getLatitude(),
+        positionStorage.toNode->getLongitude());
     const QPointF position =
-        start + (end - start) * enginePosition->linkProgress;
+        start + (end - start) * positionStorage.linkProgress;
     const double angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
 
     painter.save();
@@ -139,13 +141,40 @@ void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
     painter.restore();
 }
 
+bool TopologyWidget::setEnginePosition(const Engine &engine, EnginePosition &position) const
+{
+    const Route *trajectory = engine.getTrajectory();
+    if (trajectory == nullptr)
+        return false;
+
+    const double travelledDistance = engine.getAverageSpeedKilometersPerHour() * engine.getElapsedTrajectorySeconds() / 3600.0;
+    double distanceBeforeLink = 0.0;
+    const QVector<const Link *> &links = trajectory->getLinks();
+    const QVector<Node> &stations = trajectory->getStations();
+    for (qsizetype index = 0; index < links.size(); ++index)
+    {
+        const double linkDistance = links[index]->getDistanceKilometers();
+        if (travelledDistance < distanceBeforeLink + linkDistance)
+        {
+            position.fromNode = &stations[index];
+            position.toNode = &stations[index + 1];
+            position.linkProgress = (travelledDistance - distanceBeforeLink) / linkDistance;
+            return true;
+        }
+        distanceBeforeLink += linkDistance;
+    }
+    return false;
+}
+
 void TopologyWidget::advanceTraffic()
 {
     const qint64 elapsedMilliseconds = animationClock.restart();
     if (elapsedMilliseconds <= 0)
         return;
 
-    trafficGenerator.advance(static_cast<double>(elapsedMilliseconds) / 1000.0);
+    const double elapsedSeconds = static_cast<double>(elapsedMilliseconds) / 1000.0;
+    trafficManager.advance(elapsedSeconds);
+    trafficGenerator.tryGenerate(elapsedSeconds);
     update();
 }
 

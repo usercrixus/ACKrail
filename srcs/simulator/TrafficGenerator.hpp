@@ -3,19 +3,11 @@
 #include "../algorithm/RouteFinder.hpp"
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
-#include <optional>
 #include <random>
 
 class TrafficGenerator
 {
 public:
-    struct EnginePosition
-    {
-        const Node *fromNode;
-        const Node *toNode;
-        double linkProgress;
-    };
-
     /**
      * Creates a traffic generator for a topology and engine garage.
      *
@@ -25,26 +17,18 @@ public:
     TrafficGenerator(const Topology &topology, Garage &garage);
 
     /**
-     * Advances active engines and dispatches new traffic.
+     * Advances the generation schedule and dispatches traffic when due.
      *
      * @param elapsedSeconds Elapsed real time in seconds.
      */
-    void advance(double elapsedSeconds);
+    void tryGenerate(double elapsedSeconds);
 
-    /**
-     * Calculates an engine position along its current trajectory.
-     *
-     * @param engine Engine whose position should be calculated.
-     * @return Current route segment and progress, or an empty optional.
-     */
-    std::optional<EnginePosition> getEnginePosition(const Engine &engine) const;
-
-private:
     /**
      * Sends between 5 and 20 idle engines on random trips.
      */
-    void dispatchRandomEngines();
+    void generate();
 
+private:
     /**
      * Assigns a random reachable trip to an idle engine.
      *

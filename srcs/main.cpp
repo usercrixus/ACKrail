@@ -1,5 +1,6 @@
 #include "garage/Garage.hpp"
 #include "simulator/TrafficGenerator.hpp"
+#include "simulator/TrafficManager.hpp"
 #include "topology/Topology.hpp"
 #include "topology/TopologyWidget.hpp"
 
@@ -17,7 +18,8 @@ int main(int argc, char *argv[])
 
     Garage garage(1000);
     TrafficGenerator trafficGenerator(topology, garage);
-    TopologyWidget window(topology, garage, trafficGenerator);
+    TrafficManager trafficManager(garage);
+    TopologyWidget window(topology, garage, trafficManager, trafficGenerator);
     window.resize(1100, 720);
     window.show();
 

@@ -20,8 +20,7 @@ bool Engine::startTrajectory(const Route &route)
     trajectory = new Route(route);
     elapsedTrajectorySeconds = 0.0;
     averageSpeedKilometersPerHour = 0.0;
-    secondsToDestinationAtCurrentSpeed =
-        calculateSecondsToDestinationAtCurrentSpeed();
+    secondsToDestinationAtCurrentSpeed = calculateSecondsToDestinationAtCurrentSpeed();
     return true;
 }
 

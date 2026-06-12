@@ -15,8 +15,9 @@ topology:
 prepare-build-dir:
 	@if test -f "$(BUILD_DIR)/CMakeCache.txt"; then \
 		cached_source="$$(sed -n 's|^CMAKE_HOME_DIRECTORY:INTERNAL=||p' "$(BUILD_DIR)/CMakeCache.txt")"; \
-		if test "$$cached_source" != "$(CURDIR)"; then \
-			echo "Removing CMake cache created for $$cached_source"; \
+		cached_generator="$$(sed -n 's|^CMAKE_GENERATOR:INTERNAL=||p' "$(BUILD_DIR)/CMakeCache.txt")"; \
+		if test "$$cached_source" != "$(CURDIR)" || test "$$cached_generator" != "Ninja"; then \
+			echo "Removing incompatible CMake cache (source: $$cached_source, generator: $$cached_generator)"; \
 			$(CMAKE) -E remove_directory "$(BUILD_DIR)"; \
 		fi; \
 	fi
