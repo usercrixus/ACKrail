@@ -49,7 +49,13 @@ private:
     void drawNodes(QPainter &painter) const;
     void drawEngines(QPainter &painter) const;
     void drawEngine(QPainter &painter, const Engine &engine) const;
+    void drawEngineInformation(
+        QPainter &painter,
+        const Engine &engine,
+        const QPointF &enginePosition) const;
     bool setEnginePosition(const Engine &engine, EnginePosition &position) const;
+    bool getEngineScreenPosition(const Engine &engine, QPointF &position) const;
+    const Engine *findEngineAt(const QPointF &position) const;
     void advanceTraffic();
     QPointF mapPosition(double latitude, double longitude) const;
 
@@ -62,5 +68,8 @@ private:
     double zoomFactor = 1.0;
     QPointF panOffset;
     QPointF lastMousePosition;
+    QPointF mousePressPosition;
+    const Engine *selectedEngine = nullptr;
     bool isPanning = false;
+    bool hasDragged = false;
 };

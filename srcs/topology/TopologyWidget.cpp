@@ -2,10 +2,13 @@
 #include "../geography/Geography.hpp"
 #include <QColor>
 #include <QFont>
+#include <QFontMetrics>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
+#include <QStyleHints>
 #include <QTransform>
 #include <QWheelEvent>
 #include <algorithm>
@@ -111,6 +114,13 @@ void TopologyWidget::drawEngines(QPainter &painter) const
         if (engine.isActive())
             drawEngine(painter, engine);
     }
+
+    if (selectedEngine != nullptr && selectedEngine->isActive())
+    {
+        QPointF position;
+        if (getEngineScreenPosition(*selectedEngine, position))
+            drawEngineInformation(painter, *selectedEngine, position);
+    }
 }
 
 void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
@@ -141,6 +151,74 @@ void TopologyWidget::drawEngine(QPainter &painter, const Engine &engine) const
     painter.restore();
 }
 
+void TopologyWidget::drawEngineInformation(
+    QPainter &painter,
+    const Engine &engine,
+    const QPointF &enginePosition) const
+{
+    const Route *route = engine.getTrajectory();
+    if (route == nullptr || route->getStations().isEmpty())
+        return;
+
+    const QVector<Node> &stations = route->getStations();
+    const double totalDistance = route->getTotalDistanceKilometers();
+    const double travelledDistance = std::clamp(
+        engine.getAverageSpeedKilometersPerHour()
+            * engine.getElapsedTrajectorySeconds() / 3600.0,
+        0.0,
+        totalDistance);
+    const double progress = totalDistance > 0.0
+        ? travelledDistance / totalDistance * 100.0
+        : 0.0;
+    const QString information =
+        QStringLiteral(
+            "%1\n"
+            "%2 -> %3\n"
+            "Speed: %4 km/h\n"
+            "Distance: %5 / %6 km\n"
+            "Progress: %7%")
+            .arg(engine.getModelName())
+            .arg(stations.first().getName())
+            .arg(stations.last().getName())
+            .arg(engine.getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
+            .arg(travelledDistance, 0, 'f', 2)
+            .arg(totalDistance, 0, 'f', 2)
+            .arg(progress, 0, 'f', 1);
+
+    const QFont font(QStringLiteral("Sans Serif"), 9);
+    const QFontMetrics metrics(font);
+    QRectF panel = metrics.boundingRect(
+        QRect(0, 0, 280, 200),
+        Qt::AlignLeft | Qt::AlignTop,
+        information);
+    panel.adjust(-10, -8, 10, 8);
+    panel.moveTopLeft(enginePosition + QPointF(16, -panel.height() - 12));
+
+    const QRectF visibleArea(
+        8,
+        HeaderHeight + 8,
+        std::max(0.0, width() - 16.0),
+        std::max(0.0, height() - HeaderHeight - 16.0));
+    if (panel.right() > visibleArea.right())
+        panel.moveRight(visibleArea.right());
+    if (panel.left() < visibleArea.left())
+        panel.moveLeft(visibleArea.left());
+    if (panel.top() < visibleArea.top())
+        panel.moveTop(enginePosition.y() + 18);
+
+    painter.save();
+    painter.setFont(font);
+    painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
+    painter.setBrush(QColor(QStringLiteral("#17232f")));
+    painter.drawRoundedRect(panel, 6, 6);
+    painter.setPen(QColor(QStringLiteral("#f4f7f9")));
+    painter.drawText(
+        panel.adjusted(10, 8, -10, -8),
+        Qt::AlignLeft | Qt::AlignTop,
+        information);
+    painter.restore();
+}
+
 bool TopologyWidget::setEnginePosition(const Engine &engine, EnginePosition &position) const
 {
     const Route *trajectory = engine.getTrajectory();
@@ -164,6 +242,52 @@ bool TopologyWidget::setEnginePosition(const Engine &engine, EnginePosition &pos
         distanceBeforeLink += linkDistance;
     }
     return false;
+}
+
+bool TopologyWidget::getEngineScreenPosition(
+    const Engine &engine,
+    QPointF &position) const
+{
+    EnginePosition enginePosition;
+    if (!setEnginePosition(engine, enginePosition))
+        return false;
+
+    const QPointF start = mapPosition(
+        enginePosition.fromNode->getLatitude(),
+        enginePosition.fromNode->getLongitude());
+    const QPointF end = mapPosition(
+        enginePosition.toNode->getLatitude(),
+        enginePosition.toNode->getLongitude());
+    position = start + (end - start) * enginePosition.linkProgress;
+    return true;
+}
+
+const Engine *TopologyWidget::findEngineAt(const QPointF &position) const
+{
+    constexpr double SelectionRadius = 14.0;
+    const Engine *closestEngine = nullptr;
+    double closestDistance = SelectionRadius;
+
+    for (const Engine &engine : garage.getEngines())
+    {
+        if (!engine.isActive())
+            continue;
+
+        QPointF enginePosition;
+        if (!getEngineScreenPosition(engine, enginePosition))
+            continue;
+
+        const double distance = std::hypot(
+            position.x() - enginePosition.x(),
+            position.y() - enginePosition.y());
+        if (distance <= closestDistance)
+        {
+            closestDistance = distance;
+            closestEngine = &engine;
+        }
+    }
+
+    return closestEngine;
 }
 
 void TopologyWidget::advanceTraffic()
@@ -204,8 +328,9 @@ void TopologyWidget::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton && event->position().y() >= HeaderHeight)
     {
         isPanning = true;
+        hasDragged = false;
+        mousePressPosition = event->position();
         lastMousePosition = event->position();
-        setCursor(Qt::ClosedHandCursor);
         event->accept();
     }
     else
@@ -218,9 +343,20 @@ void TopologyWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (isPanning)
     {
-        panOffset += event->position() - lastMousePosition;
+        if (!hasDragged
+            && (event->position() - mousePressPosition).manhattanLength()
+                >= QGuiApplication::styleHints()->startDragDistance())
+        {
+            hasDragged = true;
+            setCursor(Qt::ClosedHandCursor);
+        }
+
+        if (hasDragged)
+        {
+            panOffset += event->position() - lastMousePosition;
+            update();
+        }
         lastMousePosition = event->position();
-        update();
         event->accept();
     }
     else
@@ -235,6 +371,11 @@ void TopologyWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         isPanning = false;
         unsetCursor();
+        if (!hasDragged)
+        {
+            selectedEngine = findEngineAt(event->position());
+            update();
+        }
         event->accept();
     }
     else
