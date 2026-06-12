@@ -15,32 +15,20 @@ Route::Route(QVector<Node> stations, QVector<const Link *> links)
 
 bool Route::isValid() const
 {
-    if (stations.size() < 2
-        || links.size() != stations.size() - 1
-        || totalDistanceKilometers <= 0.0)
-    {
+    if (stations.size() < 2 || links.size() != stations.size() - 1 || totalDistanceKilometers <= 0.0)
         return false;
-    }
-
     for (qsizetype index = 0; index < links.size(); ++index)
     {
         const Link *link = links[index];
         if (link == nullptr)
             return false;
-
         const int stationId = stations[index].getId();
         const int nextStationId = stations[index + 1].getId();
         const int linkFromStationId = link->getFromNode().getId();
         const int linkToStationId = link->getToNode().getId();
-        if (!((linkFromStationId == stationId
-                && linkToStationId == nextStationId)
-            || (linkFromStationId == nextStationId
-                && linkToStationId == stationId)))
-        {
+        if (!((linkFromStationId == stationId && linkToStationId == nextStationId) || (linkFromStationId == nextStationId && linkToStationId == stationId)))
             return false;
-        }
     }
-
     return true;
 }
 
