@@ -1,7 +1,6 @@
 #include "TopologyWidget.hpp"
 #include "widgets/HeaderWidget.hpp"
 #include "widgets/MapWidget.hpp"
-
 #include <QVBoxLayout>
 
 TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, QWidget *parent)
@@ -19,6 +18,6 @@ TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, Q
 
 void TopologyWidget::refresh()
 {
-    headerWidget->update();
+    headerWidget->refresh();
     mapWidget->refresh();
 }

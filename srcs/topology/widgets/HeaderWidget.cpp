@@ -11,6 +11,14 @@ HeaderWidget::HeaderWidget(const Topology &topology, const Garage &garage, QWidg
       garage(garage)
 {
     setFixedHeight(Height);
+    refresh();
+}
+
+void HeaderWidget::refresh()
+{
+    activeEngineCount = garage.getActiveEngineCount();
+    engineCount = garage.getEngines().size();
+    update();
 }
 
 void HeaderWidget::paintEvent(QPaintEvent *event)
@@ -24,5 +32,10 @@ void HeaderWidget::paintEvent(QPaintEvent *event)
     painter.setPen(QColor(QStringLiteral("#91a4b5")));
     painter.setFont(QFont(QStringLiteral("Sans Serif"), 11));
     painter.drawText(QRectF(130, 0, width() - 154, Height), Qt::AlignLeft | Qt::AlignVCenter, topology.getName());
-    painter.drawText(QRectF(width() - 260, 0, 236, Height), Qt::AlignRight | Qt::AlignVCenter, QStringLiteral("%1 / %2 engines active").arg(garage.getActiveEngineCount()).arg(garage.getEngines().size()));
+    painter.drawText(
+        QRectF(width() - 260, 0, 236, Height),
+        Qt::AlignRight | Qt::AlignVCenter,
+        QStringLiteral("%1 / %2 engines active")
+            .arg(activeEngineCount)
+            .arg(engineCount));
 }

@@ -23,12 +23,13 @@ public:
      */
     void tryGenerate(double elapsedSeconds);
 
+private:
+
     /**
      * Sends between 5 and 20 idle engines on random trips.
      */
     void generate();
 
-private:
     /**
      * Assigns a random reachable trip to an idle engine.
      *

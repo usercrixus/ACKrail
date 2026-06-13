@@ -7,8 +7,6 @@
 #include <QGraphicsTextItem>
 #include <QPainter>
 #include <QStyleHints>
-#include <algorithm>
-#include <cmath>
 
 MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *parent)
     : QGraphicsView(parent),
@@ -21,15 +19,13 @@ MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *pa
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::ArrowCursor);
-    setTransformationAnchor(QGraphicsView::NoAnchor);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
     setFrameShape(QFrame::NoFrame);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
     graphicsScene.setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-    zoomTimer.setInterval(16);
-    zoomTimer.setTimerType(Qt::PreciseTimer);
-    connect(&zoomTimer, &QTimer::timeout, this, &MapWidget::advanceZoom);
     createScene();
 }
 
@@ -37,8 +33,6 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        zoomTimer.stop();
-        targetZoom = zoomFactor;
         isLeftButtonPressed = true;
         isDragging = false;
         mousePressPosition = event->position().toPoint();
@@ -81,27 +75,16 @@ void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
-    const QPoint scrollDelta = event->pixelDelta().isNull()
-                                   ? event->angleDelta()
-                                   : event->pixelDelta();
-    if (scrollDelta.y() == 0)
+    const int verticalDelta = event->angleDelta().y();
+    if (verticalDelta == 0)
     {
-        QGraphicsView::wheelEvent(event);
+        event->accept();
         return;
     }
 
-    const double step = event->pixelDelta().isNull()
-                            ? scrollDelta.y() / 120.0
-                            : scrollDelta.y() / 40.0;
-    targetZoom = std::clamp(
-        targetZoom * std::pow(1.05, step),
-        MinimumZoom,
-        MaximumZoom);
-    zoomAnchorPosition = event->position().toPoint();
-    zoomAnchorScenePosition = mapToScene(zoomAnchorPosition);
-
-    if (!zoomTimer.isActive())
-        zoomTimer.start();
+    const double factor = verticalDelta > 0 ? 1.2 : 1.0 / 1.2;
+    scale(factor, factor);
+    viewport()->update();
     event->accept();
 }
 
@@ -119,40 +102,6 @@ void MapWidget::refresh()
 {
     for (EngineWidget *engineWidget : engineWidgets)
         engineWidget->updatePosition();
-    QGraphicsView::viewport()->update();
-}
-
-void MapWidget::setAnimatedZoom(double zoom)
-{
-    if (zoom == zoomFactor)
-        return;
-
-    const double factor = zoom / zoomFactor;
-    zoomFactor = zoom;
-    scale(factor, factor);
-
-    const QPointF shiftedAnchor = mapToScene(zoomAnchorPosition);
-    const QPointF correction = shiftedAnchor - zoomAnchorScenePosition;
-    translate(correction.x(), correction.y());
-}
-
-void MapWidget::advanceZoom()
-{
-    constexpr double MaximumLogStep = 0.040;
-
-    const double currentLogZoom = std::log(zoomFactor);
-    const double targetLogZoom = std::log(targetZoom);
-    const double difference = targetLogZoom - currentLogZoom;
-    if (std::abs(difference) <= MaximumLogStep)
-    {
-        setAnimatedZoom(targetZoom);
-        zoomTimer.stop();
-        return;
-    }
-
-    const double nextLogZoom =
-        currentLogZoom + std::copysign(MaximumLogStep, difference);
-    setAnimatedZoom(std::exp(nextLogZoom));
 }
 
 void MapWidget::createScene()

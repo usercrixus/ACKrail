@@ -8,18 +8,13 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QResizeEvent>
-#include <QTimer>
 #include <QWheelEvent>
 #include <vector>
 
 class MapWidget : public QGraphicsView
 {
 public:
-    explicit MapWidget(
-        const Topology &topology,
-        const Garage &garage,
-        QWidget *parent = nullptr);
-
+    explicit MapWidget(const Topology &topology, const Garage &garage, QWidget *parent = nullptr);
     void refresh();
 
 protected:
@@ -31,24 +26,13 @@ protected:
 
 private:
     static constexpr double SceneMargin = 250.0;
-    static constexpr double MinimumZoom = 0.25;
-    static constexpr double MaximumZoom = 80.0;
-
     void createScene();
     void fitScene();
-    void setAnimatedZoom(double zoom);
-    void advanceZoom();
-
     const Topology &topology;
     const Garage &garage;
     MapViewport mapViewport;
     QGraphicsScene graphicsScene;
     std::vector<EngineWidget *> engineWidgets;
-    QTimer zoomTimer;
-    double zoomFactor = 1.0;
-    double targetZoom = 1.0;
-    QPoint zoomAnchorPosition;
-    QPointF zoomAnchorScenePosition;
     QPoint mousePressPosition;
     bool hasFittedScene = false;
     bool isLeftButtonPressed = false;

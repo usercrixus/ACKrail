@@ -23,7 +23,14 @@ EngineWidget::EngineWidget(const Engine &engine, const MapViewport &viewport)
 
 QRectF EngineWidget::boundingRect() const
 {
-    return isSelected() ? QRectF(-14, -170, 300, 190) : QRectF(-14, -9, 28, 18);
+    const QRectF engineBounds(
+        -EngineBoundsSize / 2.0,
+        -EngineBoundsSize / 2.0,
+        EngineBoundsSize,
+        EngineBoundsSize);
+    return isSelected()
+        ? engineBounds.united(QRectF(16, -170, 284, 170))
+        : engineBounds;
 }
 
 QPainterPath EngineWidget::shape() const
@@ -43,9 +50,13 @@ void EngineWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
 void EngineWidget::updatePosition()
 {
+    if (isSelected())
+        prepareGeometryChange();
+
     Position routePosition;
     if (!setPosition(routePosition))
     {
+        information.clear();
         setVisible(false);
         setSelected(false);
     }
@@ -55,6 +66,7 @@ void EngineWidget::updatePosition()
         const QPointF end = viewport.mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
         angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
         setPos(start + (end - start) * routePosition.linkProgress);
+        information = createInformation();
         setVisible(true);
         update();
     }
@@ -85,26 +97,8 @@ void EngineWidget::drawEngine(QPainter &painter) const
 
 void EngineWidget::drawInformation(QPainter &painter) const
 {
-    const Route *route = engine.getTrajectory();
-    if (route != nullptr && !route->getStations().isEmpty())
+    if (!information.isEmpty())
     {
-        const QVector<Node> &stations = route->getStations();
-        const double totalDistance = route->getTotalDistanceKilometers();
-        const double travelledDistance = std::clamp(engine.getAverageSpeedKilometersPerHour() * engine.getElapsedTrajectorySeconds() / 3600.0, 0.0, totalDistance);
-        const double progress = totalDistance > 0.0 ? travelledDistance / totalDistance * 100.0 : 0.0;
-        const QString information = QStringLiteral(
-                                        "%1\n"
-                                        "%2 -> %3\n"
-                                        "Speed: %4 km/h\n"
-                                        "Distance: %5 / %6 km\n"
-                                        "Progress: %7%")
-                                        .arg(engine.getModelName())
-                                        .arg(stations.first().getName())
-                                        .arg(stations.last().getName())
-                                        .arg(engine.getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
-                                        .arg(travelledDistance, 0, 'f', 2)
-                                        .arg(totalDistance, 0, 'f', 2)
-                                        .arg(progress, 0, 'f', 1);
         const QFont font(QStringLiteral("Sans Serif"), 9);
         const QFontMetrics metrics(font);
         QRectF panel = metrics.boundingRect(QRect(0, 0, 280, 200), Qt::AlignLeft | Qt::AlignTop, information);
@@ -121,7 +115,39 @@ void EngineWidget::drawInformation(QPainter &painter) const
     }
 }
 
-bool EngineWidget::setPosition(Position &position) const
+QString EngineWidget::createInformation() const
+{
+    const Route *route = engine.getTrajectory();
+    if (route == nullptr || route->getStations().isEmpty())
+        return {};
+
+    const QVector<Node> &stations = route->getStations();
+    const double totalDistance = route->getTotalDistanceKilometers();
+    const double travelledDistance = std::clamp(
+        engine.getAverageSpeedKilometersPerHour()
+            * engine.getElapsedTrajectorySeconds() / 3600.0,
+        0.0,
+        totalDistance);
+    const double progress = totalDistance > 0.0
+        ? travelledDistance / totalDistance * 100.0
+        : 0.0;
+
+    return QStringLiteral(
+               "%1\n"
+               "%2 -> %3\n"
+               "Speed: %4 km/h\n"
+               "Distance: %5 / %6 km\n"
+               "Progress: %7%")
+        .arg(engine.getModelName())
+        .arg(stations.first().getName())
+        .arg(stations.last().getName())
+        .arg(engine.getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
+        .arg(travelledDistance, 0, 'f', 2)
+        .arg(totalDistance, 0, 'f', 2)
+        .arg(progress, 0, 'f', 1);
+}
+
+bool EngineWidget::setPosition(Position &position)
 {
     const Route *trajectory = engine.getTrajectory();
     if (trajectory != nullptr)

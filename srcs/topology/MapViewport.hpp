@@ -7,7 +7,6 @@ class MapViewport
 {
 public:
     explicit MapViewport(const Topology &topology);
-
     QPointF mapPosition(double latitude, double longitude) const;
 
 private:

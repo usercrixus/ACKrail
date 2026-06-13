@@ -2,26 +2,19 @@
 
 #include "TrafficGenerator.hpp"
 #include "TrafficManager.hpp"
-#include <QElapsedTimer>
-#include <QObject>
-#include <QTimer>
+#include <thread>
 
-class TrafficSimulator : public QObject
+class TrafficSimulator
 {
-    Q_OBJECT
-
 public:
-    TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, QObject *parent = nullptr);
+    TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator);
+    ~TrafficSimulator();
     void start();
     void stop();
 
-signals:
-    void advanced();
-
 private:
-    void advance();
+    void run(std::stop_token stopToken);
     TrafficManager &trafficManager;
     TrafficGenerator &trafficGenerator;
-    QTimer timer;
-    QElapsedTimer clock;
+    std::jthread workerThread;
 };

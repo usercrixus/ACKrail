@@ -1,38 +1,51 @@
 #include "TrafficSimulator.hpp"
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, QObject *parent)
-    : QObject(parent),
-      trafficManager(trafficManager),
+#include <chrono>
+
+TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator)
+    : trafficManager(trafficManager),
       trafficGenerator(trafficGenerator)
 {
-    timer.setInterval(16);
-    timer.setTimerType(Qt::PreciseTimer);
-    connect(&timer, &QTimer::timeout, this, &TrafficSimulator::advance);
+}
+
+TrafficSimulator::~TrafficSimulator()
+{
+    stop();
 }
 
 void TrafficSimulator::start()
 {
-    if (!timer.isActive())
+    if (!workerThread.joinable())
     {
-        clock.start();
-        timer.start();
+        workerThread = std::jthread([this](std::stop_token stopToken)
+                                    { run(stopToken); });
     }
 }
 
 void TrafficSimulator::stop()
 {
-    timer.stop();
-    clock.invalidate();
+    if (workerThread.joinable())
+    {
+        workerThread.request_stop();
+        workerThread.join();
+    }
 }
 
-void TrafficSimulator::advance()
+void TrafficSimulator::run(std::stop_token stopToken)
 {
-    const qint64 elapsedMilliseconds = clock.restart();
-    if (elapsedMilliseconds > 0)
+    using Clock = std::chrono::steady_clock;
+    constexpr auto TickInterval = std::chrono::milliseconds(16);
+    auto previousTick = Clock::now();
+    auto nextTick = previousTick + TickInterval;
+
+    while (!stopToken.stop_requested())
     {
-        const double elapsedSeconds = static_cast<double>(elapsedMilliseconds) / 1000.0;
+        std::this_thread::sleep_until(nextTick);
+        const auto currentTick = Clock::now();
+        const double elapsedSeconds = std::chrono::duration<double>(currentTick - previousTick).count();
+        previousTick = currentTick;
+        nextTick = currentTick + TickInterval;
         trafficManager.advance(elapsedSeconds);
         trafficGenerator.tryGenerate(elapsedSeconds);
-        emit advanced();
     }
 }

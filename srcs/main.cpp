@@ -6,6 +6,7 @@
 #include "topology/TopologyWidget.hpp"
 
 #include <QApplication>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -20,11 +21,15 @@ int main(int argc, char *argv[])
     TrafficManager trafficManager(garage);
     TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);
     TopologyWidget window(topology, garage);
-    QObject::connect(&trafficSimulator, &TrafficSimulator::advanced, &window, [&window]()
-                     { window.refresh(); });
+    QTimer renderTimer;
+    renderTimer.setInterval(33);
+    QObject::connect(&renderTimer, &QTimer::timeout, &window, &TopologyWidget::refresh);
     window.resize(1100, 720);
     window.show();
     trafficSimulator.start();
+    renderTimer.start();
 
-    return app.exec();
+    const int result = app.exec();
+    trafficSimulator.stop();
+    return result;
 }
