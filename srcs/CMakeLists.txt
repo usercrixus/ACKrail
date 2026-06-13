@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.4 REQUIRED COMPONENTS OpenGL OpenGLWidgets Widgets)
 find_package(Boost REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.4)
@@ -46,16 +46,18 @@ qt_add_executable(ackrail
     topology/Topology.hpp
     topology/TopologyWidget.cpp
     topology/TopologyWidget.hpp
-    topology/widgets/EngineWidget.cpp
-    topology/widgets/EngineWidget.hpp
     topology/widgets/HeaderWidget.cpp
     topology/widgets/HeaderWidget.hpp
-    topology/widgets/LinkWidget.cpp
-    topology/widgets/LinkWidget.hpp
+    topology/widgets/EngineRenderer.cpp
+    topology/widgets/EngineRenderer.hpp
+    topology/widgets/LinkRenderer.cpp
+    topology/widgets/LinkRenderer.hpp
+    topology/widgets/MapCamera.cpp
+    topology/widgets/MapCamera.hpp
     topology/widgets/MapWidget.cpp
     topology/widgets/MapWidget.hpp
-    topology/widgets/NodeWidget.cpp
-    topology/widgets/NodeWidget.hpp
+    topology/widgets/NodeRenderer.cpp
+    topology/widgets/NodeRenderer.hpp
 )
 
 set_source_files_properties(map/paris_metro.json PROPERTIES
@@ -68,8 +70,22 @@ qt_add_resources(ackrail "maps"
         map/paris_metro.json
 )
 
+qt_add_resources(ackrail "shaders"
+    PREFIX "/shaders"
+    BASE topology/shaders
+    FILES
+        topology/shaders/engine.frag
+        topology/shaders/engine.vert
+        topology/shaders/link.frag
+        topology/shaders/link.vert
+        topology/shaders/node.frag
+        topology/shaders/node.vert
+)
+
 target_link_libraries(ackrail PRIVATE
     Boost::headers
+    Qt6::OpenGL
+    Qt6::OpenGLWidgets
     Qt6::Widgets
 )
 

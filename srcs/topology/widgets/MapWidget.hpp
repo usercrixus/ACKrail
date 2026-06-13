@@ -1,40 +1,43 @@
 #pragma once
 
+#include "EngineRenderer.hpp"
+#include "LinkRenderer.hpp"
+#include "MapCamera.hpp"
+#include "NodeRenderer.hpp"
 #include "../../garage/Garage.hpp"
 #include "../MapViewport.hpp"
 #include "../Topology.hpp"
-#include "EngineWidget.hpp"
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QMouseEvent>
-#include <QResizeEvent>
+#include <QOpenGLExtraFunctions>
+#include <QOpenGLWidget>
 #include <QWheelEvent>
-#include <vector>
 
-class MapWidget : public QGraphicsView
+class MapWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 public:
     explicit MapWidget(const Topology &topology, const Garage &garage, QWidget *parent = nullptr);
     void refresh();
 
 protected:
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int width, int height) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private:
-    static constexpr double SceneMargin = 250.0;
-    void createScene();
-    void fitScene();
+    void drawOverlay();
+
     const Topology &topology;
-    const Garage &garage;
     MapViewport mapViewport;
-    QGraphicsScene graphicsScene;
-    std::vector<EngineWidget *> engineWidgets;
+    MapCamera camera;
+    LinkRenderer linkRenderer;
+    NodeRenderer nodeRenderer;
+    EngineRenderer engineRenderer;
     QPoint mousePressPosition;
-    bool hasFittedScene = false;
+    QPoint lastMousePosition;
     bool isLeftButtonPressed = false;
     bool isDragging = false;
 };

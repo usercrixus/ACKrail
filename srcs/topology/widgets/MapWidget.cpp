@@ -1,32 +1,57 @@
 #include "MapWidget.hpp"
-#include "LinkWidget.hpp"
-#include "NodeWidget.hpp"
 
-#include <QColor>
 #include <QGuiApplication>
-#include <QGraphicsTextItem>
 #include <QPainter>
 #include <QStyleHints>
 
 MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *parent)
-    : QGraphicsView(parent),
+    : QOpenGLWidget(parent),
       topology(topology),
-      garage(garage),
-      mapViewport(topology)
+      mapViewport(topology),
+      camera(topology, mapViewport),
+      linkRenderer(topology, mapViewport),
+      nodeRenderer(topology, mapViewport),
+      engineRenderer(garage, mapViewport)
 {
-    setScene(&graphicsScene);
-    setBackgroundBrush(QColor(QStringLiteral("#0b1118")));
-    setRenderHint(QPainter::Antialiasing);
-    setDragMode(QGraphicsView::ScrollHandDrag);
-    viewport()->setCursor(Qt::ArrowCursor);
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    setResizeAnchor(QGraphicsView::AnchorViewCenter);
-    setFrameShape(QFrame::NoFrame);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-    graphicsScene.setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-    createScene();
+    setMouseTracking(true);
+    setCursor(Qt::ArrowCursor);
+}
+
+void MapWidget::refresh()
+{
+    engineRenderer.refresh();
+    update();
+}
+
+void MapWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+    glClearColor(0.043f, 0.067f, 0.094f, 1.0f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    linkRenderer.initialize();
+    nodeRenderer.initialize();
+    engineRenderer.initialize();
+}
+
+void MapWidget::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (topology.getError().isEmpty())
+    {
+        const QMatrix4x4 matrix = camera.matrix();
+        linkRenderer.draw(matrix, size());
+        nodeRenderer.draw(matrix);
+        engineRenderer.draw(matrix, size());
+    }
+    drawOverlay();
+}
+
+void MapWidget::resizeGL(int width, int height)
+{
+    camera.resize(width, height);
 }
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
@@ -36,110 +61,76 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
         isLeftButtonPressed = true;
         isDragging = false;
         mousePressPosition = event->position().toPoint();
+        lastMousePosition = mousePressPosition;
+        event->accept();
+        return;
     }
-    QGraphicsView::mousePressEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
+    QOpenGLWidget::mousePressEvent(event);
 }
 
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (isLeftButtonPressed && !isDragging)
+    if (!isLeftButtonPressed)
+    {
+        QOpenGLWidget::mouseMoveEvent(event);
+    }
+    else
     {
         const QPoint currentPosition = event->position().toPoint();
-        if ((currentPosition - mousePressPosition).manhattanLength() >= QGuiApplication::styleHints()->startDragDistance())
+        if (!isDragging && (currentPosition - mousePressPosition).manhattanLength() >= QGuiApplication::styleHints()->startDragDistance())
+        {
             isDragging = true;
+            setCursor(Qt::ClosedHandCursor);
+        }
+        if (isDragging)
+        {
+            camera.pan(currentPosition - lastMousePosition);
+            update();
+        }
+        lastMousePosition = currentPosition;
+        event->accept();
     }
-    QGraphicsView::mouseMoveEvent(event);
-    viewport()->setCursor(
-        isDragging ? Qt::ClosedHandCursor : Qt::ArrowCursor);
 }
 
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    QGraphicsView::mouseReleaseEvent(event);
     if (event->button() == Qt::LeftButton && isLeftButtonPressed)
     {
         if (!isDragging)
-        {
-            graphicsScene.clearSelection();
-            if (auto *engineWidget = dynamic_cast<EngineWidget *>(itemAt(event->position().toPoint())))
-            {
-                engineWidget->setSelected(true);
-            }
-        }
+            engineRenderer.selectAt(event->position(), camera);
         isLeftButtonPressed = false;
         isDragging = false;
+        setCursor(Qt::ArrowCursor);
+        update();
+        event->accept();
+        return;
     }
-    viewport()->setCursor(Qt::ArrowCursor);
+    QOpenGLWidget::mouseReleaseEvent(event);
 }
 
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
     const int verticalDelta = event->angleDelta().y();
-    if (verticalDelta == 0)
+    if (verticalDelta != 0)
     {
-        event->accept();
-        return;
+        camera.zoomAt(
+            event->position(),
+            verticalDelta > 0 ? 1.2 : 1.0 / 1.2);
+        update();
     }
-
-    const double factor = verticalDelta > 0 ? 1.2 : 1.0 / 1.2;
-    scale(factor, factor);
-    viewport()->update();
     event->accept();
 }
 
-void MapWidget::resizeEvent(QResizeEvent *event)
+void MapWidget::drawOverlay()
 {
-    QGraphicsView::resizeEvent(event);
-    if (!hasFittedScene)
-    {
-        fitScene();
-        hasFittedScene = true;
-    }
-}
-
-void MapWidget::refresh()
-{
-    for (EngineWidget *engineWidget : engineWidgets)
-        engineWidget->updatePosition();
-}
-
-void MapWidget::createScene()
-{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
     if (!topology.getError().isEmpty())
     {
-        QGraphicsTextItem *errorItem =
-            graphicsScene.addText(topology.getError());
-        errorItem->setDefaultTextColor(
-            QColor(QStringLiteral("#ff8f8f")));
-        graphicsScene.setSceneRect(errorItem->boundingRect());
+        painter.setPen(QColor(QStringLiteral("#ff8f8f")));
+        painter.drawText(rect(), Qt::AlignCenter, topology.getError());
         return;
     }
-
-    for (const Link &link : topology.getLinks())
-        graphicsScene.addItem(new LinkWidget(link, mapViewport));
-
-    for (const Node &node : topology.getNodes())
-        graphicsScene.addItem(new NodeWidget(node, mapViewport));
-
-    engineWidgets.reserve(garage.getEngines().size());
-    for (const Engine &engine : garage.getEngines())
-    {
-        auto *engineWidget = new EngineWidget(engine, mapViewport);
-        engineWidgets.push_back(engineWidget);
-        graphicsScene.addItem(engineWidget);
-    }
-
-    graphicsScene.setSceneRect(
-        graphicsScene.itemsBoundingRect().adjusted(
-            -SceneMargin,
-            -SceneMargin,
-            SceneMargin,
-            SceneMargin));
-}
-
-void MapWidget::fitScene()
-{
-    if (!graphicsScene.sceneRect().isEmpty())
-        fitInView(graphicsScene.itemsBoundingRect(), Qt::KeepAspectRatio);
+    nodeRenderer.drawLabels(painter, camera);
+    engineRenderer.drawInformation(painter, camera);
 }
