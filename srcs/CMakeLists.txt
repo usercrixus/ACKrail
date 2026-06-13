@@ -42,6 +42,14 @@ qt_add_executable(ackrail
     topology/Topology.hpp
     topology/TopologyWidget.cpp
     topology/TopologyWidget.hpp
+    topology/widgets/EngineWidget.cpp
+    topology/widgets/EngineWidget.hpp
+    topology/widgets/HeaderWidget.cpp
+    topology/widgets/HeaderWidget.hpp
+    topology/widgets/LinkWidget.cpp
+    topology/widgets/LinkWidget.hpp
+    topology/widgets/NodeWidget.cpp
+    topology/widgets/NodeWidget.hpp
 )
 
 set_source_files_properties(map/paris_metro.json PROPERTIES
