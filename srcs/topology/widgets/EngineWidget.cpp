@@ -16,6 +16,7 @@ EngineWidget::EngineWidget(const Engine &engine, const MapViewport &viewport)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations);
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setAcceptedMouseButtons(Qt::NoButton);
     setZValue(NormalZValue);
     updatePosition();
 }
