@@ -3,6 +3,7 @@
 #include "NodeWidget.hpp"
 
 #include <QColor>
+#include <QEasingCurve>
 #include <QGuiApplication>
 #include <QGraphicsTextItem>
 #include <QPainter>
@@ -21,10 +22,22 @@ MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *pa
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::ScrollHandDrag);
     viewport()->setCursor(Qt::ArrowCursor);
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
     setFrameShape(QFrame::NoFrame);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     graphicsScene.setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+    zoomAnimation.setDuration(500);
+    zoomAnimation.setEasingCurve(QEasingCurve::OutCubic);
+    connect(
+        &zoomAnimation,
+        &QVariantAnimation::valueChanged,
+        this,
+        [this](const QVariant &value)
+        {
+            setAnimatedZoom(value.toDouble());
+        });
     createScene();
 }
 
@@ -98,15 +111,32 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     const double step = event->pixelDelta().isNull()
         ? scrollDelta.y() / 120.0
         : scrollDelta.y() / 40.0;
-    const double requestedZoom =
-        std::clamp(
-            zoomFactor * std::pow(1.2, step),
-            MinimumZoom,
-            MaximumZoom);
-    const double factor = requestedZoom / zoomFactor;
-    zoomFactor = requestedZoom;
-    scale(factor, factor);
+    targetZoom = std::clamp(
+        targetZoom * std::pow(1.2, step),
+        MinimumZoom,
+        MaximumZoom);
+    zoomAnchorPosition = event->position().toPoint();
+    zoomAnchorScenePosition = mapToScene(zoomAnchorPosition);
+
+    zoomAnimation.stop();
+    zoomAnimation.setStartValue(zoomFactor);
+    zoomAnimation.setEndValue(targetZoom);
+    zoomAnimation.start();
     event->accept();
+}
+
+void MapWidget::setAnimatedZoom(double zoom)
+{
+    if (zoom == zoomFactor)
+        return;
+
+    const double factor = zoom / zoomFactor;
+    zoomFactor = zoom;
+    scale(factor, factor);
+
+    const QPointF shiftedAnchor = mapToScene(zoomAnchorPosition);
+    const QPointF correction = shiftedAnchor - zoomAnchorScenePosition;
+    translate(correction.x(), correction.y());
 }
 
 void MapWidget::createScene()

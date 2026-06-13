@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QResizeEvent>
+#include <QVariantAnimation>
 #include <QWheelEvent>
 #include <vector>
 
@@ -35,13 +36,18 @@ private:
 
     void createScene();
     void fitScene();
+    void setAnimatedZoom(double zoom);
 
     const Topology &topology;
     const Garage &garage;
     MapViewport mapViewport;
     QGraphicsScene graphicsScene;
     std::vector<EngineWidget *> engineWidgets;
+    QVariantAnimation zoomAnimation;
     double zoomFactor = 1.0;
+    double targetZoom = 1.0;
+    QPoint zoomAnchorPosition;
+    QPointF zoomAnchorScenePosition;
     QPoint mousePressPosition;
     bool hasFittedScene = false;
     bool isLeftButtonPressed = false;
