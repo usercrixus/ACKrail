@@ -34,8 +34,12 @@ qt_add_executable(ackrail
     simulator/TrafficGenerator.hpp
     simulator/TrafficManager.cpp
     simulator/TrafficManager.hpp
+    simulator/TrafficSimulator.cpp
+    simulator/TrafficSimulator.hpp
     topology/Link.cpp
     topology/Link.hpp
+    topology/MapViewport.cpp
+    topology/MapViewport.hpp
     topology/Node.cpp
     topology/Node.hpp
     topology/Topology.cpp
@@ -48,6 +52,8 @@ qt_add_executable(ackrail
     topology/widgets/HeaderWidget.hpp
     topology/widgets/LinkWidget.cpp
     topology/widgets/LinkWidget.hpp
+    topology/widgets/MapWidget.cpp
+    topology/widgets/MapWidget.hpp
     topology/widgets/NodeWidget.cpp
     topology/widgets/NodeWidget.hpp
 )

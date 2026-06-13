@@ -1,12 +1,21 @@
 #pragma once
 
-class Garage;
-class QPainter;
-class Topology;
+#include "../../garage/Garage.hpp"
+#include "../Topology.hpp"
+#include <QWidget>
 
-class HeaderWidget
+class QPaintEvent;
+
+class HeaderWidget : public QWidget
 {
 public:
-    static const double Height;
-    static void draw(QPainter &painter, const Topology &topology, const Garage &garage, double width);
+    explicit HeaderWidget(const Topology &topology, const Garage &garage, QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    static constexpr int Height = 64;
+    const Topology &topology;
+    const Garage &garage;
 };

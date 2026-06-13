@@ -1,5 +1,6 @@
 #include "EngineWidget.hpp"
 #include "../../garage/Garage.hpp"
+#include "../MapViewport.hpp"
 
 #include <QColor>
 #include <QFont>
@@ -15,29 +16,29 @@ EngineWidget::EngineWidget(const Engine &engine)
 {
 }
 
-void EngineWidget::drawAll(QPainter &painter, const Garage &garage, const Engine *selectedEngine, const std::function<QPointF(double, double)> &mapPosition)
+void EngineWidget::drawAll(QPainter &painter, const Garage &garage, const Engine *selectedEngine, const MapViewport &viewport)
 {
     for (const Engine &engine : garage.getEngines())
     {
         if (engine.isActive())
-            EngineWidget(engine).draw(painter, mapPosition);
+            EngineWidget(engine).draw(painter, viewport);
     }
     if (selectedEngine != nullptr && selectedEngine->isActive())
     {
         QPointF position;
         const EngineWidget engineWidget(*selectedEngine);
-        if (engineWidget.getScreenPosition(mapPosition, position))
+        if (engineWidget.setScreenPosition(viewport, position))
             engineWidget.drawInformation(painter, position);
     }
 }
 
-void EngineWidget::draw(QPainter &painter, const std::function<QPointF(double, double)> &mapPosition) const
+void EngineWidget::draw(QPainter &painter, const MapViewport &viewport) const
 {
     Position routePosition;
     if (setPosition(routePosition))
     {
-        const QPointF start = mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
-        const QPointF end = mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
+        const QPointF start = viewport.mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
+        const QPointF end = viewport.mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
         const QPointF position = start + (end - start) * routePosition.linkProgress;
         const double angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
         painter.save();
@@ -91,13 +92,13 @@ void EngineWidget::drawInformation(QPainter &painter, const QPointF &enginePosit
     }
 }
 
-bool EngineWidget::getScreenPosition(const std::function<QPointF(double, double)> &mapPosition, QPointF &position) const
+bool EngineWidget::setScreenPosition(const MapViewport &viewport, QPointF &position) const
 {
     Position routePosition;
     if (setPosition(routePosition))
     {
-        const QPointF start = mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
-        const QPointF end = mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
+        const QPointF start = viewport.mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
+        const QPointF end = viewport.mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
         position = start + (end - start) * routePosition.linkProgress;
         return true;
     }

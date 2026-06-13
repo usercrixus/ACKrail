@@ -1,4 +1,5 @@
 #include "NodeWidget.hpp"
+#include "../MapViewport.hpp"
 
 #include <QColor>
 #include <QFont>
@@ -10,15 +11,15 @@ NodeWidget::NodeWidget(const Node &node)
 {
 }
 
-void NodeWidget::drawAll(QPainter &painter, const QVector<Node> &nodes, const std::function<QPointF(double, double)> &mapPosition)
+void NodeWidget::drawAll(QPainter &painter, const QVector<Node> &nodes, const MapViewport &viewport)
 {
     for (const Node &node : nodes)
-        NodeWidget(node).draw(painter, mapPosition);
+        NodeWidget(node).draw(painter, viewport);
 }
 
-void NodeWidget::draw(QPainter &painter, const std::function<QPointF(double, double)> &mapPosition) const
+void NodeWidget::draw(QPainter &painter, const MapViewport &viewport) const
 {
-    const QPointF position = mapPosition(node.getLatitude(), node.getLongitude());
+    const QPointF position = viewport.mapPosition(node.getLatitude(), node.getLongitude());
     painter.setPen(QPen(QColor(QStringLiteral("#f4f7f9")), 3));
     painter.setBrush(QColor(QStringLiteral("#101a24")));
     painter.drawEllipse(position, 7, 7);

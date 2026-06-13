@@ -1,18 +1,17 @@
 #pragma once
 
 #include "../Node.hpp"
-#include <QPointF>
 #include <QVector>
-#include <functional>
 
+class MapViewport;
 class QPainter;
 
 class NodeWidget
 {
 public:
     NodeWidget(const Node &node);
-    static void drawAll(QPainter &painter, const QVector<Node> &nodes, const std::function<QPointF(double, double)> &mapPosition);
-    void draw(QPainter &painter, const std::function<QPointF(double, double)> &mapPosition) const;
+    static void drawAll(QPainter &painter, const QVector<Node> &nodes, const MapViewport &viewport);
+    void draw(QPainter &painter, const MapViewport &viewport) const;
 
 private:
     const Node &node;

@@ -1,6 +1,7 @@
 #include "garage/Garage.hpp"
 #include "simulator/TrafficGenerator.hpp"
 #include "simulator/TrafficManager.hpp"
+#include "simulator/TrafficSimulator.hpp"
 #include "topology/Topology.hpp"
 #include "topology/TopologyWidget.hpp"
 
@@ -11,17 +12,19 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     Topology topology;
-    const QString topologyFile = argc > 1
-        ? QString::fromLocal8Bit(argv[1])
-        : QStringLiteral(":/map/paris_metro.json");
+    const QString topologyFile = argc > 1 ? QString::fromLocal8Bit(argv[1]) : QStringLiteral(":/map/paris_metro.json");
     topology.load(topologyFile);
 
     Garage garage(1000);
     TrafficGenerator trafficGenerator(topology, garage);
     TrafficManager trafficManager(garage);
-    TopologyWidget window(topology, garage, trafficManager, trafficGenerator);
+    TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);
+    TopologyWidget window(topology, garage);
+    QObject::connect(&trafficSimulator, &TrafficSimulator::advanced, &window, [&window]()
+                     { window.refresh(); });
     window.resize(1100, 720);
     window.show();
+    trafficSimulator.start();
 
     return app.exec();
 }

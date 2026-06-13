@@ -1,20 +1,19 @@
 #pragma once
 
+#include "../../garage/Garage.hpp"
 #include "../../garage/engine/Engine.hpp"
+#include "../MapViewport.hpp"
+#include <QPainter>
 #include <QPointF>
-#include <functional>
-
-class QPainter;
-class Garage;
 
 class EngineWidget
 {
 public:
     EngineWidget(const Engine &engine);
-    static void drawAll(QPainter &painter, const Garage &garage, const Engine *selectedEngine, const std::function<QPointF(double, double)> &mapPosition);
-    void draw(QPainter &painter, const std::function<QPointF(double, double)> &mapPosition) const;
+    void draw(QPainter &painter, const MapViewport &viewport) const;
     void drawInformation(QPainter &painter, const QPointF &enginePosition) const;
-    bool getScreenPosition(const std::function<QPointF(double, double)> &mapPosition, QPointF &position) const;
+    bool setScreenPosition(const MapViewport &viewport, QPointF &position) const;
+    static void drawAll(QPainter &painter, const Garage &garage, const Engine *selectedEngine, const MapViewport &viewport);
 
 private:
     struct Position
