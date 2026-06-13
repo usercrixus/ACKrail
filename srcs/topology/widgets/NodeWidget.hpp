@@ -1,17 +1,15 @@
 #pragma once
 
+#include "../MapViewport.hpp"
 #include "../Node.hpp"
-#include <QVector>
+#include <QGraphicsItem>
 
-class MapViewport;
-class QPainter;
-
-class NodeWidget
+class NodeWidget : public QGraphicsItem
 {
 public:
-    NodeWidget(const Node &node);
-    static void drawAll(QPainter &painter, const QVector<Node> &nodes, const MapViewport &viewport);
-    void draw(QPainter &painter, const MapViewport &viewport) const;
+    NodeWidget(const Node &node, const MapViewport &viewport);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     const Node &node;

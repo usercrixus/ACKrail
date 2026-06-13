@@ -1,29 +1,30 @@
 #include "NodeWidget.hpp"
-#include "../MapViewport.hpp"
 
 #include <QColor>
 #include <QFont>
 #include <QPainter>
 #include <QPen>
 
-NodeWidget::NodeWidget(const Node &node)
+NodeWidget::NodeWidget(const Node &node, const MapViewport &viewport)
     : node(node)
 {
+    setPos(viewport.mapPosition(node.getLatitude(), node.getLongitude()));
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    setZValue(1);
 }
 
-void NodeWidget::drawAll(QPainter &painter, const QVector<Node> &nodes, const MapViewport &viewport)
+QRectF NodeWidget::boundingRect() const
 {
-    for (const Node &node : nodes)
-        NodeWidget(node).draw(painter, viewport);
+    return QRectF(-9, -9, 220, 22);
 }
 
-void NodeWidget::draw(QPainter &painter, const MapViewport &viewport) const
+void NodeWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    const QPointF position = viewport.mapPosition(node.getLatitude(), node.getLongitude());
-    painter.setPen(QPen(QColor(QStringLiteral("#f4f7f9")), 3));
-    painter.setBrush(QColor(QStringLiteral("#101a24")));
-    painter.drawEllipse(position, 7, 7);
-    painter.setPen(QColor(QStringLiteral("#dce6ed")));
-    painter.setFont(QFont(QStringLiteral("Sans Serif"), 8));
-    painter.drawText(position + QPointF(11, 4), node.getName());
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(QColor(QStringLiteral("#f4f7f9")), 3));
+    painter->setBrush(QColor(QStringLiteral("#101a24")));
+    painter->drawEllipse(QPointF(0, 0), 7, 7);
+    painter->setPen(QColor(QStringLiteral("#dce6ed")));
+    painter->setFont(QFont(QStringLiteral("Sans Serif"), 8));
+    painter->drawText(QPointF(11, 4), node.getName());
 }

@@ -1,60 +1,88 @@
 #include "EngineWidget.hpp"
-#include "../../garage/Garage.hpp"
-#include "../MapViewport.hpp"
 
 #include <QColor>
 #include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPen>
 #include <algorithm>
 #include <cmath>
 #include <numbers>
 
-EngineWidget::EngineWidget(const Engine &engine)
-    : engine(engine)
+EngineWidget::EngineWidget(const Engine &engine, const MapViewport &viewport)
+    : engine(engine),
+      viewport(viewport)
 {
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setZValue(NormalZValue);
+    updatePosition();
 }
 
-void EngineWidget::drawAll(QPainter &painter, const Garage &garage, const Engine *selectedEngine, const MapViewport &viewport)
+QRectF EngineWidget::boundingRect() const
 {
-    for (const Engine &engine : garage.getEngines())
-    {
-        if (engine.isActive())
-            EngineWidget(engine).draw(painter, viewport);
-    }
-    if (selectedEngine != nullptr && selectedEngine->isActive())
-    {
-        QPointF position;
-        const EngineWidget engineWidget(*selectedEngine);
-        if (engineWidget.setScreenPosition(viewport, position))
-            engineWidget.drawInformation(painter, position);
-    }
+    return isSelected() ? QRectF(-14, -170, 300, 190) : QRectF(-14, -9, 28, 18);
 }
 
-void EngineWidget::draw(QPainter &painter, const MapViewport &viewport) const
+QPainterPath EngineWidget::shape() const
+{
+    QPainterPath path;
+    path.addRoundedRect(QRectF(-14, -9, 28, 18), 5, 5);
+    return path;
+}
+
+void EngineWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    painter->setRenderHint(QPainter::Antialiasing);
+    drawEngine(*painter);
+    if (isSelected())
+        drawInformation(*painter);
+}
+
+void EngineWidget::updatePosition()
 {
     Position routePosition;
-    if (setPosition(routePosition))
+    if (!setPosition(routePosition))
+    {
+        setVisible(false);
+        setSelected(false);
+    }
+    else
     {
         const QPointF start = viewport.mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
         const QPointF end = viewport.mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
-        const QPointF position = start + (end - start) * routePosition.linkProgress;
-        const double angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
-        painter.save();
-        painter.translate(position);
-        painter.rotate(angleDegrees);
-        painter.setPen(QPen(QColor(QStringLiteral("#ffffff")), 2));
-        painter.setBrush(QColor(QStringLiteral("#ff5c35")));
-        painter.drawRoundedRect(QRectF(-11, -6, 22, 12), 5, 5);
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(QColor(QStringLiteral("#8fe3ff")));
-        painter.drawRoundedRect(QRectF(1, -3.5, 6, 7), 2, 2);
-        painter.restore();
+        angleDegrees = std::atan2(end.y() - start.y(), end.x() - start.x()) * 180.0 / std::numbers::pi;
+        setPos(start + (end - start) * routePosition.linkProgress);
+        setVisible(true);
+        update();
     }
 }
 
-void EngineWidget::drawInformation(QPainter &painter, const QPointF &enginePosition) const
+QVariant EngineWidget::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemSelectedChange)
+    {
+        prepareGeometryChange();
+        setZValue(value.toBool() ? SelectedZValue : NormalZValue);
+    }
+    return QGraphicsItem::itemChange(change, value);
+}
+
+void EngineWidget::drawEngine(QPainter &painter) const
+{
+    painter.save();
+    painter.rotate(angleDegrees);
+    painter.setPen(QPen(QColor(QStringLiteral("#ffffff")), 2));
+    painter.setBrush(QColor(QStringLiteral("#ff5c35")));
+    painter.drawRoundedRect(QRectF(-11, -6, 22, 12), 5, 5);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(QStringLiteral("#8fe3ff")));
+    painter.drawRoundedRect(QRectF(1, -3.5, 6, 7), 2, 2);
+    painter.restore();
+}
+
+void EngineWidget::drawInformation(QPainter &painter) const
 {
     const Route *route = engine.getTrajectory();
     if (route != nullptr && !route->getStations().isEmpty())
@@ -80,7 +108,7 @@ void EngineWidget::drawInformation(QPainter &painter, const QPointF &enginePosit
         const QFontMetrics metrics(font);
         QRectF panel = metrics.boundingRect(QRect(0, 0, 280, 200), Qt::AlignLeft | Qt::AlignTop, information);
         panel.adjust(-10, -8, 10, 8);
-        panel.moveTopLeft(enginePosition + QPointF(16, -panel.height() - 12));
+        panel.moveTopLeft(QPointF(16, -panel.height() - 12));
         painter.save();
         painter.setFont(font);
         painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
@@ -90,19 +118,6 @@ void EngineWidget::drawInformation(QPainter &painter, const QPointF &enginePosit
         painter.drawText(panel.adjusted(10, 8, -10, -8), Qt::AlignLeft | Qt::AlignTop, information);
         painter.restore();
     }
-}
-
-bool EngineWidget::setScreenPosition(const MapViewport &viewport, QPointF &position) const
-{
-    Position routePosition;
-    if (setPosition(routePosition))
-    {
-        const QPointF start = viewport.mapPosition(routePosition.fromNode->getLatitude(), routePosition.fromNode->getLongitude());
-        const QPointF end = viewport.mapPosition(routePosition.toNode->getLatitude(), routePosition.toNode->getLongitude());
-        position = start + (end - start) * routePosition.linkProgress;
-        return true;
-    }
-    return false;
 }
 
 bool EngineWidget::setPosition(Position &position) const

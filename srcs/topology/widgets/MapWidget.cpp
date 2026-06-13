@@ -1,146 +1,150 @@
 #include "MapWidget.hpp"
-#include "../MapViewport.hpp"
-#include "EngineWidget.hpp"
 #include "LinkWidget.hpp"
 #include "NodeWidget.hpp"
 
 #include <QColor>
 #include <QGuiApplication>
-#include <QMouseEvent>
+#include <QGraphicsTextItem>
 #include <QPainter>
-#include <QPaintEvent>
 #include <QStyleHints>
-#include <QWheelEvent>
 #include <algorithm>
 #include <cmath>
 
 MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *parent)
-    : QWidget(parent),
+    : QGraphicsView(parent),
       topology(topology),
-      garage(garage)
+      garage(garage),
+      mapViewport(topology)
 {
-}
-
-void MapWidget::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(rect(), QColor(QStringLiteral("#0b1118")));
-    if (!topology.getError().isEmpty())
-    {
-        painter.setPen(QColor(QStringLiteral("#ff8f8f")));
-        painter.drawText(rect(), Qt::AlignCenter, topology.getError());
-    }
-    else
-        drawMap(painter);
-}
-
-void MapWidget::drawMap(QPainter &painter) const
-{
-    const MapViewport viewport(topology, width(), height(), Margin, zoomFactor, panOffset);
-    LinkWidget::drawAll(painter, topology.getLinks(), viewport);
-    NodeWidget::drawAll(painter, topology.getNodes(), viewport);
-    EngineWidget::drawAll(painter, garage, selectedEngine, viewport);
-}
-
-const Engine *MapWidget::findEngineAt(const QPointF &position) const
-{
-    const Engine *closestEngine = nullptr;
-    double closestDistance = SelectionRadius;
-    const MapViewport viewport(topology, width(), height(), Margin, zoomFactor, panOffset);
-    for (const Engine &engine : garage.getEngines())
-    {
-        if (engine.isActive())
-        {
-            QPointF enginePosition;
-            if (EngineWidget(engine).setScreenPosition(viewport, enginePosition))
-            {
-                const double distance = std::hypot(position.x() - enginePosition.x(), position.y() - enginePosition.y());
-                if (distance <= closestDistance)
-                {
-                    closestDistance = distance;
-                    closestEngine = &engine;
-                }
-            }
-        }
-    }
-    return closestEngine;
+    setScene(&graphicsScene);
+    setBackgroundBrush(QColor(QStringLiteral("#0b1118")));
+    setRenderHint(QPainter::Antialiasing);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    viewport()->setCursor(Qt::ArrowCursor);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    setResizeAnchor(QGraphicsView::AnchorViewCenter);
+    setFrameShape(QFrame::NoFrame);
+    graphicsScene.setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+    createScene();
 }
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        isPanning = true;
-        hasDragged = false;
-        mousePressPosition = event->position();
-        lastMousePosition = event->position();
-        event->accept();
-        return;
+        isLeftButtonPressed = true;
+        isDragging = false;
+        mousePressPosition = event->position().toPoint();
     }
-
-    QWidget::mousePressEvent(event);
+    QGraphicsView::mousePressEvent(event);
+    viewport()->setCursor(Qt::ArrowCursor);
 }
 
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!isPanning)
+    if (isLeftButtonPressed && !isDragging)
     {
-        QWidget::mouseMoveEvent(event);
-        return;
-    }
-
-    if (!hasDragged
-        && (event->position() - mousePressPosition).manhattanLength()
+        const QPoint currentPosition = event->position().toPoint();
+        if ((currentPosition - mousePressPosition).manhattanLength()
             >= QGuiApplication::styleHints()->startDragDistance())
-    {
-        hasDragged = true;
-        setCursor(Qt::ClosedHandCursor);
+            isDragging = true;
     }
 
-    if (hasDragged)
-    {
-        panOffset += event->position() - lastMousePosition;
-        update();
-    }
-    lastMousePosition = event->position();
-    event->accept();
+    QGraphicsView::mouseMoveEvent(event);
+    viewport()->setCursor(
+        isDragging ? Qt::ClosedHandCursor : Qt::ArrowCursor);
 }
 
 void MapWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() != Qt::LeftButton || !isPanning)
+    QGraphicsView::mouseReleaseEvent(event);
+
+    if (event->button() == Qt::LeftButton && isLeftButtonPressed)
     {
-        QWidget::mouseReleaseEvent(event);
+        isLeftButtonPressed = false;
+        isDragging = false;
     }
-    else
+    viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void MapWidget::refresh()
+{
+    for (EngineWidget *engineWidget : engineWidgets)
+        engineWidget->updatePosition();
+    QGraphicsView::viewport()->update();
+}
+
+void MapWidget::resizeEvent(QResizeEvent *event)
+{
+    QGraphicsView::resizeEvent(event);
+    if (!hasFittedScene)
     {
-        isPanning = false;
-        unsetCursor();
-        if (!hasDragged)
-        {
-            selectedEngine = findEngineAt(event->position());
-            update();
-        }
-        event->accept();
+        fitScene();
+        hasFittedScene = true;
     }
 }
 
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
-    const QPoint scrollDelta = event->pixelDelta().isNull() ? event->angleDelta() : event->pixelDelta();
+    const QPoint scrollDelta = event->pixelDelta().isNull()
+        ? event->angleDelta()
+        : event->pixelDelta();
     if (scrollDelta.y() == 0)
     {
-        QWidget::wheelEvent(event);
+        QGraphicsView::wheelEvent(event);
         return;
     }
-    const double step = event->pixelDelta().isNull() ? scrollDelta.y() / 120.0 : scrollDelta.y() / 40.0;
-    const double oldZoom = zoomFactor;
-    zoomFactor = std::clamp(zoomFactor * std::pow(1.2, step), MinimumZoom, MaximumZoom);
-    const double appliedFactor = zoomFactor / oldZoom;
-    const QPointF mapCenter(width() / 2.0, height() / 2.0);
-    panOffset += (1.0 - appliedFactor) * (event->position() - mapCenter - panOffset);
-    update();
+
+    const double step = event->pixelDelta().isNull()
+        ? scrollDelta.y() / 120.0
+        : scrollDelta.y() / 40.0;
+    const double requestedZoom =
+        std::clamp(
+            zoomFactor * std::pow(1.2, step),
+            MinimumZoom,
+            MaximumZoom);
+    const double factor = requestedZoom / zoomFactor;
+    zoomFactor = requestedZoom;
+    scale(factor, factor);
     event->accept();
+}
+
+void MapWidget::createScene()
+{
+    if (!topology.getError().isEmpty())
+    {
+        QGraphicsTextItem *errorItem =
+            graphicsScene.addText(topology.getError());
+        errorItem->setDefaultTextColor(
+            QColor(QStringLiteral("#ff8f8f")));
+        graphicsScene.setSceneRect(errorItem->boundingRect());
+        return;
+    }
+
+    for (const Link &link : topology.getLinks())
+        graphicsScene.addItem(new LinkWidget(link, mapViewport));
+
+    for (const Node &node : topology.getNodes())
+        graphicsScene.addItem(new NodeWidget(node, mapViewport));
+
+    engineWidgets.reserve(garage.getEngines().size());
+    for (const Engine &engine : garage.getEngines())
+    {
+        auto *engineWidget = new EngineWidget(engine, mapViewport);
+        engineWidgets.push_back(engineWidget);
+        graphicsScene.addItem(engineWidget);
+    }
+
+    graphicsScene.setSceneRect(
+        graphicsScene.itemsBoundingRect().adjusted(
+            -SceneMargin,
+            -SceneMargin,
+            SceneMargin,
+            SceneMargin));
+}
+
+void MapWidget::fitScene()
+{
+    if (!graphicsScene.sceneRect().isEmpty())
+        fitInView(graphicsScene.sceneRect(), Qt::KeepAspectRatio);
 }
