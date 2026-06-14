@@ -16,14 +16,66 @@ Topology::Topology()
 {
 }
 
+Topology::Topology(QVector<Node> nodes, QVector<Link> links)
+    : Topology()
+{
+    this->nodes = std::move(nodes);
+    this->links = std::move(links);
+    name = QStringLiteral("Topology");
+    if (this->nodes.isEmpty())
+        return;
+
+    minimumLatitude = this->nodes.first().getLatitude();
+    maximumLatitude = minimumLatitude;
+    minimumLongitude = this->nodes.first().getLongitude();
+    maximumLongitude = minimumLongitude;
+    for (const Node &node : this->nodes)
+    {
+        minimumLatitude = qMin(minimumLatitude, node.getLatitude());
+        maximumLatitude = qMax(maximumLatitude, node.getLatitude());
+        minimumLongitude = qMin(minimumLongitude, node.getLongitude());
+        maximumLongitude = qMax(maximumLongitude, node.getLongitude());
+    }
+}
+
+QVector<Node> &Topology::getNodes()
+{
+    return nodes;
+}
+
 const QVector<Node> &Topology::getNodes() const
 {
     return nodes;
 }
 
+QVector<Link> &Topology::getLinks()
+{
+    return links;
+}
+
 const QVector<Link> &Topology::getLinks() const
 {
     return links;
+}
+
+Node *Topology::findNode(int nodeId)
+{
+    for (Node &node : nodes)
+    {
+        if (node.getId() == nodeId)
+            return &node;
+    }
+    return nullptr;
+}
+
+const Node *Topology::findNode(int nodeId) const
+{
+    for (const Node &node : nodes)
+    {
+        if (node.getId() == nodeId)
+            return &node;
+    }
+    return nullptr;
 }
 
 const QString &Topology::getName() const

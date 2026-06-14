@@ -2,7 +2,7 @@
 
 #include "engine/Biplace.hpp"
 #include <cstddef>
-#include <vector>
+#include <deque>
 
 /**
  * Owns the simulated rail-module fleet and provides access to its engines.
@@ -22,14 +22,14 @@ public:
      *
      * @return Active and idle engines owned by the garage.
      */
-    const std::vector<Biplace> &getEngines() const;
+    const std::deque<Biplace> &getEngines() const;
 
     /**
      * Returns the mutable fleet for simulation updates.
      *
      * @return Active and idle engines owned by the garage.
      */
-    std::vector<Biplace> &getEngines();
+    std::deque<Biplace> &getEngines();
 
     /**
      * Finds an engine that is not currently travelling.
@@ -46,5 +46,5 @@ public:
     std::size_t getActiveEngineCount() const;
 
 private:
-    std::vector<Biplace> engines;
+    std::deque<Biplace> engines;
 };

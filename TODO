@@ -1,0 +1,7 @@
+Entry-time windows instead of exact times.
+Contract cancellation and local replanning.
+Acceleration and braking distance.
+Station and junction capacity.
+Reservation cleanup.
+Batch optimization of multiple route requests.
+Comparison against rolling-horizon reservations.

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../algorithm/RouteFinder.hpp"
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
+#include "TrafficManager.hpp"
 #include <random>
 
 class TrafficGenerator
@@ -14,7 +14,7 @@ public:
      * @param topology Network used to generate trips and routes.
      * @param garage Garage that owns engines used for generated trips.
      */
-    TrafficGenerator(const Topology &topology, Garage &garage);
+    TrafficGenerator(const Topology &topology, Garage &garage, TrafficManager &trafficManager);
 
     /**
      * Advances the generation schedule and dispatches traffic when due.
@@ -40,7 +40,7 @@ private:
 
     const Topology &topology;
     Garage &garage;
-    RouteFinder routeFinder;
+    TrafficManager &trafficManager;
     std::mt19937 randomGenerator;
     double secondsUntilDispatch = 1.0;
 };

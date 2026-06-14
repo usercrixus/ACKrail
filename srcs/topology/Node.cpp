@@ -5,7 +5,8 @@ Node::Node(int id, QString name, double latitude, double longitude)
     : id(id),
       name(std::move(name)),
       latitude(latitude),
-      longitude(longitude)
+      longitude(longitude),
+      controller(id)
 {
 }
 
@@ -27,4 +28,14 @@ double Node::getLatitude() const
 double Node::getLongitude() const
 {
     return longitude;
+}
+
+NodeController &Node::getController()
+{
+    return controller;
+}
+
+const NodeController &Node::getController() const
+{
+    return controller;
 }

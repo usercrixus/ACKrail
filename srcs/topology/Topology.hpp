@@ -9,9 +9,14 @@ class Topology
 {
 public:
     Topology();
+    Topology(QVector<Node> nodes, QVector<Link> links);
 
+    QVector<Node> &getNodes();
     const QVector<Node> &getNodes() const;
+    QVector<Link> &getLinks();
     const QVector<Link> &getLinks() const;
+    Node *findNode(int nodeId);
+    const Node *findNode(int nodeId) const;
     const QString &getName() const;
     const QString &getError() const;
     double getMinimumLatitude() const;

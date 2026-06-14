@@ -2,6 +2,7 @@
 
 #include <QFont>
 #include <QFontMetrics>
+#include <QStringList>
 #include <QVector2D>
 #include <algorithm>
 #include <cmath>
@@ -126,9 +127,16 @@ void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera)
             {
                 const QFont font(QStringLiteral("Sans Serif"), 9);
                 const QFontMetrics metrics(font);
-                QRectF panel = metrics.boundingRect(QRect(0, 0, 280, 200), Qt::AlignLeft | Qt::AlignTop, information);
+                QRectF panel = metrics.boundingRect(
+                    QRect(0, 0, 420, camera.viewportSize().height()),
+                    Qt::AlignLeft | Qt::AlignTop,
+                    information);
                 panel.adjust(-10, -8, 10, 8);
                 panel.moveTopLeft(camera.sceneToScreen(state.position) + QPointF(16, -panel.height() - 12));
+                if (panel.right() > camera.viewportSize().width() - 8)
+                    panel.moveRight(camera.viewportSize().width() - 8);
+                if (panel.top() < 8)
+                    panel.moveTop(8);
                 painter.setFont(font);
                 painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
                 painter.setBrush(QColor(QStringLiteral("#17232f")));
@@ -165,23 +173,24 @@ void EngineRenderer::updateBuffer()
 
 bool EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
 {
-    const Route *trajectory = engine.getTrajectory();
+    const Route *trajectory = engine.getPad().getTrajectory();
     if (trajectory == nullptr)
     {
         state.active = false;
         return false;
     }
-    const double travelledDistance = engine.getAverageSpeedKilometersPerHour() * engine.getElapsedTrajectorySeconds() / 3600.0;
+    const double travelledDistance =
+        engine.getPad().getTravelledDistanceKilometers();
     double distanceBeforeLink = 0.0;
-    const QVector<const Link *> &links = trajectory->getLinks();
-    const QVector<Node> &stations = trajectory->getStations();
+    const QVector<Link *> &links = trajectory->getLinks();
+    const QVector<Node *> &stations = trajectory->getStations();
     for (qsizetype index = 0; index < links.size(); ++index)
     {
         const double linkDistance = links[index]->getDistanceKilometers();
         if (travelledDistance < distanceBeforeLink + linkDistance)
         {
-            const QPointF start = mapViewport.mapPosition(stations[index].getLatitude(), stations[index].getLongitude());
-            const QPointF end = mapViewport.mapPosition(stations[index + 1].getLatitude(), stations[index + 1].getLongitude());
+            const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
+            const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
             state.position = start + (end - start) * ((travelledDistance - distanceBeforeLink) / linkDistance);
             state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
             state.active = true;
@@ -195,23 +204,47 @@ bool EngineRenderer::calculateState(const Engine &engine, RenderState &state) co
 
 QString EngineRenderer::createInformation(const Engine &engine) const
 {
-    const Route *route = engine.getTrajectory();
+    const Route *route = engine.getPad().getTrajectory();
     if (route == nullptr || route->getStations().isEmpty())
         return {};
-    const QVector<Node> &stations = route->getStations();
+    const QVector<Node *> &stations = route->getStations();
     const double totalDistance = route->getTotalDistanceKilometers();
-    const double travelledDistance = std::clamp(engine.getAverageSpeedKilometersPerHour() * engine.getElapsedTrajectorySeconds() / 3600.0, 0.0, totalDistance);
+    const double travelledDistance = std::clamp(
+        engine.getPad().getTravelledDistanceKilometers(),
+        0.0,
+        totalDistance);
     const double progress = totalDistance > 0.0 ? travelledDistance / totalDistance * 100.0 : 0.0;
-    return QStringLiteral("%1\n"
-                          "%2 -> %3\n"
-                          "Speed: %4 km/h\n"
-                          "Distance: %5 / %6 km\n"
-                          "Progress: %7%")
+    QString information = QStringLiteral("%1\n"
+                                         "%2 -> %3\n"
+                                         "Speed: %4 km/h\n"
+                                         "Distance: %5 / %6 km\n"
+                                         "Progress: %7%")
         .arg(engine.getModelName())
-        .arg(stations.first().getName())
-        .arg(stations.last().getName())
-        .arg(engine.getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
+        .arg(stations.first()->getName())
+        .arg(stations.last()->getName())
+        .arg(engine.getPad().getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
         .arg(travelledDistance, 0, 'f', 2)
         .arg(totalDistance, 0, 'f', 2)
         .arg(progress, 0, 'f', 1);
+
+    const QVector<Link *> &links = route->getLinks();
+    const QVector<Route::ContractStep> &contract = route->getContract();
+    if (contract.size() == links.size())
+    {
+        QStringList roadmap;
+        roadmap.reserve(contract.size());
+        for (qsizetype index = 0; index < contract.size(); ++index)
+        {
+            roadmap.append(
+                QStringLiteral("%1. Wait %2 s -> Link %3: %4 -> %5 (%6 s)")
+                    .arg(index + 1)
+                    .arg(contract[index].waitSeconds, 0, 'f', 2)
+                    .arg(links[index]->getId())
+                    .arg(stations[index]->getName())
+                    .arg(stations[index + 1]->getName())
+                    .arg(contract[index].traversalSeconds, 0, 'f', 2));
+        }
+        information += QStringLiteral("\n\nRoadmap:\n") + roadmap.join(QLatin1Char('\n'));
+    }
+    return information;
 }

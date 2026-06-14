@@ -1,6 +1,8 @@
 #pragma once
 
+#include "../algorithm/Dijkstra.hpp"
 #include "../garage/Garage.hpp"
+#include "../topology/Topology.hpp"
 
 /**
  * Advances and manages engine simulation.
@@ -11,9 +13,15 @@ public:
     /**
      * Creates a traffic manager for a garage.
      *
+     * @param topology Topology whose nodes control directional link entries.
      * @param garage Garage containing the simulated engines.
      */
-    TrafficManager(Garage &garage);
+    TrafficManager(Topology &topology, Garage &garage);
+
+    /**
+     * Finds and commits the earliest-arrival route contract for an engine.
+     */
+    bool contractRoute(Biplace &engine, int fromStationId, int toStationId);
 
     /**
      * Advances active engines.
@@ -23,5 +31,10 @@ public:
     void advance(double elapsedSeconds);
 
 private:
+    double calculateEntrySeparationSeconds(const Engine &engine) const;
+
+    Topology &topology;
     Garage &garage;
+    Dijkstra dijkstra;
+    double simulationTimeSeconds = 0.0;
 };

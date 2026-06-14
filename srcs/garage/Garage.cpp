@@ -1,21 +1,18 @@
 #include "Garage.hpp"
 
-#include "engine/EngineFactory.hpp"
 #include <algorithm>
 
 Garage::Garage(std::size_t engineCount)
+    : engines(engineCount)
 {
-    engines.reserve(engineCount);
-    for (std::size_t index = 0; index < engineCount; ++index)
-        engines.push_back(EngineFactory::createBiplace());
 }
 
-const std::vector<Biplace> &Garage::getEngines() const
+const std::deque<Biplace> &Garage::getEngines() const
 {
     return engines;
 }
 
-std::vector<Biplace> &Garage::getEngines()
+std::deque<Biplace> &Garage::getEngines()
 {
     return engines;
 }
@@ -23,7 +20,7 @@ std::vector<Biplace> &Garage::getEngines()
 Biplace *Garage::getIdleEngine()
 {
     for (Biplace &engine : engines) {
-        if (!engine.isActive())
+        if (!engine.getPad().isActive())
             return &engine;
     }
     return nullptr;
@@ -33,7 +30,7 @@ std::size_t Garage::getActiveEngineCount() const
 {
     std::size_t count = 0;
     for (const Biplace &engine : engines) {
-        if (engine.isActive())
+        if (engine.getPad().isActive())
             ++count;
     }
     return count;

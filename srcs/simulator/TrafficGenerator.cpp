@@ -2,10 +2,10 @@
 
 #include <chrono>
 
-TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage)
+TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage, TrafficManager &trafficManager)
     : topology(topology),
       garage(garage),
-      routeFinder(topology),
+      trafficManager(trafficManager),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()))
 {
 }
@@ -50,11 +50,8 @@ bool TrafficGenerator::dispatchEngine(Biplace &engine)
         const Node &toStation = stations[stationDistribution(randomGenerator)];
         if (fromStation.getId() != toStation.getId())
         {
-            const auto route = routeFinder.findShortestRoute(fromStation.getId(), toStation.getId());
-            if (!route.has_value())
-                continue;
-            engine.setCurrentSpeedKilometersPerHour(engine.getMaximumSpeedKilometersPerHour());
-            return engine.startTrajectory(*route);
+            if (trafficManager.contractRoute(engine, fromStation.getId(), toStation.getId()))
+                return true;
         }
     }
     return false;

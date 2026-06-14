@@ -56,6 +56,11 @@ QPointF MapCamera::screenToScene(const QPointF &position) const
     return cameraCenter + (position - QPointF(viewportWidth / 2.0, viewportHeight / 2.0) - panOffset) / displayScale;
 }
 
+QSize MapCamera::viewportSize() const
+{
+    return QSize(viewportWidth, viewportHeight);
+}
+
 void MapCamera::updateFitScale()
 {
     if (contentBounds.isEmpty())

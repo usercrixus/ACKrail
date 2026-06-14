@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../algorithm/Route.hpp"
+#include "EnginePad.hpp"
 #include <QString>
 
 /**
@@ -18,28 +19,6 @@ public:
     virtual ~Engine();
 
     /**
-     * Checks whether the engine is currently travelling on a route.
-     *
-     * @return true when the engine has a current route segment; otherwise false.
-     */
-    bool isActive() const;
-
-    /**
-     * Starts travelling along a route.
-     *
-     * @param route Route returned by RouteFinder.
-     * @return true when the route contains a valid trajectory; otherwise false.
-     */
-    bool startTrajectory(const Route &route);
-
-    /**
-     * Moves the engine along its assigned route.
-     *
-     * @param elapsedSeconds Elapsed simulation time in seconds.
-     */
-    void advance(double elapsedSeconds);
-
-    /**
      * Returns the engine model name.
      *
      * @return Engine model name.
@@ -47,39 +26,24 @@ public:
     const QString &getModelName() const;
 
     /**
-     * Returns the maximum engine speed.
+     * Returns the physical engine length.
      *
-     * @return Maximum speed in kilometers per hour.
+     * @return Engine length in meters.
      */
-    double getMaximumSpeedKilometersPerHour() const;
+    double getLengthMeters() const;
 
     /**
-     * Returns the current engine speed.
+     * Returns the minimum empty distance required behind another engine.
      *
-     * @return Current speed in kilometers per hour.
+     * @return Security distance in meters.
      */
-    double getCurrentSpeedKilometersPerHour() const;
+    double getSecurityDistanceMeters() const;
 
-    /**
-     * Returns the elapsed time since the current trajectory started.
-     *
-     * @return Elapsed trajectory time in seconds.
-     */
-    double getElapsedTrajectorySeconds() const;
+    /** @return Mutable journey execution state. */
+    EnginePad &getPad();
 
-    /**
-     * Returns the average speed since the current trajectory started.
-     *
-     * @return Average speed in kilometers per hour.
-     */
-    double getAverageSpeedKilometersPerHour() const;
-
-    /**
-     * Returns the current trajectory.
-     *
-     * @return Active trajectory, or nullptr when the engine is idle.
-     */
-    const Route *getTrajectory() const;
+    /** @return Read-only journey execution state. */
+    const EnginePad &getPad() const;
 
     /**
      * Sets the engine model name.
@@ -95,27 +59,33 @@ public:
      */
     void setMaximumSpeedKilometersPerHour(double maximumSpeedKilometersPerHour);
 
-    /**
-     * Sets the current speed, clamped to the valid engine speed range.
-     *
-     * @param speedKilometersPerHour Requested speed in kilometers per hour.
-     */
-    void setCurrentSpeedKilometersPerHour(double speedKilometersPerHour);
-
 protected:
     /**
      * Creates an idle engine.
      */
     Engine();
 
-private:
-    double calculateSecondsToDestinationAtCurrentSpeed() const;
+    /**
+     * Sets the physical engine length.
+     *
+     * Negative values are clamped to zero.
+     *
+     * @param lengthMeters Engine length in meters.
+     */
+    void setLengthMeters(double lengthMeters);
 
+    /**
+     * Sets the minimum empty distance required behind another engine.
+     *
+     * Negative values are clamped to zero.
+     *
+     * @param securityDistanceMeters Security distance in meters.
+     */
+    void setSecurityDistanceMeters(double securityDistanceMeters);
+
+private:
     QString modelName;
-    double maximumSpeedKilometersPerHour = 0.0;
-    double currentSpeedKilometersPerHour = 0.0;
-    double elapsedTrajectorySeconds = 0.0;
-    double averageSpeedKilometersPerHour = 0.0;
-    double secondsToDestinationAtCurrentSpeed = 0.0;
-    Route *trajectory = nullptr;
+    double lengthMeters = 0.0;
+    double securityDistanceMeters = 3.0;
+    EnginePad pad;
 };

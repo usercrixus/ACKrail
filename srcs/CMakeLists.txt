@@ -8,21 +8,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 6.4 REQUIRED COMPONENTS OpenGL OpenGLWidgets Widgets)
-find_package(Boost REQUIRED)
-
 qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(ackrail
+    algorithm/Dijkstra.cpp
+    algorithm/Dijkstra.hpp
     algorithm/Route.cpp
     algorithm/Route.hpp
-    algorithm/RouteFinder.cpp
-    algorithm/RouteFinder.hpp
     garage/engine/Biplace.cpp
     garage/engine/Biplace.hpp
     garage/engine/Engine.cpp
     garage/engine/Engine.hpp
-    garage/engine/EngineFactory.cpp
-    garage/engine/EngineFactory.hpp
+    garage/engine/EnginePad.cpp
+    garage/engine/EnginePad.hpp
     garage/Garage.cpp
     garage/Garage.hpp
     geography/Geography.cpp
@@ -32,6 +30,8 @@ qt_add_executable(ackrail
     main.cpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
+    simulator/NodeController.cpp
+    simulator/NodeController.hpp
     simulator/TrafficManager.cpp
     simulator/TrafficManager.hpp
     simulator/TrafficSimulator.cpp
@@ -83,7 +83,6 @@ qt_add_resources(ackrail "shaders"
 )
 
 target_link_libraries(ackrail PRIVATE
-    Boost::headers
     Qt6::OpenGL
     Qt6::OpenGLWidgets
     Qt6::Widgets
@@ -99,8 +98,8 @@ if(BUILD_TESTING)
         garage/engine/Biplace.hpp
         garage/engine/Engine.cpp
         garage/engine/Engine.hpp
-        garage/engine/EngineFactory.cpp
-        garage/engine/EngineFactory.hpp
+        garage/engine/EnginePad.cpp
+        garage/engine/EnginePad.hpp
         garage/engine/EngineTest.cpp
         geography/Geography.cpp
         geography/Geography.hpp
@@ -110,20 +109,21 @@ if(BUILD_TESTING)
         topology/Link.hpp
         topology/Node.cpp
         topology/Node.hpp
+        simulator/NodeController.cpp
+        simulator/NodeController.hpp
     )
 
     target_link_libraries(engine_tests PRIVATE
-        Boost::headers
         Qt6::Core
     )
     add_test(NAME engine_tests COMMAND engine_tests)
 
-    add_executable(route_finder_tests
+    add_executable(dijkstra_tests
+        algorithm/Dijkstra.cpp
+        algorithm/Dijkstra.hpp
+        algorithm/DijkstraTest.cpp
         algorithm/Route.cpp
         algorithm/Route.hpp
-        algorithm/RouteFinder.cpp
-        algorithm/RouteFinder.hpp
-        algorithm/RouteFinderTest.cpp
         geography/Geography.cpp
         geography/Geography.hpp
         geography/Point.cpp
@@ -134,14 +134,51 @@ if(BUILD_TESTING)
         topology/Node.hpp
         topology/Topology.cpp
         topology/Topology.hpp
+        simulator/NodeController.cpp
+        simulator/NodeController.hpp
     )
 
-    target_link_libraries(route_finder_tests PRIVATE
-        Boost::headers
+    target_link_libraries(dijkstra_tests PRIVATE
         Qt6::Core
     )
 
-    add_test(NAME route_finder_tests COMMAND route_finder_tests)
+    add_test(NAME dijkstra_tests COMMAND dijkstra_tests)
+
+    add_executable(traffic_manager_tests
+        algorithm/Dijkstra.cpp
+        algorithm/Dijkstra.hpp
+        algorithm/Route.cpp
+        algorithm/Route.hpp
+        garage/engine/Biplace.cpp
+        garage/engine/Biplace.hpp
+        garage/engine/Engine.cpp
+        garage/engine/Engine.hpp
+        garage/engine/EnginePad.cpp
+        garage/engine/EnginePad.hpp
+        garage/Garage.cpp
+        garage/Garage.hpp
+        geography/Geography.cpp
+        geography/Geography.hpp
+        geography/Point.cpp
+        geography/Point.hpp
+        simulator/NodeController.cpp
+        simulator/NodeController.hpp
+        simulator/TrafficManager.cpp
+        simulator/TrafficManager.hpp
+        simulator/TrafficManagerTest.cpp
+        topology/Link.cpp
+        topology/Link.hpp
+        topology/Node.cpp
+        topology/Node.hpp
+        topology/Topology.cpp
+        topology/Topology.hpp
+    )
+
+    target_link_libraries(traffic_manager_tests PRIVATE
+        Qt6::Core
+    )
+
+    add_test(NAME traffic_manager_tests COMMAND traffic_manager_tests)
 endif()
 
 install(TARGETS ackrail

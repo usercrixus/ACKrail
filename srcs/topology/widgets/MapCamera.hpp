@@ -5,6 +5,7 @@
 #include <QMatrix4x4>
 #include <QPointF>
 #include <QRectF>
+#include <QSize>
 
 class MapCamera
 {
@@ -18,6 +19,7 @@ public:
     QMatrix4x4 matrix() const;
     QPointF sceneToScreen(const QPointF &position) const;
     QPointF screenToScene(const QPointF &position) const;
+    QSize viewportSize() const;
 
 private:
     static constexpr double Margin = 70.0;
