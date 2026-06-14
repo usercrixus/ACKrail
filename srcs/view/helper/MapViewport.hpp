@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Topology.hpp"
+#include "../../topology/Topology.hpp"
 #include <QPointF>
 
 class MapViewport

@@ -2,11 +2,11 @@
 
 #include "EngineRenderer.hpp"
 #include "LinkRenderer.hpp"
-#include "MapCamera.hpp"
+#include "../helper/MapCamera.hpp"
 #include "NodeRenderer.hpp"
 #include "../../garage/Garage.hpp"
-#include "../MapViewport.hpp"
-#include "../Topology.hpp"
+#include "../helper/MapViewport.hpp"
+#include "../../topology/Topology.hpp"
 #include <QMouseEvent>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLWidget>

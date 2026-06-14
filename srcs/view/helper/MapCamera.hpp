@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../MapViewport.hpp"
-#include "../Topology.hpp"
+#include "MapViewport.hpp"
+#include "../../topology/Topology.hpp"
 #include <QMatrix4x4>
 #include <QPointF>
 #include <QRectF>

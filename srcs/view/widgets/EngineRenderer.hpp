@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MapCamera.hpp"
+#include "../helper/MapCamera.hpp"
 #include "../../garage/Garage.hpp"
-#include "../MapViewport.hpp"
+#include "../helper/MapViewport.hpp"
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
 #include <QOpenGLExtraFunctions>

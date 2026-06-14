@@ -3,7 +3,7 @@
 #include "simulator/TrafficManager.hpp"
 #include "simulator/TrafficSimulator.hpp"
 #include "topology/Topology.hpp"
-#include "topology/TopologyWidget.hpp"
+#include "view/TopologyWidget.hpp"
 
 #include <QApplication>
 #include <QSurfaceFormat>

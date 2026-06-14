@@ -38,26 +38,26 @@ qt_add_executable(ackrail
     simulator/TrafficSimulator.hpp
     topology/Link.cpp
     topology/Link.hpp
-    topology/MapViewport.cpp
-    topology/MapViewport.hpp
     topology/Node.cpp
     topology/Node.hpp
     topology/Topology.cpp
     topology/Topology.hpp
-    topology/TopologyWidget.cpp
-    topology/TopologyWidget.hpp
-    topology/widgets/HeaderWidget.cpp
-    topology/widgets/HeaderWidget.hpp
-    topology/widgets/EngineRenderer.cpp
-    topology/widgets/EngineRenderer.hpp
-    topology/widgets/LinkRenderer.cpp
-    topology/widgets/LinkRenderer.hpp
-    topology/widgets/MapCamera.cpp
-    topology/widgets/MapCamera.hpp
-    topology/widgets/MapWidget.cpp
-    topology/widgets/MapWidget.hpp
-    topology/widgets/NodeRenderer.cpp
-    topology/widgets/NodeRenderer.hpp
+    view/TopologyWidget.cpp
+    view/TopologyWidget.hpp
+    view/helper/MapCamera.cpp
+    view/helper/MapCamera.hpp
+    view/helper/MapViewport.cpp
+    view/helper/MapViewport.hpp
+    view/widgets/HeaderWidget.cpp
+    view/widgets/HeaderWidget.hpp
+    view/widgets/EngineRenderer.cpp
+    view/widgets/EngineRenderer.hpp
+    view/widgets/LinkRenderer.cpp
+    view/widgets/LinkRenderer.hpp
+    view/widgets/MapWidget.cpp
+    view/widgets/MapWidget.hpp
+    view/widgets/NodeRenderer.cpp
+    view/widgets/NodeRenderer.hpp
 )
 
 set_source_files_properties(map/paris_metro.json PROPERTIES
@@ -72,14 +72,14 @@ qt_add_resources(ackrail "maps"
 
 qt_add_resources(ackrail "shaders"
     PREFIX "/shaders"
-    BASE topology/shaders
+    BASE view/shaders
     FILES
-        topology/shaders/engine.frag
-        topology/shaders/engine.vert
-        topology/shaders/link.frag
-        topology/shaders/link.vert
-        topology/shaders/node.frag
-        topology/shaders/node.vert
+        view/shaders/engine.frag
+        view/shaders/engine.vert
+        view/shaders/link.frag
+        view/shaders/link.vert
+        view/shaders/node.frag
+        view/shaders/node.vert
 )
 
 target_link_libraries(ackrail PRIVATE
