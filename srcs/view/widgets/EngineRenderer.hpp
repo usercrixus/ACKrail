@@ -47,8 +47,10 @@ private:
     };
 
     void updateBuffer();
-    bool calculateState(const Engine &engine, RenderState &state) const;
+    void calculateState(const Engine &engine, RenderState &state) const;
     QString createInformation(const Engine &engine) const;
+    QString getInformation(const Engine &engine, const Route &route) const;
+    QString getRoadmap(const Route &route) const;
 
     const Garage &garage;
     const MapViewport &mapViewport;

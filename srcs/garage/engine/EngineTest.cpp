@@ -29,6 +29,11 @@ int main()
         });
     assert(route->hasValidContract());
     assert(engine.getPad().startContractedTrajectory(route));
+    assert(std::abs(
+        engine.getPad().getTotalTrajectorySeconds()
+        - 3.0
+        - firstTraversalSeconds
+        - secondTraversalSeconds) < 0.000001);
 
     engine.getPad().advance(1.0);
     assert(engine.getPad().getCurrentSpeedKilometersPerHour() == 0.0);

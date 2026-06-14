@@ -53,6 +53,9 @@ public:
     /** @return Elapsed trajectory time in seconds. */
     double getElapsedTrajectorySeconds() const;
 
+    /** @return Total contracted trajectory time in seconds. */
+    double getTotalTrajectorySeconds() const;
+
     /** @return Average trajectory speed in kilometers per hour. */
     double getAverageSpeedKilometersPerHour() const;
 
@@ -85,6 +88,7 @@ private:
     double maximumSpeedKilometersPerHour = 0.0;
     double currentSpeedKilometersPerHour = 0.0;
     double elapsedTrajectorySeconds = 0.0;
+    double totalTrajectorySeconds = 0.0;
     double averageSpeedKilometersPerHour = 0.0;
     double travelledDistanceKilometers = 0.0;
     double remainingTraversalKilometers = 0.0;

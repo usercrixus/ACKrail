@@ -22,14 +22,14 @@ public:
      *
      * @return Active and idle engines owned by the garage.
      */
-    const std::deque<Biplace> &getEngines() const;
+    const std::vector<Biplace> &getEngines() const;
 
     /**
      * Returns the mutable fleet for simulation updates.
      *
      * @return Active and idle engines owned by the garage.
      */
-    std::deque<Biplace> &getEngines();
+    std::vector<Biplace> &getEngines();
 
     /**
      * Finds an engine that is not currently travelling.
@@ -46,5 +46,5 @@ public:
     std::size_t getActiveEngineCount() const;
 
 private:
-    std::deque<Biplace> engines;
+    std::vector<Biplace> engines;
 };

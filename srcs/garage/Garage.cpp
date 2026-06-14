@@ -7,12 +7,12 @@ Garage::Garage(std::size_t engineCount)
 {
 }
 
-const std::deque<Biplace> &Garage::getEngines() const
+const std::vector<Biplace> &Garage::getEngines() const
 {
     return engines;
 }
 
-std::deque<Biplace> &Garage::getEngines()
+std::vector<Biplace> &Garage::getEngines()
 {
     return engines;
 }

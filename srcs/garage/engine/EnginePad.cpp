@@ -18,6 +18,9 @@ bool EnginePad::startContractedTrajectory(Route *route)
         return false;
     trajectory = route;
     elapsedTrajectorySeconds = 0.0;
+    totalTrajectorySeconds = 0.0;
+    for (const Route::ContractStep &step : trajectory->getContract())
+        totalTrajectorySeconds += step.waitSeconds + step.traversalSeconds;
     averageSpeedKilometersPerHour = 0.0;
     travelledDistanceKilometers = 0.0;
     currentContractStep = 0;
@@ -100,6 +103,11 @@ double EnginePad::getMaximumSpeedKilometersPerHour() const
 double EnginePad::getElapsedTrajectorySeconds() const
 {
     return elapsedTrajectorySeconds;
+}
+
+double EnginePad::getTotalTrajectorySeconds() const
+{
+    return totalTrajectorySeconds;
 }
 
 double EnginePad::getAverageSpeedKilometersPerHour() const

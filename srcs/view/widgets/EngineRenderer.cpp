@@ -20,8 +20,7 @@ void EngineRenderer::initialize()
     initializeOpenGLFunctions();
     if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/shaders/engine.vert")) || !program.addShaderFromSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/shaders/engine.frag")) || !program.link())
     {
-        qFatal("Unable to create engine shader: %s",
-               qPrintable(program.log()));
+        qFatal("Unable to create engine shader: %s", qPrintable(program.log()));
     }
     vertexArray.create();
     const float orange[] = {1.0f, 0.361f, 0.208f};
@@ -102,47 +101,11 @@ void EngineRenderer::selectAt(const QPointF &screenPosition, const MapCamera &ca
         if (state.active)
         {
             const QPointF position = camera.sceneToScreen(state.position);
-            const double distance = std::hypot(
-                position.x() - screenPosition.x(),
-                position.y() - screenPosition.y());
+            const double distance = std::hypot(position.x() - screenPosition.x(), position.y() - screenPosition.y());
             if (distance <= closestDistance)
             {
                 closestDistance = distance;
                 selectedEngineIndex = static_cast<int>(index);
-            }
-        }
-    }
-}
-
-void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
-{
-    if (selectedEngineIndex >= 0 && selectedEngineIndex < static_cast<int>(states.size()))
-    {
-        const RenderState &state = states[selectedEngineIndex];
-        if (state.active)
-        {
-            const QString information = createInformation(
-                garage.getEngines()[selectedEngineIndex]);
-            if (!information.isEmpty())
-            {
-                const QFont font(QStringLiteral("Sans Serif"), 9);
-                const QFontMetrics metrics(font);
-                QRectF panel = metrics.boundingRect(
-                    QRect(0, 0, 420, camera.viewportSize().height()),
-                    Qt::AlignLeft | Qt::AlignTop,
-                    information);
-                panel.adjust(-10, -8, 10, 8);
-                panel.moveTopLeft(camera.sceneToScreen(state.position) + QPointF(16, -panel.height() - 12));
-                if (panel.right() > camera.viewportSize().width() - 8)
-                    panel.moveRight(camera.viewportSize().width() - 8);
-                if (panel.top() < 8)
-                    panel.moveTop(8);
-                painter.setFont(font);
-                painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
-                painter.setBrush(QColor(QStringLiteral("#17232f")));
-                painter.drawRoundedRect(panel, 6, 6);
-                painter.setPen(QColor(QStringLiteral("#f4f7f9")));
-                painter.drawText(panel.adjusted(10, 8, -10, -8), Qt::AlignLeft | Qt::AlignTop, information);
             }
         }
     }
@@ -171,48 +134,64 @@ void EngineRenderer::updateBuffer()
     instanceBuffer.release();
 }
 
-bool EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
+void EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
 {
     const EnginePad &pad = engine.getPad();
-    const Route *trajectory = pad.getTrajectory();
-    if (trajectory == nullptr)
+    if (!pad.isActive())
     {
         state.active = false;
-        return false;
+        return;
     }
     const qsizetype index = pad.getCurrentContractStep();
-    const QVector<Link *> &links = trajectory->getLinks();
-    const QVector<Node *> &stations = trajectory->getStations();
-    if (index < 0 || index >= links.size() || index + 1 >= stations.size())
-    {
-        state.active = false;
-        return false;
-    }
+    const QVector<Node *> &stations = pad.getTrajectory()->getStations();
     const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
     const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
     state.position = start + (end - start) * pad.getCurrentLinkProgress();
     state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
     state.active = true;
-    return true;
 }
 
-QString EngineRenderer::createInformation(const Engine &engine) const
+void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
 {
-    const Route *route = engine.getPad().getTrajectory();
-    if (route == nullptr || route->getStations().isEmpty())
-        return {};
-    const QVector<Node *> &stations = route->getStations();
-    const double totalDistance = route->getTotalDistanceKilometers();
-    const double travelledDistance = std::clamp(
-        engine.getPad().getTravelledDistanceKilometers(),
-        0.0,
-        totalDistance);
+    if (selectedEngineIndex >= 0 && selectedEngineIndex < static_cast<int>(states.size()))
+    {
+        const RenderState &state = states[selectedEngineIndex];
+        if (state.active)
+        {
+            const QString information = createInformation(garage.getEngines()[selectedEngineIndex]);
+            if (!information.isEmpty())
+            {
+                const QFont font(QStringLiteral("Sans Serif"), 9);
+                const QFontMetrics metrics(font);
+                QRectF panel = metrics.boundingRect(QRect(0, 0, 420, camera.viewportSize().height()), Qt::AlignLeft | Qt::AlignTop, information);
+                panel.adjust(-10, -8, 10, 8);
+                panel.moveTopLeft(camera.sceneToScreen(state.position) + QPointF(16, -panel.height() - 12));
+                if (panel.right() > camera.viewportSize().width() - 8)
+                    panel.moveRight(camera.viewportSize().width() - 8);
+                if (panel.top() < 8)
+                    panel.moveTop(8);
+                painter.setFont(font);
+                painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
+                painter.setBrush(QColor(QStringLiteral("#17232f")));
+                painter.drawRoundedRect(panel, 6, 6);
+                painter.setPen(QColor(QStringLiteral("#f4f7f9")));
+                painter.drawText(panel.adjusted(10, 8, -10, -8), Qt::AlignLeft | Qt::AlignTop, information);
+            }
+        }
+    }
+}
+
+QString EngineRenderer::getInformation(const Engine &engine, const Route &route) const
+{
+    const QVector<Node *> &stations = route.getStations();
+    const double totalDistance = route.getTotalDistanceKilometers();
+    const double travelledDistance = std::clamp(engine.getPad().getTravelledDistanceKilometers(), 0.0, totalDistance);
     const double progress = totalDistance > 0.0 ? travelledDistance / totalDistance * 100.0 : 0.0;
-    QString information = QStringLiteral("%1\n"
-                                         "%2 -> %3\n"
-                                         "Speed: %4 km/h\n"
-                                         "Distance: %5 / %6 km\n"
-                                         "Progress: %7%")
+    return QStringLiteral("%1\n"
+                          "%2 -> %3\n"
+                          "Speed: %4 km/h\n"
+                          "Distance: %5 / %6 km\n"
+                          "Progress: %7%")
         .arg(engine.getModelName())
         .arg(stations.first()->getName())
         .arg(stations.last()->getName())
@@ -220,25 +199,42 @@ QString EngineRenderer::createInformation(const Engine &engine) const
         .arg(travelledDistance, 0, 'f', 2)
         .arg(totalDistance, 0, 'f', 2)
         .arg(progress, 0, 'f', 1);
+}
 
-    const QVector<Link *> &links = route->getLinks();
-    const QVector<Route::ContractStep> &contract = route->getContract();
-    if (contract.size() == links.size())
+QString EngineRenderer::getRoadmap(const Route &route) const
+{
+    const QVector<Node *> &stations = route.getStations();
+    const QVector<Link *> &links = route.getLinks();
+    const QVector<Route::ContractStep> &contract = route.getContract();
+    if (contract.size() != links.size() || stations.size() != links.size() + 1)
+        return {};
+
+    QStringList roadmap;
+    roadmap.reserve(contract.size());
+    for (qsizetype index = 0; index < contract.size(); ++index)
     {
-        QStringList roadmap;
-        roadmap.reserve(contract.size());
-        for (qsizetype index = 0; index < contract.size(); ++index)
-        {
-            roadmap.append(
-                QStringLiteral("%1. Wait %2 s -> Link %3: %4 -> %5 (%6 s)")
-                    .arg(index + 1)
-                    .arg(contract[index].waitSeconds, 0, 'f', 2)
-                    .arg(links[index]->getId())
-                    .arg(stations[index]->getName())
-                    .arg(stations[index + 1]->getName())
-                    .arg(contract[index].traversalSeconds, 0, 'f', 2));
-        }
-        information += QStringLiteral("\n\nRoadmap:\n") + roadmap.join(QLatin1Char('\n'));
+        roadmap.append(
+            QStringLiteral("%1. Wait %2 s -> Link %3: %4 -> %5 (%6 s)")
+                .arg(index + 1)
+                .arg(contract[index].waitSeconds, 0, 'f', 2)
+                .arg(links[index]->getId())
+                .arg(stations[index]->getName())
+                .arg(stations[index + 1]->getName())
+                .arg(contract[index].traversalSeconds, 0, 'f', 2));
+    }
+    return roadmap.join(QLatin1Char('\n'));
+}
+
+QString EngineRenderer::createInformation(const Engine &engine) const
+{
+    const Route *route = engine.getPad().getTrajectory();
+    if (route == nullptr || route->getStations().isEmpty())
+        return {};
+    QString information = getInformation(engine, *route);
+    const QString roadmap = getRoadmap(*route);
+    if (!roadmap.isEmpty())
+    {
+        information += QStringLiteral("\n\nRoadmap (total time: %1 s):\n").arg(engine.getPad().getTotalTrajectorySeconds(), 0, 'f', 2) + roadmap;
     }
     return information;
 }
