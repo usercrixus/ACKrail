@@ -9,9 +9,10 @@ TrafficManager::TrafficManager(Topology &topology, Garage &garage)
 
 bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId)
 {
+    const std::lock_guard lock(garage.getMutex());
     if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
-    const double entrySeparationSeconds = calculateEntrySeparationSeconds(engine);
+    const double entrySeparationSeconds = engine.getEntrySeparationSeconds();
     Route *route = dijkstra.findRoute(fromStationId, toStationId, simulationTimeSeconds, engine.getPad().getMaximumSpeedKilometersPerHour(), entrySeparationSeconds);
     if (route == nullptr)
         return false;
@@ -29,18 +30,14 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
         departureNode->getController().reserveEntry(route->getLinks()[index]->getId(), engine, entryTimeSeconds, entrySeparationSeconds);
         arrivalTimeSeconds = entryTimeSeconds + step.traversalSeconds;
     }
+    engine.getPad().setTotalTrajectorySeconds(arrivalTimeSeconds - simulationTimeSeconds);
     garage.activateEngine(&engine);
     return true;
 }
 
-double TrafficManager::calculateEntrySeparationSeconds(const Engine &engine) const
-{
-    const double protectedDistanceKilometers = (engine.getLengthMeters() + engine.getSecurityDistanceMeters()) / 1000.0;
-    return protectedDistanceKilometers / engine.getPad().getMaximumSpeedKilometersPerHour() * 3600.0;
-}
-
 void TrafficManager::advance(double elapsedSeconds)
 {
+    const std::lock_guard lock(garage.getMutex());
     if (elapsedSeconds > 0.0)
     {
         for (const auto &[id, engine] : garage.getActiveEngines())

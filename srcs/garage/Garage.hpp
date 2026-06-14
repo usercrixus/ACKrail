@@ -2,6 +2,7 @@
 
 #include "engine/Biplace.hpp"
 #include <cstddef>
+#include <mutex>
 #include <unordered_map>
 
 /**
@@ -90,7 +91,15 @@ public:
      */
     void recycleInactiveEngines();
 
+    /**
+     * Returns the mutex protecting engine collections and mutable engine state.
+     *
+     * @return Garage synchronization mutex.
+     */
+    std::recursive_mutex &getMutex() const;
+
 private:
+    mutable std::recursive_mutex mutex;
     std::unordered_map<int, Engine *> idleEngines;
     std::unordered_map<int, Engine *> activeEngines;
 };

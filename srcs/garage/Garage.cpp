@@ -13,6 +13,7 @@ Garage::Garage(std::size_t engineCount)
 
 Garage::~Garage()
 {
+    const std::lock_guard lock(mutex);
     for (const auto &[id, engine] : idleEngines)
         delete engine;
     for (const auto &[id, engine] : activeEngines)
@@ -31,27 +32,32 @@ const std::unordered_map<int, Engine *> &Garage::getActiveEngines() const
 
 Engine *Garage::getIdleEngine()
 {
+    const std::lock_guard lock(mutex);
     return idleEngines.empty() ? nullptr : idleEngines.begin()->second;
 }
 
 bool Garage::isIdleEngine(const Engine &engine) const
 {
+    const std::lock_guard lock(mutex);
     const auto position = idleEngines.find(engine.getId());
     return position != idleEngines.end() && position->second == &engine;
 }
 
 std::size_t Garage::getActiveEngineCount() const
 {
+    const std::lock_guard lock(mutex);
     return activeEngines.size();
 }
 
 std::size_t Garage::getEngineCount() const
 {
+    const std::lock_guard lock(mutex);
     return idleEngines.size() + activeEngines.size();
 }
 
 void Garage::activateEngine(Engine *engine)
 {
+    const std::lock_guard lock(mutex);
     if (engine == nullptr)
         return;
     auto node = idleEngines.extract(engine->getId());
@@ -66,6 +72,7 @@ void Garage::activateEngine(Engine *engine)
 
 void Garage::recycleInactiveEngines()
 {
+    const std::lock_guard lock(mutex);
     auto position = activeEngines.begin();
     while (position != activeEngines.end())
     {
@@ -77,4 +84,9 @@ void Garage::recycleInactiveEngines()
         auto current = position++;
         idleEngines.insert(activeEngines.extract(current));
     }
+}
+
+std::recursive_mutex &Garage::getMutex() const
+{
+    return mutex;
 }

@@ -31,8 +31,6 @@ public:
     void advance(double elapsedSeconds);
 
 private:
-    double calculateEntrySeparationSeconds(const Engine &engine) const;
-
     Topology &topology;
     Garage &garage;
     Dijkstra dijkstra;

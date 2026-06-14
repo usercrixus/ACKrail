@@ -32,6 +32,11 @@ double Engine::getSecurityDistanceMeters() const
     return securityDistanceMeters;
 }
 
+double Engine::getEntrySeparationSeconds() const
+{
+    return entrySeparationSeconds;
+}
+
 EnginePad &Engine::getPad()
 {
     return pad;
@@ -51,14 +56,29 @@ void Engine::setMaximumSpeedKilometersPerHour(
     double maximumSpeedKilometersPerHour)
 {
     pad.setMaximumSpeedKilometersPerHour(maximumSpeedKilometersPerHour);
+    updateEntrySeparationSeconds();
 }
 
 void Engine::setLengthMeters(double lengthMeters)
 {
     this->lengthMeters = std::max(0.0, lengthMeters);
+    updateEntrySeparationSeconds();
 }
 
 void Engine::setSecurityDistanceMeters(double securityDistanceMeters)
 {
     this->securityDistanceMeters = std::max(0.0, securityDistanceMeters);
+    updateEntrySeparationSeconds();
+}
+
+void Engine::updateEntrySeparationSeconds()
+{
+    const double maximumSpeedKilometersPerHour = pad.getMaximumSpeedKilometersPerHour();
+    if (maximumSpeedKilometersPerHour <= 0.0)
+    {
+        entrySeparationSeconds = 0.0;
+        return;
+    }
+    const double protectedDistanceKilometers = (lengthMeters + securityDistanceMeters) / 1000.0;
+    entrySeparationSeconds = protectedDistanceKilometers / maximumSpeedKilometersPerHour * 3600.0;
 }

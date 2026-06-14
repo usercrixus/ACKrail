@@ -13,5 +13,5 @@ public:
      *
      * @param id Unique engine identifier.
      */
-    explicit Biplace(int id = 0);
+    Biplace(int id = 0);
 };

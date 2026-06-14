@@ -12,6 +12,14 @@ int main()
     Link secondLink(2, stationB, stationC, QStringLiteral("Demo"), QStringLiteral("#ffffff"));
 
     Biplace engine;
+    const double expectedEntrySeparationSeconds =
+        (engine.getLengthMeters() + engine.getSecurityDistanceMeters())
+        / 1000.0
+        / engine.getPad().getMaximumSpeedKilometersPerHour()
+        * 3600.0;
+    assert(std::abs(
+        engine.getEntrySeparationSeconds()
+        - expectedEntrySeparationSeconds) < 0.000001);
     const double firstTraversalSeconds =
         link.getDistanceKilometers()
         / engine.getPad().getMaximumSpeedKilometersPerHour()
@@ -29,6 +37,8 @@ int main()
         });
     assert(route->hasValidContract());
     assert(engine.getPad().startContractedTrajectory(route));
+    engine.getPad().setTotalTrajectorySeconds(
+        3.0 + firstTraversalSeconds + secondTraversalSeconds);
     assert(std::abs(
         engine.getPad().getTotalTrajectorySeconds()
         - 3.0

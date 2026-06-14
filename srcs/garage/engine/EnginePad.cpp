@@ -19,8 +19,6 @@ bool EnginePad::startContractedTrajectory(Route *route)
     trajectory = route;
     elapsedTrajectorySeconds = 0.0;
     totalTrajectorySeconds = 0.0;
-    for (const Route::ContractStep &step : trajectory->getContract())
-        totalTrajectorySeconds += step.waitSeconds + step.traversalSeconds;
     averageSpeedKilometersPerHour = 0.0;
     travelledDistanceKilometers = 0.0;
     currentContractStep = 0;
@@ -110,6 +108,11 @@ double EnginePad::getTotalTrajectorySeconds() const
     return totalTrajectorySeconds;
 }
 
+void EnginePad::setTotalTrajectorySeconds(double totalTrajectorySeconds)
+{
+    this->totalTrajectorySeconds = std::max(0.0, totalTrajectorySeconds);
+}
+
 double EnginePad::getAverageSpeedKilometersPerHour() const
 {
     return averageSpeedKilometersPerHour;
@@ -132,10 +135,7 @@ double EnginePad::getCurrentLinkProgress() const
     const double linkDistance = trajectory->getLinks()[currentContractStep]->getDistanceKilometers();
     if (linkDistance <= 0.0)
         return 0.0;
-    return std::clamp(
-        (linkDistance - remainingTraversalKilometers) / linkDistance,
-        0.0,
-        1.0);
+    return std::clamp((linkDistance - remainingTraversalKilometers) / linkDistance, 0.0, 1.0);
 }
 
 const Route *EnginePad::getTrajectory() const

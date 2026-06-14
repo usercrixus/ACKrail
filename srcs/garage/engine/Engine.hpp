@@ -42,6 +42,13 @@ public:
      */
     double getSecurityDistanceMeters() const;
 
+    /**
+     * Returns the minimum interval between same-direction link entries.
+     *
+     * @return Entry separation in seconds.
+     */
+    double getEntrySeparationSeconds() const;
+
     /** @return Mutable journey execution state. */
     EnginePad &getPad();
 
@@ -89,9 +96,12 @@ protected:
     void setSecurityDistanceMeters(double securityDistanceMeters);
 
 private:
+    void updateEntrySeparationSeconds();
+
     const int id;
     QString modelName;
     double lengthMeters = 0.0;
     double securityDistanceMeters = 3.0;
+    double entrySeparationSeconds = 0.0;
     EnginePad pad;
 };

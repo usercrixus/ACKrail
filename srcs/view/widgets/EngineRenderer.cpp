@@ -53,6 +53,7 @@ void EngineRenderer::initialize()
 
 void EngineRenderer::refresh()
 {
+    const std::lock_guard lock(garage.getMutex());
     const auto &engines = garage.getActiveEngines();
     if (states.size() != engines.size())
         states.resize(engines.size());
@@ -162,6 +163,7 @@ void EngineRenderer::calculateState(const Engine &engine, RenderState &state) co
 
 void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
 {
+    const std::lock_guard lock(garage.getMutex());
     if (selectedEngine == nullptr)
         return;
     for (const RenderState &state : states)

@@ -56,6 +56,15 @@ public:
     /** @return Total contracted trajectory time in seconds. */
     double getTotalTrajectorySeconds() const;
 
+    /**
+     * Sets the total contracted trajectory time.
+     *
+     * Negative values are clamped to zero.
+     *
+     * @param totalTrajectorySeconds Total wait and traversal time in seconds.
+     */
+    void setTotalTrajectorySeconds(double totalTrajectorySeconds);
+
     /** @return Average trajectory speed in kilometers per hour. */
     double getAverageSpeedKilometersPerHour() const;
 
