@@ -173,33 +173,27 @@ void EngineRenderer::updateBuffer()
 
 bool EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
 {
-    const Route *trajectory = engine.getPad().getTrajectory();
+    const EnginePad &pad = engine.getPad();
+    const Route *trajectory = pad.getTrajectory();
     if (trajectory == nullptr)
     {
         state.active = false;
         return false;
     }
-    const double travelledDistance =
-        engine.getPad().getTravelledDistanceKilometers();
-    double distanceBeforeLink = 0.0;
+    const qsizetype index = pad.getCurrentContractStep();
     const QVector<Link *> &links = trajectory->getLinks();
     const QVector<Node *> &stations = trajectory->getStations();
-    for (qsizetype index = 0; index < links.size(); ++index)
+    if (index < 0 || index >= links.size() || index + 1 >= stations.size())
     {
-        const double linkDistance = links[index]->getDistanceKilometers();
-        if (travelledDistance < distanceBeforeLink + linkDistance)
-        {
-            const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
-            const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
-            state.position = start + (end - start) * ((travelledDistance - distanceBeforeLink) / linkDistance);
-            state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
-            state.active = true;
-            return true;
-        }
-        distanceBeforeLink += linkDistance;
+        state.active = false;
+        return false;
     }
-    state.active = false;
-    return false;
+    const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
+    const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
+    state.position = start + (end - start) * pad.getCurrentLinkProgress();
+    state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
+    state.active = true;
+    return true;
 }
 
 QString EngineRenderer::createInformation(const Engine &engine) const

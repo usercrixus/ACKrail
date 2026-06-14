@@ -59,6 +59,12 @@ public:
     /** @return Distance travelled on the active trajectory in kilometers. */
     double getTravelledDistanceKilometers() const;
 
+    /** @return Index of the current route contract step. */
+    qsizetype getCurrentContractStep() const;
+
+    /** @return Progress on the current link, between 0.0 and 1.0. */
+    double getCurrentLinkProgress() const;
+
     /** @return Active route, or nullptr when idle. */
     const Route *getTrajectory() const;
 

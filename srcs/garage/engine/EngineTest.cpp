@@ -33,11 +33,16 @@ int main()
     engine.getPad().advance(1.0);
     assert(engine.getPad().getCurrentSpeedKilometersPerHour() == 0.0);
     assert(engine.getPad().getTravelledDistanceKilometers() == 0.0);
+    assert(engine.getPad().getCurrentContractStep() == 0);
+    assert(engine.getPad().getCurrentLinkProgress() == 0.0);
 
     engine.getPad().advance(2.0);
     assert(engine.getPad().getCurrentSpeedKilometersPerHour()
         == engine.getPad().getMaximumSpeedKilometersPerHour());
     assert(engine.getPad().getTravelledDistanceKilometers() > 0.0);
+    assert(engine.getPad().getCurrentContractStep() == 0);
+    assert(engine.getPad().getCurrentLinkProgress() > 0.0);
+    assert(engine.getPad().getCurrentLinkProgress() < 1.0);
     assert(engine.getPad().getTrajectory() != nullptr);
     assert(engine.getPad().getTrajectory()->getLinks()[0] == &link);
 
