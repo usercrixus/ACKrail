@@ -29,7 +29,7 @@ void TrafficGenerator::generate()
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
-        Biplace *engine = garage.getIdleEngine();
+        Engine *engine = garage.getIdleEngine();
         if (engine == nullptr || !dispatchEngine(*engine))
             break;
         else
@@ -37,7 +37,7 @@ void TrafficGenerator::generate()
     }
 }
 
-bool TrafficGenerator::dispatchEngine(Biplace &engine)
+bool TrafficGenerator::dispatchEngine(Engine &engine)
 {
     const QVector<Node> &stations = topology.getNodes();
     if (stations.size() < 2)

@@ -3,12 +3,18 @@
 #include <algorithm>
 #include <utility>
 
-Engine::Engine()
+Engine::Engine(int id)
+    : id(id)
 {
 }
 
 Engine::~Engine()
 {
+}
+
+int Engine::getId() const
+{
+    return id;
 }
 
 const QString &Engine::getModelName() const

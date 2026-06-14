@@ -10,6 +10,8 @@ class Biplace final : public Engine
 public:
     /**
      * Creates an idle biplace rail module.
+     *
+     * @param id Unique engine identifier.
      */
-    Biplace();
+    explicit Biplace(int id = 0);
 };

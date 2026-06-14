@@ -41,6 +41,7 @@ private:
 
     struct RenderState
     {
+        const Engine *engine = nullptr;
         QPointF position;
         double angleRadians = 0.0;
         bool active = false;
@@ -63,5 +64,5 @@ private:
     int shapeVertexCount = 0;
     int activeEngineCount = 0;
     int bufferCapacity = 0;
-    int selectedEngineIndex = -1;
+    const Engine *selectedEngine = nullptr;
 };

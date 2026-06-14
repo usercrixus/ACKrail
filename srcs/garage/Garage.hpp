@@ -2,10 +2,14 @@
 
 #include "engine/Biplace.hpp"
 #include <cstddef>
-#include <deque>
+#include <unordered_map>
 
 /**
- * Owns the simulated rail-module fleet and provides access to its engines.
+ * Owns and manages the simulated engine fleet.
+ *
+ * Engines are dynamically allocated as Biplace instances and stored as
+ * Engine pointers. Each engine belongs to exactly one collection: idle or
+ * active.
  */
 class Garage
 {
@@ -18,33 +22,75 @@ public:
     Garage(std::size_t engineCount);
 
     /**
-     * Returns the complete fleet.
-     *
-     * @return Active and idle engines owned by the garage.
+     * Destroys every engine owned by the garage.
      */
-    const std::vector<Biplace> &getEngines() const;
+    ~Garage();
+
+    /** Garage ownership cannot be copied. */
+    Garage(const Garage &) = delete;
+
+    /** Garage ownership cannot be copied. */
+    Garage &operator=(const Garage &) = delete;
 
     /**
-     * Returns the mutable fleet for simulation updates.
+     * Returns the engines that are available for a new route.
      *
-     * @return Active and idle engines owned by the garage.
+     * @return Read-only collection of idle engine pointers.
      */
-    std::vector<Biplace> &getEngines();
+    const std::unordered_map<int, Engine *> &getIdleEngines() const;
 
     /**
-     * Finds an engine that is not currently travelling.
+     * Returns the engines currently executing a route.
+     *
+     * @return Read-only collection of active engine pointers.
+     */
+    const std::unordered_map<int, Engine *> &getActiveEngines() const;
+
+    /**
+     * Returns an engine available for a new route.
      *
      * @return An idle engine, or nullptr when every engine is active.
      */
-    Biplace *getIdleEngine();
+    Engine *getIdleEngine();
 
     /**
-     * Counts engines currently travelling.
+     * Checks whether an engine belongs to the idle collection.
+     *
+     * @param engine Engine to find.
+     * @return true when the engine is idle; otherwise false.
+     */
+    bool isIdleEngine(const Engine &engine) const;
+
+    /**
+     * Returns the number of engines currently executing a route.
      *
      * @return Number of active engines.
      */
     std::size_t getActiveEngineCount() const;
 
+    /**
+     * Returns the total number of engines owned by the garage.
+     *
+     * @return Combined number of idle and active engines.
+     */
+    std::size_t getEngineCount() const;
+
+    /**
+     * Moves an idle engine to the active collection in average constant time.
+     *
+     * The operation has no effect if the pointer is null or does not match the
+     * idle engine stored under its identifier.
+     *
+     * @param engine Engine whose contracted route has started.
+     */
+    void activateEngine(Engine *engine);
+
+    /**
+     * Moves every engine with a completed route back to the idle collection.
+     */
+    void recycleInactiveEngines();
+
 private:
-    std::vector<Biplace> engines;
+    std::unordered_map<int, Engine *> idleEngines;
+    std::unordered_map<int, Engine *> activeEngines;
 };

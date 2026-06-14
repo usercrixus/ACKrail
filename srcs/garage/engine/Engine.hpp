@@ -18,6 +18,9 @@ public:
      */
     virtual ~Engine();
 
+    /** @return Unique engine identifier within its garage. */
+    int getId() const;
+
     /**
      * Returns the engine model name.
      *
@@ -62,8 +65,10 @@ public:
 protected:
     /**
      * Creates an idle engine.
+     *
+     * @param id Unique engine identifier.
      */
-    Engine();
+    explicit Engine(int id);
 
     /**
      * Sets the physical engine length.
@@ -84,6 +89,7 @@ protected:
     void setSecurityDistanceMeters(double securityDistanceMeters);
 
 private:
+    const int id;
     QString modelName;
     double lengthMeters = 0.0;
     double securityDistanceMeters = 3.0;

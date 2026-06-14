@@ -7,9 +7,9 @@ TrafficManager::TrafficManager(Topology &topology, Garage &garage)
 {
 }
 
-bool TrafficManager::contractRoute(Biplace &engine, int fromStationId, int toStationId)
+bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId)
 {
-    if (engine.getPad().isActive())
+    if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
     const double entrySeparationSeconds = calculateEntrySeparationSeconds(engine);
     Route *route = dijkstra.findRoute(fromStationId, toStationId, simulationTimeSeconds, engine.getPad().getMaximumSpeedKilometersPerHour(), entrySeparationSeconds);
@@ -29,6 +29,7 @@ bool TrafficManager::contractRoute(Biplace &engine, int fromStationId, int toSta
         departureNode->getController().reserveEntry(route->getLinks()[index]->getId(), engine, entryTimeSeconds, entrySeparationSeconds);
         arrivalTimeSeconds = entryTimeSeconds + step.traversalSeconds;
     }
+    garage.activateEngine(&engine);
     return true;
 }
 
@@ -42,8 +43,9 @@ void TrafficManager::advance(double elapsedSeconds)
 {
     if (elapsedSeconds > 0.0)
     {
-        for (Biplace &engine : garage.getEngines())
-            engine.getPad().advance(elapsedSeconds);
+        for (const auto &[id, engine] : garage.getActiveEngines())
+            engine->getPad().advance(elapsedSeconds);
+        garage.recycleInactiveEngines();
         simulationTimeSeconds += elapsedSeconds;
     }
 }

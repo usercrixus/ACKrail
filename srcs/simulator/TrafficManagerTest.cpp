@@ -17,12 +17,14 @@ int main()
             QStringLiteral("#000000"))});
     Garage headwayGarage(2);
     TrafficManager headwayManager(headwayTopology, headwayGarage);
-    Biplace &headwayLeader = headwayGarage.getEngines()[0];
-    Biplace &headwayFollower = headwayGarage.getEngines()[1];
+    Engine &headwayLeader = *headwayGarage.getIdleEngine();
+    assert(headwayGarage.getIdleEngines().at(headwayLeader.getId()) == &headwayLeader);
     assert(headwayManager.contractRoute(
         headwayLeader,
         headwayStationA.getId(),
         headwayStationB.getId()));
+    assert(headwayGarage.getActiveEngines().at(headwayLeader.getId()) == &headwayLeader);
+    Engine &headwayFollower = *headwayGarage.getIdleEngine();
     assert(headwayManager.contractRoute(
         headwayFollower,
         headwayStationA.getId(),
@@ -61,9 +63,7 @@ int main()
 
     Garage garage(3);
     TrafficManager trafficManager(topology, garage);
-    Biplace &firstEngine = garage.getEngines()[0];
-    Biplace &secondEngine = garage.getEngines()[1];
-    Biplace &reverseEngine = garage.getEngines()[2];
+    Engine &firstEngine = *garage.getIdleEngine();
 
     assert(firstEngine.getLengthMeters() == 3.0);
     assert(firstEngine.getSecurityDistanceMeters() == 3.0);
@@ -71,9 +71,11 @@ int main()
     assert(firstEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(firstEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);
 
+    Engine &secondEngine = *garage.getIdleEngine();
     assert(trafficManager.contractRoute(secondEngine, stationA.getId(), stationB.getId()));
     assert(secondEngine.getPad().getTrajectory()->getLinks().first()->getId() == 2);
 
+    Engine &reverseEngine = *garage.getIdleEngine();
     assert(trafficManager.contractRoute(reverseEngine, stationB.getId(), stationA.getId()));
     assert(reverseEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(reverseEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);

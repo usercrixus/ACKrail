@@ -1,37 +1,80 @@
 #include "Garage.hpp"
 
-#include <algorithm>
-
 Garage::Garage(std::size_t engineCount)
-    : engines(engineCount)
 {
-}
-
-const std::vector<Biplace> &Garage::getEngines() const
-{
-    return engines;
-}
-
-std::vector<Biplace> &Garage::getEngines()
-{
-    return engines;
-}
-
-Biplace *Garage::getIdleEngine()
-{
-    for (Biplace &engine : engines) {
-        if (!engine.getPad().isActive())
-            return &engine;
+    idleEngines.reserve(engineCount);
+    activeEngines.reserve(engineCount);
+    for (std::size_t index = 0; index < engineCount; ++index)
+    {
+        const int id = static_cast<int>(index);
+        idleEngines.emplace(id, new Biplace(id));
     }
-    return nullptr;
+}
+
+Garage::~Garage()
+{
+    for (const auto &[id, engine] : idleEngines)
+        delete engine;
+    for (const auto &[id, engine] : activeEngines)
+        delete engine;
+}
+
+const std::unordered_map<int, Engine *> &Garage::getIdleEngines() const
+{
+    return idleEngines;
+}
+
+const std::unordered_map<int, Engine *> &Garage::getActiveEngines() const
+{
+    return activeEngines;
+}
+
+Engine *Garage::getIdleEngine()
+{
+    return idleEngines.empty() ? nullptr : idleEngines.begin()->second;
+}
+
+bool Garage::isIdleEngine(const Engine &engine) const
+{
+    const auto position = idleEngines.find(engine.getId());
+    return position != idleEngines.end() && position->second == &engine;
 }
 
 std::size_t Garage::getActiveEngineCount() const
 {
-    std::size_t count = 0;
-    for (const Biplace &engine : engines) {
-        if (engine.getPad().isActive())
-            ++count;
+    return activeEngines.size();
+}
+
+std::size_t Garage::getEngineCount() const
+{
+    return idleEngines.size() + activeEngines.size();
+}
+
+void Garage::activateEngine(Engine *engine)
+{
+    if (engine == nullptr)
+        return;
+    auto node = idleEngines.extract(engine->getId());
+    if (node.empty() || node.mapped() != engine)
+    {
+        if (!node.empty())
+            idleEngines.insert(std::move(node));
+        return;
     }
-    return count;
+    activeEngines.insert(std::move(node));
+}
+
+void Garage::recycleInactiveEngines()
+{
+    auto position = activeEngines.begin();
+    while (position != activeEngines.end())
+    {
+        if (position->second->getPad().isActive())
+        {
+            ++position;
+            continue;
+        }
+        auto current = position++;
+        idleEngines.insert(activeEngines.extract(current));
+    }
 }

@@ -1,6 +1,7 @@
 #include "./Biplace.hpp"
 
-Biplace::Biplace()
+Biplace::Biplace(int id)
+    : Engine(id)
 {
     setModelName(QStringLiteral("Rail Module X1"));
     setLengthMeters(3.0);

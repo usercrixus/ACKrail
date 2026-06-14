@@ -17,7 +17,7 @@ HeaderWidget::HeaderWidget(const Topology &topology, const Garage &garage, QWidg
 void HeaderWidget::refresh()
 {
     activeEngineCount = garage.getActiveEngineCount();
-    engineCount = garage.getEngines().size();
+    engineCount = garage.getEngineCount();
     update();
 }
 

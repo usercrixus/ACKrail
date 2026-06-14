@@ -21,7 +21,7 @@ public:
     /**
      * Finds and commits the earliest-arrival route contract for an engine.
      */
-    bool contractRoute(Biplace &engine, int fromStationId, int toStationId);
+    bool contractRoute(Engine &engine, int fromStationId, int toStationId);
 
     /**
      * Advances active engines.

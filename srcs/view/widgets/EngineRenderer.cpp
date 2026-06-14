@@ -12,7 +12,7 @@ EngineRenderer::EngineRenderer(const Garage &garage, const MapViewport &mapViewp
     : garage(garage),
       mapViewport(mapViewport)
 {
-    states.resize(garage.getEngines().size());
+    states.resize(garage.getActiveEngines().size());
 }
 
 void EngineRenderer::initialize()
@@ -53,11 +53,19 @@ void EngineRenderer::initialize()
 
 void EngineRenderer::refresh()
 {
-    const auto &engines = garage.getEngines();
+    const auto &engines = garage.getActiveEngines();
     if (states.size() != engines.size())
         states.resize(engines.size());
-    for (std::size_t index = 0; index < engines.size(); ++index)
-        calculateState(engines[index], states[index]);
+    bool selectionFound = false;
+    std::size_t index = 0;
+    for (const auto &[id, engine] : engines)
+    {
+        calculateState(*engine, states[index]);
+        selectionFound = selectionFound || states[index].engine == selectedEngine;
+        ++index;
+    }
+    if (!selectionFound)
+        selectedEngine = nullptr;
 }
 
 void EngineRenderer::draw(const QMatrix4x4 &matrix, const QSize &viewportSize)
@@ -93,7 +101,7 @@ void EngineRenderer::draw(const QMatrix4x4 &matrix, const QSize &viewportSize)
 void EngineRenderer::selectAt(const QPointF &screenPosition, const MapCamera &camera)
 {
     constexpr double SelectionRadius = 14.0;
-    selectedEngineIndex = -1;
+    selectedEngine = nullptr;
     double closestDistance = SelectionRadius;
     for (std::size_t index = 0; index < states.size(); ++index)
     {
@@ -105,7 +113,7 @@ void EngineRenderer::selectAt(const QPointF &screenPosition, const MapCamera &ca
             if (distance <= closestDistance)
             {
                 closestDistance = distance;
-                selectedEngineIndex = static_cast<int>(index);
+                selectedEngine = state.engine;
             }
         }
     }
@@ -137,6 +145,7 @@ void EngineRenderer::updateBuffer()
 void EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
 {
     const EnginePad &pad = engine.getPad();
+    state.engine = &engine;
     if (!pad.isActive())
     {
         state.active = false;
@@ -153,12 +162,13 @@ void EngineRenderer::calculateState(const Engine &engine, RenderState &state) co
 
 void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
 {
-    if (selectedEngineIndex >= 0 && selectedEngineIndex < static_cast<int>(states.size()))
+    if (selectedEngine == nullptr)
+        return;
+    for (const RenderState &state : states)
     {
-        const RenderState &state = states[selectedEngineIndex];
-        if (state.active)
+        if (state.engine == selectedEngine && state.active)
         {
-            const QString information = createInformation(garage.getEngines()[selectedEngineIndex]);
+            const QString information = createInformation(*selectedEngine);
             if (!information.isEmpty())
             {
                 const QFont font(QStringLiteral("Sans Serif"), 9);
@@ -177,6 +187,7 @@ void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera)
                 painter.setPen(QColor(QStringLiteral("#f4f7f9")));
                 painter.drawText(panel.adjusted(10, 8, -10, -8), Qt::AlignLeft | Qt::AlignTop, information);
             }
+            return;
         }
     }
 }

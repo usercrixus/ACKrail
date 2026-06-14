@@ -36,7 +36,7 @@ private:
      * @param engine Engine to dispatch.
      * @return true when a route was assigned; otherwise false.
      */
-    bool dispatchEngine(Biplace &engine);
+    bool dispatchEngine(Engine &engine);
 
     const Topology &topology;
     Garage &garage;
