@@ -27,7 +27,12 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
         const Route::ContractStep &step = route->getContract()[index];
         const double entryTimeSeconds = arrivalTimeSeconds + step.waitSeconds;
         Node *departureNode = route->getStations()[index];
-        departureNode->getController().reserveEntry(route->getLinks()[index]->getId(), engine, entryTimeSeconds, entrySeparationSeconds);
+        departureNode->getController().reserveEntry(
+            route->getLinks()[index]->getId(),
+            engine.getId(),
+            static_cast<std::size_t>(index),
+            entryTimeSeconds,
+            entrySeparationSeconds);
         arrivalTimeSeconds = entryTimeSeconds + step.traversalSeconds;
     }
     engine.getPad().setTotalTrajectorySeconds(arrivalTimeSeconds - simulationTimeSeconds);
@@ -41,7 +46,16 @@ void TrafficManager::advance(double elapsedSeconds)
     if (elapsedSeconds > 0.0)
     {
         for (const auto &[id, engine] : garage.getActiveEngines())
-            engine->getPad().advance(elapsedSeconds);
+        {
+            EnginePad &pad = engine->getPad();
+            const qsizetype currentContractStep = pad.getCurrentContractStep();
+            const QVector<Node *> stations = pad.getTrajectory()->getStations();
+            const QVector<Link *> links = pad.getTrajectory()->getLinks();
+            pad.advance(elapsedSeconds);
+            const qsizetype advancedContractStep = pad.getCurrentContractStep();
+            for (qsizetype step = currentContractStep; step < advancedContractStep; ++step)
+                stations[step]->getController().cleanExpiredReservation(links[step]->getId(), id, static_cast<std::size_t>(step));
+        }
         garage.recycleInactiveEngines();
         simulationTimeSeconds += elapsedSeconds;
     }

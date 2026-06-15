@@ -1,9 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <unordered_map>
 #include <vector>
-
-class Engine;
 
 /**
  * Maintains the departure schedule for links controlled by one node.
@@ -23,14 +22,25 @@ public:
     /**
      * Commits a departure slot previously selected by the route planner.
      */
-    void reserveEntry(int linkId, const Engine &engine, double entryTime, double entrySeparationSeconds);
+    void reserveEntry(
+        int linkId,
+        int engineId,
+        std::size_t contractStep,
+        double entryTime,
+        double entrySeparationSeconds);
+
+    /**
+     * Removes completed departure slots belonging to an engine.
+     */
+    void cleanExpiredReservation(int linkId, int engineId, std::size_t contractStep);
 
 private:
     struct Reservation
     {
         double startSeconds;
         double endSeconds;
-        const Engine *engine;
+        int engineId;
+        std::size_t contractStep;
     };
 
     int nodeId;

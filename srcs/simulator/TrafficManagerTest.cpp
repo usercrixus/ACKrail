@@ -5,6 +5,13 @@
 
 int main()
 {
+    NodeController controller(1);
+    controller.reserveEntry(1, 7, 0, 2.0, 3.0);
+    controller.reserveEntry(2, 7, 1, 4.0, 3.0);
+    controller.cleanExpiredReservation(1, 7, 0);
+    assert(controller.findEarliestEntryTime(1, 2.0, 1.0) == 2.0);
+    assert(controller.findEarliestEntryTime(2, 4.0, 1.0) == 7.0);
+
     const Node headwayStationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node headwayStationB(2, QStringLiteral("B"), 0.0, 0.00001);
     Topology headwayTopology(
@@ -92,6 +99,7 @@ int main()
 
     firstEngine.getPad().advance(directTraversalSeconds);
     assert(!firstEngine.getPad().isActive());
+    assert(firstEngine.getPad().getCurrentContractStep() == 1);
     assert(std::abs(
         firstEngine.getPad().getTravelledDistanceKilometers()
         - topology.getLinks().first().getDistanceKilometers()) < 0.000001);

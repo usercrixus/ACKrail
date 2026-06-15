@@ -83,7 +83,6 @@ void EnginePad::finishTrajectory()
     delete trajectory;
     trajectory = nullptr;
     currentSpeedKilometersPerHour = 0.0;
-    currentContractStep = 0;
     remainingWaitSeconds = 0.0;
     remainingTraversalKilometers = 0.0;
 }
