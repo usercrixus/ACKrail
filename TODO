@@ -1,3 +1,6 @@
+Look in /media/sf_vmShared/ACKrail/srcs/simulator/NodeController.cpp
+verify that linkId is linked to the current node, return a bool or use exception if not
+
 Entry-time windows instead of exact times.
 Contract cancellation and local replanning.
 Acceleration and braking distance.
