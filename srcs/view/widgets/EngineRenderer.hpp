@@ -9,6 +9,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QPainter>
+#include <QPixmap>
 #include <QSize>
 #include <vector>
 
@@ -59,6 +60,7 @@ private:
     QOpenGLBuffer shapeBuffer{QOpenGLBuffer::VertexBuffer};
     QOpenGLBuffer instanceBuffer{QOpenGLBuffer::VertexBuffer};
     QOpenGLVertexArrayObject vertexArray;
+    QPixmap enginePreview;
     std::vector<RenderState> states;
     std::vector<Instance> instances;
     int shapeVertexCount = 0;

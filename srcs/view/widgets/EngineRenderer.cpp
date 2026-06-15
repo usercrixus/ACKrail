@@ -18,6 +18,8 @@ EngineRenderer::EngineRenderer(const Garage &garage, const MapViewport &mapViewp
 void EngineRenderer::initialize()
 {
     initializeOpenGLFunctions();
+    enginePreview = QPixmap(QStringLiteral(":/assets/biplace.png"))
+                        .scaled(240, 120, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/shaders/engine.vert")) || !program.addShaderFromSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/shaders/engine.frag")) || !program.link())
     {
         qFatal("Unable to create engine shader: %s", qPrintable(program.log()));
@@ -175,8 +177,13 @@ void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera)
             {
                 const QFont font(QStringLiteral("Sans Serif"), 9);
                 const QFontMetrics metrics(font);
-                QRectF panel = metrics.boundingRect(QRect(0, 0, 420, camera.viewportSize().height()), Qt::AlignLeft | Qt::AlignTop, information);
-                panel.adjust(-10, -8, 10, 8);
+                constexpr qreal horizontalPadding = 10.0;
+                constexpr qreal verticalPadding = 8.0;
+                constexpr qreal imageSpacing = 8.0;
+                const QRect textBounds = metrics.boundingRect(QRect(0, 0, 420, camera.viewportSize().height()), Qt::AlignLeft | Qt::AlignTop, information);
+                const qreal contentWidth = std::max<qreal>(textBounds.width(), enginePreview.width());
+                const qreal previewHeight = enginePreview.isNull() ? 0.0 : enginePreview.height() + imageSpacing;
+                QRectF panel(0, 0, contentWidth + horizontalPadding * 2, textBounds.height() + previewHeight + verticalPadding * 2);
                 panel.moveTopLeft(camera.sceneToScreen(state.position) + QPointF(16, -panel.height() - 12));
                 if (panel.right() > camera.viewportSize().width() - 8)
                     panel.moveRight(camera.viewportSize().width() - 8);
@@ -186,8 +193,22 @@ void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera)
                 painter.setPen(QPen(QColor(QStringLiteral("#ff8a65")), 1.5));
                 painter.setBrush(QColor(QStringLiteral("#17232f")));
                 painter.drawRoundedRect(panel, 6, 6);
+                qreal textTop = panel.top() + verticalPadding;
+                if (!enginePreview.isNull())
+                {
+                    const QPointF previewPosition(
+                        panel.left() + (panel.width() - enginePreview.width()) / 2.0,
+                        textTop);
+                    painter.drawPixmap(previewPosition, enginePreview);
+                    textTop += enginePreview.height() + imageSpacing;
+                }
                 painter.setPen(QColor(QStringLiteral("#f4f7f9")));
-                painter.drawText(panel.adjusted(10, 8, -10, -8), Qt::AlignLeft | Qt::AlignTop, information);
+                const QRectF textRect(
+                    panel.left() + horizontalPadding,
+                    textTop,
+                    contentWidth,
+                    textBounds.height());
+                painter.drawText(textRect, Qt::AlignLeft | Qt::AlignTop, information);
             }
             return;
         }

@@ -82,6 +82,13 @@ qt_add_resources(ackrail "shaders"
         view/shaders/node.vert
 )
 
+qt_add_resources(ackrail "assets"
+    PREFIX "/assets"
+    BASE view/asset
+    FILES
+        view/asset/biplace.png
+)
+
 target_link_libraries(ackrail PRIVATE
     Qt6::OpenGL
     Qt6::OpenGLWidgets
