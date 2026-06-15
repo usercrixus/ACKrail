@@ -32,48 +32,65 @@ void EnginePad::advance(double elapsedSeconds)
 {
     if (!isActive() || elapsedSeconds <= 0.0)
         return;
-
     double remainingSeconds = elapsedSeconds;
     double activeSeconds = 0.0;
     while (isActive() && remainingSeconds > 0.0)
     {
+        const double waitedSeconds = advanceWait(remainingSeconds);
+        remainingSeconds -= waitedSeconds;
+        activeSeconds += waitedSeconds;
         if (remainingWaitSeconds > 0.0)
-        {
-            currentSpeedKilometersPerHour = 0.0;
-            const double consumedSeconds = std::min(remainingSeconds, remainingWaitSeconds);
-            remainingWaitSeconds -= consumedSeconds;
-            remainingSeconds -= consumedSeconds;
-            activeSeconds += consumedSeconds;
-            if (remainingWaitSeconds > 0.0)
-                break;
-        }
-
-        currentSpeedKilometersPerHour = maximumSpeedKilometersPerHour;
-        const double secondsToEndOfLink = remainingTraversalKilometers / currentSpeedKilometersPerHour * 3600.0;
-        const double consumedSeconds = std::min(remainingSeconds, secondsToEndOfLink);
-        const double travelledKilometers = currentSpeedKilometersPerHour * consumedSeconds / 3600.0;
-        remainingTraversalKilometers = std::max(0.0, remainingTraversalKilometers - travelledKilometers);
-        travelledDistanceKilometers += travelledKilometers;
-        remainingSeconds -= consumedSeconds;
-        activeSeconds += consumedSeconds;
-
+            break;
+        const double traversalSeconds = advanceCurrentLink(remainingSeconds);
+        remainingSeconds -= traversalSeconds;
+        activeSeconds += traversalSeconds;
         if (remainingTraversalKilometers > 0.0)
             break;
-
-        ++currentContractStep;
-        if (currentContractStep >= trajectory->getContract().size())
+        if (!advanceContractStep())
         {
             travelledDistanceKilometers = trajectory->getTotalDistanceKilometers();
-            elapsedTrajectorySeconds += activeSeconds;
-            averageSpeedKilometersPerHour = travelledDistanceKilometers / elapsedTrajectorySeconds * 3600.0;
+            updateTrajectoryMetrics(activeSeconds);
             finishTrajectory();
             return;
         }
-
-        remainingWaitSeconds = trajectory->getContract()[currentContractStep].waitSeconds;
-        remainingTraversalKilometers = trajectory->getLinks()[currentContractStep]->getDistanceKilometers();
     }
 
+    updateTrajectoryMetrics(activeSeconds);
+}
+
+double EnginePad::advanceWait(double availableSeconds)
+{
+    if (remainingWaitSeconds <= 0.0)
+        return 0.0;
+    currentSpeedKilometersPerHour = 0.0;
+    const double consumedSeconds = std::min(availableSeconds, remainingWaitSeconds);
+    remainingWaitSeconds -= consumedSeconds;
+    return consumedSeconds;
+}
+
+double EnginePad::advanceCurrentLink(double availableSeconds)
+{
+    currentSpeedKilometersPerHour = maximumSpeedKilometersPerHour;
+    const double secondsToEndOfLink = remainingTraversalKilometers / currentSpeedKilometersPerHour * 3600.0;
+    const double consumedSeconds = std::min(availableSeconds, secondsToEndOfLink);
+    const double travelledKilometers = currentSpeedKilometersPerHour * consumedSeconds / 3600.0;
+    remainingTraversalKilometers = std::max(0.0, remainingTraversalKilometers - travelledKilometers);
+    travelledDistanceKilometers += travelledKilometers;
+    return consumedSeconds;
+}
+
+bool EnginePad::advanceContractStep()
+{
+    ++currentContractStep;
+    if (currentContractStep >= trajectory->getContract().size())
+        return false;
+    remainingWaitSeconds = trajectory->getContract()[currentContractStep].waitSeconds;
+    remainingTraversalKilometers = trajectory->getLinks()[currentContractStep]->getDistanceKilometers();
+    return true;
+}
+
+void EnginePad::updateTrajectoryMetrics(double activeSeconds)
+{
     elapsedTrajectorySeconds += activeSeconds;
     averageSpeedKilometersPerHour = elapsedTrajectorySeconds > 0.0 ? travelledDistanceKilometers / elapsedTrajectorySeconds * 3600.0 : 0.0;
 }

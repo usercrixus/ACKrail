@@ -92,6 +92,18 @@ public:
     void setMaximumSpeedKilometersPerHour(double maximumSpeedKilometersPerHour);
 
 private:
+    /** Consumes waiting time and returns the number of seconds used. */
+    double advanceWait(double availableSeconds);
+
+    /** Traverses the current link and returns the number of seconds used. */
+    double advanceCurrentLink(double availableSeconds);
+
+    /** Selects the next contract step, if one remains. */
+    bool advanceContractStep();
+
+    /** Adds elapsed time and recalculates the average speed. */
+    void updateTrajectoryMetrics(double activeSeconds);
+
     /** Completes the active route and resets transient state. */
     void finishTrajectory();
 
