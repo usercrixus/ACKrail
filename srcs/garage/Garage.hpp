@@ -3,6 +3,7 @@
 #include "engine/Biplace.hpp"
 #include <cstddef>
 #include <mutex>
+#include <random>
 #include <unordered_map>
 
 /**
@@ -53,6 +54,14 @@ public:
      * @return An idle engine, or nullptr when every engine is active.
      */
     Engine *getIdleEngine();
+
+    /**
+     * Returns a random engine available for a new route.
+     *
+     * @param randomGenerator Generator used to select the idle engine.
+     * @return A random idle engine, or nullptr when every engine is active.
+     */
+    Engine *getRandomIdleEngine(std::mt19937 &randomGenerator);
 
     /**
      * Checks whether an engine belongs to the idle collection.

@@ -1,5 +1,7 @@
 #include "Garage.hpp"
 
+#include <iterator>
+
 Garage::Garage(std::size_t engineCount)
 {
     idleEngines.reserve(engineCount);
@@ -34,6 +36,17 @@ Engine *Garage::getIdleEngine()
 {
     const std::lock_guard lock(mutex);
     return idleEngines.empty() ? nullptr : idleEngines.begin()->second;
+}
+
+Engine *Garage::getRandomIdleEngine(std::mt19937 &randomGenerator)
+{
+    const std::lock_guard lock(mutex);
+    if (idleEngines.empty())
+        return nullptr;
+    std::uniform_int_distribution<std::size_t> idleEngineDistribution(0, idleEngines.size() - 1);
+    auto position = idleEngines.begin();
+    std::advance(position, static_cast<std::ptrdiff_t>(idleEngineDistribution(randomGenerator)));
+    return position->second;
 }
 
 bool Garage::isIdleEngine(const Engine &engine) const

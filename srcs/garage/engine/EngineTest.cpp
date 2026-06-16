@@ -12,6 +12,11 @@ int main()
     Link secondLink(2, stationB, stationC, QStringLiteral("Demo"), QStringLiteral("#ffffff"));
 
     Biplace engine;
+    assert(!engine.getPad().hasParkingStation());
+    engine.getPad().setParkingStationId(stationA.getId());
+    assert(engine.getPad().hasParkingStation());
+    assert(engine.getPad().getParkingStationId() == stationA.getId());
+
     const double expectedEntrySeparationSeconds =
         (engine.getLengthMeters() + engine.getSecurityDistanceMeters())
         / 1000.0
@@ -72,4 +77,12 @@ int main()
         engine.getPad().getTravelledDistanceKilometers()
         - link.getDistanceKilometers()
         - secondLink.getDistanceKilometers()) < 0.000001);
+    assert(engine.getPad().getParkingStationId() == stationC.getId());
+
+    Route *wrongDepartureRoute = new Route(
+        {&stationA, &stationB},
+        {&link},
+        {{0.0, firstTraversalSeconds}});
+    assert(!engine.getPad().startContractedTrajectory(wrongDepartureRoute));
+    delete wrongDepartureRoute;
 }

@@ -29,6 +29,23 @@ public:
     bool isActive() const;
 
     /**
+     * Checks whether the idle parking station is known.
+     *
+     * @return true when this pad has a valid parking station id.
+     */
+    bool hasParkingStation() const;
+
+    /** @return Station where the engine is parked while idle. */
+    int getParkingStationId() const;
+
+    /**
+     * Sets the station where the engine is parked while idle.
+     *
+     * @param stationId Station identifier.
+     */
+    void setParkingStationId(int stationId);
+
+    /**
      * Starts a route governed by its timing contract.
      *
      * @param route Contracted route whose ownership is transferred on
@@ -117,4 +134,5 @@ private:
     double travelledDistanceKilometers = 0.0;
     double remainingTraversalKilometers = 0.0;
     double remainingWaitSeconds = 0.0;
+    int parkingStationId = -1;
 };

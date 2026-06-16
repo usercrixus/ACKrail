@@ -26,17 +26,20 @@ public:
 private:
 
     /**
-     * Sends between 5 and 20 idle engines on random trips.
+     * Sends idle engines on random trips.
      */
     void generate();
 
     /**
-     * Assigns a random reachable trip to an idle engine.
+     * Assigns a random reachable trip from an idle engine's parking station.
      *
      * @param engine Engine to dispatch.
      * @return true when a route was assigned; otherwise false.
      */
     bool dispatchEngine(Engine &engine);
+
+    /** Parks idle engines evenly across topology stations. */
+    void initializeEngineParkingStations();
 
     const Topology &topology;
     Garage &garage;

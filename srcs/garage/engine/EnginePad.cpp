@@ -12,9 +12,26 @@ bool EnginePad::isActive() const
     return trajectory != nullptr;
 }
 
+bool EnginePad::hasParkingStation() const
+{
+    return parkingStationId >= 0;
+}
+
+int EnginePad::getParkingStationId() const
+{
+    return parkingStationId;
+}
+
+void EnginePad::setParkingStationId(int stationId)
+{
+    parkingStationId = stationId;
+}
+
 bool EnginePad::startContractedTrajectory(Route *route)
 {
     if (isActive() || route == nullptr || !route->hasValidContract() || maximumSpeedKilometersPerHour <= 0.0)
+        return false;
+    if (hasParkingStation() && route->getStations().first()->getId() != parkingStationId)
         return false;
     trajectory = route;
     elapsedTrajectorySeconds = 0.0;
@@ -97,6 +114,9 @@ void EnginePad::updateTrajectoryMetrics(double activeSeconds)
 
 void EnginePad::finishTrajectory()
 {
+    const QVector<Node *> &stations = trajectory->getStations();
+    if (!stations.isEmpty() && stations.last() != nullptr)
+        parkingStationId = stations.last()->getId();
     delete trajectory;
     trajectory = nullptr;
     currentSpeedKilometersPerHour = 0.0;
