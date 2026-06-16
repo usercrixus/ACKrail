@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     const QString topologyFile = argc > 1 ? QString::fromLocal8Bit(argv[1]) : QStringLiteral(":/map/paris_metro.json");
     topology.load(topologyFile);
 
-    Garage garage(10000);
+    Garage garage(50000);
     TrafficManager trafficManager(topology, garage);
     TrafficGenerator trafficGenerator(topology, garage, trafficManager);
     TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);

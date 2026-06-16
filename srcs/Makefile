@@ -1,8 +1,10 @@
 BUILD_DIR ?= /tmp/ackrail-build
+RELEASE_BUILD_DIR ?= /tmp/ackrail-release
 CMAKE ?= cmake
 ARGS ?=
+PERF_DATA ?= perf.data
 
-.PHONY: all setup topology prepare-build-dir configure build run clean
+.PHONY: all setup topology prepare-build-dir configure build run release-configure release-build run-release perf perf-report clean
 
 all: build
 
@@ -30,6 +32,21 @@ build: configure
 
 run: build
 	$(BUILD_DIR)/ackrail $(ARGS)
+
+release-configure:
+	$(CMAKE) -S . -B $(RELEASE_BUILD_DIR) -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+release-build: release-configure
+	$(CMAKE) --build $(RELEASE_BUILD_DIR)
+
+run-release: release-build
+	$(RELEASE_BUILD_DIR)/ackrail $(ARGS)
+
+perf: release-build
+	perf record -o $(PERF_DATA) -- $(RELEASE_BUILD_DIR)/ackrail $(ARGS)
+
+perf-report:
+	perf report -i $(PERF_DATA)
 
 clean:
 	$(CMAKE) -E remove_directory $(BUILD_DIR)
