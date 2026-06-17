@@ -11,7 +11,7 @@ class TopologyWidget : public QWidget
 {
 public:
     explicit TopologyWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
-    void refresh();
+    void refresh(double simulationTimeSeconds);
 
 private:
     HeaderWidget *headerWidget;

@@ -31,10 +31,14 @@ qt_add_executable(ackrail
     main.cpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
+    simulator/TrafficEventManager.cpp
+    simulator/TrafficEventManager.hpp
     simulator/NodeController.cpp
     simulator/NodeController.hpp
     simulator/TrafficManager.cpp
     simulator/TrafficManager.hpp
+    simulator/TrafficRouteManager.cpp
+    simulator/TrafficRouteManager.hpp
     simulator/TrafficSimulator.cpp
     simulator/TrafficSimulator.hpp
     topology/Link.cpp
@@ -178,8 +182,12 @@ if(BUILD_TESTING)
         geography/Point.hpp
         simulator/NodeController.cpp
         simulator/NodeController.hpp
+        simulator/TrafficEventManager.cpp
+        simulator/TrafficEventManager.hpp
         simulator/TrafficManager.cpp
         simulator/TrafficManager.hpp
+        simulator/TrafficRouteManager.cpp
+        simulator/TrafficRouteManager.hpp
         simulator/TrafficManagerTest.cpp
         topology/Link.cpp
         topology/Link.hpp

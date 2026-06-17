@@ -6,7 +6,6 @@
 #include "view/TopologyWidget.hpp"
 
 #include <QApplication>
-#include <QElapsedTimer>
 #include <QSurfaceFormat>
 #include <QTimer>
 
@@ -30,21 +29,15 @@ int main(int argc, char *argv[])
     TrafficGenerator trafficGenerator(topology, garage, trafficManager);
     TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);
     TopologyWidget window(topology, garage, trafficManager);
-    QElapsedTimer simulationClock;
-    QTimer simulationTimer;
     QTimer renderTimer;
-    simulationTimer.setInterval(16);
     renderTimer.setInterval(33);
-    QObject::connect(&simulationTimer, &QTimer::timeout, [&trafficSimulator, &simulationClock]()
+    QObject::connect(&renderTimer, &QTimer::timeout, [&trafficSimulator, &window]()
                      {
-                         const double elapsedSeconds = static_cast<double>(simulationClock.restart()) / 1000.0;
-                         trafficSimulator.advance(elapsedSeconds);
+                         window.refresh(trafficSimulator.getCurrentSimulationTimeSeconds());
                      });
-    QObject::connect(&renderTimer, &QTimer::timeout, &window, &TopologyWidget::refresh);
     window.resize(1100, 720);
     window.show();
-    simulationClock.start();
-    simulationTimer.start();
+    trafficSimulator.start();
     renderTimer.start();
 
     const int result = app.exec();

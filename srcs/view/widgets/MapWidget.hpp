@@ -17,7 +17,7 @@ class MapWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 public:
     explicit MapWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
-    void refresh();
+    void refresh(double simulationTimeSeconds);
 
 protected:
     void initializeGL() override;
@@ -37,6 +37,7 @@ private:
     LinkRenderer linkRenderer;
     NodeRenderer nodeRenderer;
     EngineRenderer engineRenderer;
+    double simulationTimeSeconds = 0.0;
     QPoint mousePressPosition;
     QPoint lastMousePosition;
     bool isLeftButtonPressed = false;

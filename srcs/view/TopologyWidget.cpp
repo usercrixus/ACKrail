@@ -16,8 +16,8 @@ TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, c
     layout->addWidget(mapWidget, 1);
 }
 
-void TopologyWidget::refresh()
+void TopologyWidget::refresh(double simulationTimeSeconds)
 {
     headerWidget->refresh();
-    mapWidget->refresh();
+    mapWidget->refresh(simulationTimeSeconds);
 }

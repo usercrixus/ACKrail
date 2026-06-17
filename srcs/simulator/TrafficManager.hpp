@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../algorithm/Dijkstra.hpp"
 #include "../garage/Garage.hpp"
+#include "TrafficEventManager.hpp"
+#include "TrafficRouteManager.hpp"
 #include "../topology/Topology.hpp"
-#include <queue>
-#include <vector>
+#include <optional>
 
 /**
  * Advances and manages engine simulation.
@@ -23,38 +23,16 @@ public:
     /**
      * Finds and commits the earliest-arrival route contract for an engine.
      */
-    bool contractRoute(Engine &engine, int fromStationId, int toStationId);
+    bool contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds);
 
-    /**
-     * Advances active engines.
-     *
-     * @param elapsedSeconds Elapsed real time in seconds.
-     */
-    void advance(double elapsedSeconds);
+    /** Processes every scheduled event due at the current simulation time. */
+    void processCurrentEvents(double currentSimulationTimeSeconds);
 
-    /** @return Current simulation time in seconds. */
-    double getSimulationTimeSeconds() const;
+    /** @return Time of the next scheduled event, or empty when none exists. */
+    std::optional<double> getNextEventTimeSeconds() const;
 
 private:
-    struct SimulationEvent
-    {
-        double timeSeconds;
-        int engineId;
-        qsizetype contractStep;
-    };
-
-    struct EarlierSimulationEvent
-    {
-        bool operator()(const SimulationEvent &left, const SimulationEvent &right) const;
-    };
-
-    void scheduleRouteEvents(const Engine &engine, const Route &route, double departureTimeSeconds);
-    void processDueEvents();
-    void processStepCompletion(const SimulationEvent &event);
-
-    Topology &topology;
     Garage &garage;
-    Dijkstra dijkstra;
-    std::priority_queue<SimulationEvent, std::vector<SimulationEvent>, EarlierSimulationEvent> events;
-    double simulationTimeSeconds = 0.0;
+    TrafficRouteManager routeManager;
+    TrafficEventManager eventManager;
 };

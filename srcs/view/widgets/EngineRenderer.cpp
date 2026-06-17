@@ -10,9 +10,9 @@
 
 EngineRenderer::EngineRenderer(const Garage &garage, const TrafficManager &trafficManager, const MapViewport &mapViewport)
     : garage(garage),
-      trafficManager(trafficManager),
       mapViewport(mapViewport)
 {
+    Q_UNUSED(trafficManager);
     states.resize(garage.getActiveEngines().size());
 }
 
@@ -50,14 +50,13 @@ void EngineRenderer::initialize()
     bufferCapacity = static_cast<int>(states.size());
     instanceBuffer.allocate(bufferCapacity * static_cast<int>(sizeof(Instance)));
     instanceBuffer.release();
-    refresh();
+    refresh(0.0);
     updateBuffer();
 }
 
-void EngineRenderer::refresh()
+void EngineRenderer::refresh(double simulationTimeSeconds)
 {
     const auto &engines = garage.getActiveEngines();
-    const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (states.size() != engines.size())
         states.resize(engines.size());
     bool selectionFound = false;
@@ -164,9 +163,8 @@ void EngineRenderer::calculateState(const Engine &engine, double simulationTimeS
     state.active = true;
 }
 
-void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
+void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera, double simulationTimeSeconds) const
 {
-    const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (selectedEngine == nullptr)
         return;
     for (const RenderState &state : states)

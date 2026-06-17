@@ -24,18 +24,21 @@ int main()
             QStringLiteral("#000000"))});
     Garage headwayGarage(2);
     TrafficManager headwayManager(headwayTopology, headwayGarage);
+    double headwaySimulationTimeSeconds = 0.0;
     Engine &headwayLeader = *headwayGarage.getIdleEngine();
     assert(headwayGarage.getIdleEngines().at(headwayLeader.getId()) == &headwayLeader);
     assert(headwayManager.contractRoute(
         headwayLeader,
         headwayStationA.getId(),
-        headwayStationB.getId()));
+        headwayStationB.getId(),
+        headwaySimulationTimeSeconds));
     assert(headwayGarage.getActiveEngines().at(headwayLeader.getId()) == &headwayLeader);
     Engine &headwayFollower = *headwayGarage.getIdleEngine();
     assert(headwayManager.contractRoute(
         headwayFollower,
         headwayStationA.getId(),
-        headwayStationB.getId()));
+        headwayStationB.getId(),
+        headwaySimulationTimeSeconds));
     const double expectedHeadwaySeconds =
         (headwayFollower.getLengthMeters() + headwayFollower.getSecurityDistanceMeters())
         / 1000.0
@@ -48,14 +51,15 @@ int main()
         headwayTopology.getLinks().first().getDistanceKilometers()
         / headwayFollower.getPad().getMaximumSpeedKilometersPerHour()
         * 3600.0;
-    headwayManager.advance(expectedHeadwaySeconds / 2.0);
-    assert(headwayFollower.getPad().getCurrentSpeedKilometersPerHour(headwayManager.getSimulationTimeSeconds()) == 0.0);
-    assert(headwayFollower.getPad().getTravelledDistanceKilometers(headwayManager.getSimulationTimeSeconds()) == 0.0);
-    headwayManager.advance(
-        expectedHeadwaySeconds / 2.0 + headwayLinkTraversalSeconds / 2.0);
-    assert(headwayFollower.getPad().getCurrentSpeedKilometersPerHour(headwayManager.getSimulationTimeSeconds())
+    headwaySimulationTimeSeconds += expectedHeadwaySeconds / 2.0;
+    headwayManager.processCurrentEvents(headwaySimulationTimeSeconds);
+    assert(headwayFollower.getPad().getCurrentSpeedKilometersPerHour(headwaySimulationTimeSeconds) == 0.0);
+    assert(headwayFollower.getPad().getTravelledDistanceKilometers(headwaySimulationTimeSeconds) == 0.0);
+    headwaySimulationTimeSeconds += expectedHeadwaySeconds / 2.0 + headwayLinkTraversalSeconds / 2.0;
+    headwayManager.processCurrentEvents(headwaySimulationTimeSeconds);
+    assert(headwayFollower.getPad().getCurrentSpeedKilometersPerHour(headwaySimulationTimeSeconds)
         == headwayFollower.getPad().getMaximumSpeedKilometersPerHour());
-    assert(headwayFollower.getPad().getTravelledDistanceKilometers(headwayManager.getSimulationTimeSeconds()) > 0.0);
+    assert(headwayFollower.getPad().getTravelledDistanceKilometers(headwaySimulationTimeSeconds) > 0.0);
 
     const Node stationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node stationB(2, QStringLiteral("B"), 0.0, 0.00001);
@@ -70,20 +74,21 @@ int main()
 
     Garage garage(3);
     TrafficManager trafficManager(topology, garage);
+    double simulationTimeSeconds = 0.0;
     Engine &firstEngine = *garage.getIdleEngine();
 
     assert(firstEngine.getLengthMeters() == 3.0);
     assert(firstEngine.getSecurityDistanceMeters() == 3.0);
-    assert(trafficManager.contractRoute(firstEngine, stationA.getId(), stationB.getId()));
+    assert(trafficManager.contractRoute(firstEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds));
     assert(firstEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(firstEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);
 
     Engine &secondEngine = *garage.getIdleEngine();
-    assert(trafficManager.contractRoute(secondEngine, stationA.getId(), stationB.getId()));
+    assert(trafficManager.contractRoute(secondEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds));
     assert(secondEngine.getPad().getTrajectory()->getLinks().first()->getId() == 2);
 
     Engine &reverseEngine = *garage.getIdleEngine();
-    assert(trafficManager.contractRoute(reverseEngine, stationB.getId(), stationA.getId()));
+    assert(trafficManager.contractRoute(reverseEngine, stationB.getId(), stationA.getId(), simulationTimeSeconds));
     assert(reverseEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(reverseEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);
 
@@ -91,13 +96,15 @@ int main()
         topology.getLinks().first().getDistanceKilometers()
         / firstEngine.getPad().getMaximumSpeedKilometersPerHour()
         * 3600.0;
-    trafficManager.advance(directTraversalSeconds / 2.0);
+    simulationTimeSeconds += directTraversalSeconds / 2.0;
+    trafficManager.processCurrentEvents(simulationTimeSeconds);
     assert(firstEngine.getPad().isActive());
-    assert(firstEngine.getPad().getCurrentSpeedKilometersPerHour(trafficManager.getSimulationTimeSeconds())
+    assert(firstEngine.getPad().getCurrentSpeedKilometersPerHour(simulationTimeSeconds)
         == firstEngine.getPad().getMaximumSpeedKilometersPerHour());
-    assert(firstEngine.getPad().getTravelledDistanceKilometers(trafficManager.getSimulationTimeSeconds()) > 0.0);
+    assert(firstEngine.getPad().getTravelledDistanceKilometers(simulationTimeSeconds) > 0.0);
 
-    trafficManager.advance(directTraversalSeconds);
+    simulationTimeSeconds += directTraversalSeconds;
+    trafficManager.processCurrentEvents(simulationTimeSeconds);
     assert(!firstEngine.getPad().isActive());
     assert(firstEngine.getPad().getCurrentContractStep() == 1);
     assert(std::abs(
@@ -111,17 +118,20 @@ int main()
         {Link(1, completionStationA, completionStationB, QStringLiteral("Direct"), QStringLiteral("#000000"))});
     Garage completionGarage(1);
     TrafficManager completionManager(completionTopology, completionGarage);
+    double completionSimulationTimeSeconds = 0.0;
     Engine &completionEngine = *completionGarage.getIdleEngine();
-    assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId()));
+    assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds));
     const double completionTraversalSeconds =
         completionTopology.getLinks().first().getDistanceKilometers()
         / completionEngine.getPad().getMaximumSpeedKilometersPerHour()
         * 3600.0;
-    completionManager.advance(completionTraversalSeconds / 2.0);
+    completionSimulationTimeSeconds += completionTraversalSeconds / 2.0;
+    completionManager.processCurrentEvents(completionSimulationTimeSeconds);
     assert(completionEngine.getPad().isActive());
     assert(completionGarage.getActiveEngineCount() == 1);
-    assert(completionEngine.getPad().getCurrentLinkProgress(completionManager.getSimulationTimeSeconds()) > 0.0);
-    completionManager.advance(completionTraversalSeconds + 1.0);
+    assert(completionEngine.getPad().getCurrentLinkProgress(completionSimulationTimeSeconds) > 0.0);
+    completionSimulationTimeSeconds += completionTraversalSeconds + 1.0;
+    completionManager.processCurrentEvents(completionSimulationTimeSeconds);
     assert(!completionEngine.getPad().isActive());
     assert(completionGarage.getActiveEngineCount() == 0);
 }

@@ -11,34 +11,39 @@ TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage, Tra
     initializeEngineParkingStations();
 }
 
-void TrafficGenerator::tryGenerate(double elapsedSeconds)
+void TrafficGenerator::tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds)
 {
     if (elapsedSeconds > 0.0)
     {
         secondsUntilDispatch -= elapsedSeconds;
         while (secondsUntilDispatch <= 0.0)
         {
-            generate();
+            generate(currentSimulationTimeSeconds);
             secondsUntilDispatch += 1.0;
         }
     }
 }
 
-void TrafficGenerator::generate()
+double TrafficGenerator::getSecondsUntilDispatch() const
+{
+    return secondsUntilDispatch;
+}
+
+void TrafficGenerator::generate(double currentSimulationTimeSeconds)
 {
     std::uniform_int_distribution<int> dispatchCountDistribution(100, 150);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
         Engine *engine = garage.getRandomIdleEngine(randomGenerator);
-        if (engine == nullptr || !dispatchEngine(*engine))
+        if (engine == nullptr || !dispatchEngine(*engine, currentSimulationTimeSeconds))
             break;
         else
             --remainingDispatches;
     }
 }
 
-bool TrafficGenerator::dispatchEngine(Engine &engine)
+bool TrafficGenerator::dispatchEngine(Engine &engine, double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
     if (stations.size() < 2 || !engine.getPad().hasParkingStation())
@@ -51,7 +56,7 @@ bool TrafficGenerator::dispatchEngine(Engine &engine)
         const Node &toStation = stations[stationDistribution(randomGenerator)];
         if (fromStationId != toStation.getId())
         {
-            if (trafficManager.contractRoute(engine, fromStationId, toStation.getId()))
+            if (trafficManager.contractRoute(engine, fromStationId, toStation.getId(), currentSimulationTimeSeconds))
                 return true;
         }
     }

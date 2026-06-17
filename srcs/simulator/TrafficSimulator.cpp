@@ -1,16 +1,51 @@
 #include "TrafficSimulator.hpp"
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator)
-    : trafficManager(trafficManager),
+#include <QTimer>
+#include <algorithm>
+#include <cmath>
+
+TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, QObject *parent)
+    : QObject(parent),
+      trafficManager(trafficManager),
       trafficGenerator(trafficGenerator)
 {
 }
 
-void TrafficSimulator::advance(double elapsedSeconds)
+void TrafficSimulator::start()
 {
-    if (elapsedSeconds > 0.0)
-    {
-        trafficManager.advance(elapsedSeconds);
-        trafficGenerator.tryGenerate(elapsedSeconds);
-    }
+    if (started)
+        return;
+    started = true;
+    lastGeneratorUpdateSeconds = 0.0;
+    simulationClock.start();
+    trafficManager.processCurrentEvents(0.0);
+    scheduleNextWork();
+}
+
+double TrafficSimulator::getCurrentSimulationTimeSeconds() const
+{
+    if (!started)
+        return 0.0;
+    return static_cast<double>(simulationClock.elapsed()) / 1000.0;
+}
+
+void TrafficSimulator::processScheduledWork()
+{
+    const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
+    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
+    trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
+    lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
+    scheduleNextWork();
+}
+
+void TrafficSimulator::scheduleNextWork()
+{
+    const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
+    double delaySeconds = trafficGenerator.getSecondsUntilDispatch();
+    const std::optional<double> nextEventTimeSeconds = trafficManager.getNextEventTimeSeconds();
+    if (nextEventTimeSeconds.has_value())
+        delaySeconds = std::min(delaySeconds, std::max(0.0, *nextEventTimeSeconds - currentSimulationTimeSeconds));
+    const int delayMilliseconds = std::max(0, static_cast<int>(std::ceil(delaySeconds * 1000.0)));
+    QTimer::singleShot(delayMilliseconds, this, [this]()
+                       { processScheduledWork(); });
 }

@@ -17,9 +17,10 @@ MapWidget::MapWidget(const Topology &topology, const Garage &garage, const Traff
     setCursor(Qt::ArrowCursor);
 }
 
-void MapWidget::refresh()
+void MapWidget::refresh(double simulationTimeSeconds)
 {
-    engineRenderer.refresh();
+    this->simulationTimeSeconds = simulationTimeSeconds;
+    engineRenderer.refresh(simulationTimeSeconds);
     update();
 }
 
@@ -132,5 +133,5 @@ void MapWidget::drawOverlay()
         return;
     }
     nodeRenderer.drawLabels(painter, camera);
-    engineRenderer.drawInformation(painter, camera);
+    engineRenderer.drawInformation(painter, camera, simulationTimeSeconds);
 }

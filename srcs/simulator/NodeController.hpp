@@ -10,7 +10,7 @@
 class NodeController
 {
 public:
-    explicit NodeController(int nodeId);
+    NodeController(int nodeId);
 
     int getNodeId() const;
 

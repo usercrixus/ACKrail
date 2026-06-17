@@ -19,16 +19,20 @@ public:
     /**
      * Advances the generation schedule and dispatches traffic when due.
      *
+     * @param currentSimulationTimeSeconds Current simulation time in seconds.
      * @param elapsedSeconds Elapsed real time in seconds.
      */
-    void tryGenerate(double elapsedSeconds);
+    void tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds);
+
+    /** @return Seconds before the next generated traffic dispatch. */
+    double getSecondsUntilDispatch() const;
 
 private:
 
     /**
      * Sends idle engines on random trips.
      */
-    void generate();
+    void generate(double currentSimulationTimeSeconds);
 
     /**
      * Assigns a random reachable trip from an idle engine's parking station.
@@ -36,7 +40,7 @@ private:
      * @param engine Engine to dispatch.
      * @return true when a route was assigned; otherwise false.
      */
-    bool dispatchEngine(Engine &engine);
+    bool dispatchEngine(Engine &engine, double currentSimulationTimeSeconds);
 
     /** Parks idle engines evenly across topology stations. */
     void initializeEngineParkingStations();

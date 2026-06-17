@@ -19,10 +19,10 @@ class EngineRenderer : protected QOpenGLExtraFunctions
 public:
     EngineRenderer(const Garage &garage, const TrafficManager &trafficManager, const MapViewport &mapViewport);
     void initialize();
-    void refresh();
+    void refresh(double simulationTimeSeconds);
     void draw(const QMatrix4x4 &matrix, const QSize &viewportSize);
     void selectAt(const QPointF &screenPosition, const MapCamera &camera);
-    void drawInformation(QPainter &painter, const MapCamera &camera) const;
+    void drawInformation(QPainter &painter, const MapCamera &camera, double simulationTimeSeconds) const;
 
 private:
     struct Vertex
@@ -56,7 +56,6 @@ private:
     QString getRoadmap(const Route &route) const;
 
     const Garage &garage;
-    const TrafficManager &trafficManager;
     const MapViewport &mapViewport;
     QOpenGLShaderProgram program;
     QOpenGLBuffer shapeBuffer{QOpenGLBuffer::VertexBuffer};
