@@ -56,7 +56,7 @@ bool TrafficGenerator::dispatchEngine(Engine &engine, double currentSimulationTi
         const Node &toStation = stations[stationDistribution(randomGenerator)];
         if (fromStationId != toStation.getId())
         {
-            if (trafficManager.contractRoute(engine, fromStationId, toStation.getId(), currentSimulationTimeSeconds))
+            if (trafficManager.contractRoute(engine, fromStationId, toStation.getId(), currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
                 return true;
         }
     }

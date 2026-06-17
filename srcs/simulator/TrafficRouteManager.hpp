@@ -17,7 +17,7 @@ public:
 
     TrafficRouteManager(Topology &topology);
 
-    std::optional<ContractedRoute> contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType = EnginePad::TravelType::Passenger);
+    std::optional<ContractedRoute> contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
 
 private:
     Topology &topology;

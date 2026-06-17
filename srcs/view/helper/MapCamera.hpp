@@ -24,7 +24,7 @@ public:
 private:
     static constexpr double Margin = 70.0;
     static constexpr double MinimumZoom = 0.25;
-    static constexpr double MaximumZoom = 80.0;
+    static constexpr double MaximumZoom = 180.0;
 
     void updateFitScale();
 
