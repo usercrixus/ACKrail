@@ -11,6 +11,13 @@
 class EnginePad
 {
 public:
+    enum class TravelType
+    {
+        Idle,
+        Passenger,
+        Rebalancing
+    };
+
     /** Creates an idle journey state. */
     EnginePad() = default;
 
@@ -53,7 +60,10 @@ public:
      * @param simulationTimeSeconds Current simulation time in seconds.
      * @return true when the contracted route was accepted; otherwise false.
      */
-    bool startContractedTrajectory(Route *route, double simulationTimeSeconds);
+    bool startContractedTrajectory(Route *route, double simulationTimeSeconds, TravelType travelType);
+
+    /** @return Current travel type. */
+    TravelType getTravelType() const;
 
     /** @return Maximum speed in kilometers per hour. */
     double getMaximumSpeedKilometersPerHour() const;
@@ -157,4 +167,5 @@ private:
     double currentLinkExitTimeSeconds = 0.0;
     double completedDistanceKilometers = 0.0;
     int parkingStationId = -1;
+    TravelType travelType = TravelType::Idle;
 };

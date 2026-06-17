@@ -6,7 +6,12 @@ TrafficRouteManager::TrafficRouteManager(Topology &topology)
 {
 }
 
-std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds)
+std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractRoute(
+    Engine &engine,
+    int fromStationId,
+    int toStationId,
+    double currentSimulationTimeSeconds,
+    EnginePad::TravelType travelType)
 {
     if (engine.getPad().isActive())
         return std::nullopt;
@@ -15,7 +20,7 @@ std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contrac
     Route *route = dijkstra.findRoute(fromStationId, toStationId, currentSimulationTimeSeconds, engine.getPad().getMaximumSpeedKilometersPerHour(), entrySeparationSeconds);
     if (route == nullptr)
         return std::nullopt;
-    if (!engine.getPad().startContractedTrajectory(route, currentSimulationTimeSeconds))
+    if (!engine.getPad().startContractedTrajectory(route, currentSimulationTimeSeconds, travelType))
     {
         delete route;
         return std::nullopt;

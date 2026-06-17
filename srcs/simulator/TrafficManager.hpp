@@ -23,7 +23,7 @@ public:
     /**
      * Finds and commits the earliest-arrival route contract for an engine.
      */
-    bool contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds);
+    bool contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
 
     /** Processes every scheduled event due at the current simulation time. */
     void processCurrentEvents(double currentSimulationTimeSeconds);

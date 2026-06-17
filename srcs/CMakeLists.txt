@@ -29,6 +29,8 @@ qt_add_executable(ackrail
     geography/Point.cpp
     geography/Point.hpp
     main.cpp
+    simulator/TrafficBalancer.cpp
+    simulator/TrafficBalancer.hpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
     simulator/TrafficEventManager.cpp
@@ -184,6 +186,8 @@ if(BUILD_TESTING)
         simulator/NodeController.hpp
         simulator/TrafficEventManager.cpp
         simulator/TrafficEventManager.hpp
+        simulator/TrafficBalancer.cpp
+        simulator/TrafficBalancer.hpp
         simulator/TrafficManager.cpp
         simulator/TrafficManager.hpp
         simulator/TrafficRouteManager.cpp

@@ -7,11 +7,11 @@ TrafficManager::TrafficManager(Topology &topology, Garage &garage)
 {
 }
 
-bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds)
+bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
     if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
-    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds);
+    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
     if (!contractedRoute.has_value())
         return false;
     garage.activateEngine(&engine);

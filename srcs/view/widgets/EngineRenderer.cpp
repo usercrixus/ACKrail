@@ -88,13 +88,17 @@ void EngineRenderer::draw(const QMatrix4x4 &matrix, const QSize &viewportSize)
         instanceBuffer.bind();
         program.enableAttributeArray(2);
         program.enableAttributeArray(3);
+        program.enableAttributeArray(4);
         program.setAttributeBuffer(2, GL_FLOAT, offsetof(Instance, x), 2, sizeof(Instance));
         program.setAttributeBuffer(3, GL_FLOAT, offsetof(Instance, angleRadians), 1, sizeof(Instance));
+        program.setAttributeBuffer(4, GL_FLOAT, offsetof(Instance, red), 3, sizeof(Instance));
         glVertexAttribDivisor(2, 1);
         glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
         glDrawArraysInstanced(GL_TRIANGLES, 0, shapeVertexCount, activeEngineCount);
         glVertexAttribDivisor(2, 0);
         glVertexAttribDivisor(3, 0);
+        glVertexAttribDivisor(4, 0);
         instanceBuffer.release();
         shapeBuffer.release();
         program.release();
@@ -129,7 +133,7 @@ void EngineRenderer::updateBuffer()
     for (const RenderState &state : states)
     {
         if (state.active)
-            instances.push_back({static_cast<float>(state.position.x()), static_cast<float>(state.position.y()), static_cast<float>(state.angleRadians)});
+            instances.push_back(createInstance(state));
     }
     activeEngineCount = static_cast<int>(instances.size());
     instanceBuffer.bind();
@@ -145,6 +149,32 @@ void EngineRenderer::updateBuffer()
     instanceBuffer.release();
 }
 
+EngineRenderer::Instance EngineRenderer::createInstance(const RenderState &state)
+{
+    const QColor color = colorForTravelType(state.travelType);
+    return {
+        static_cast<float>(state.position.x()),
+        static_cast<float>(state.position.y()),
+        static_cast<float>(state.angleRadians),
+        static_cast<float>(color.redF()),
+        static_cast<float>(color.greenF()),
+        static_cast<float>(color.blueF())};
+}
+
+QColor EngineRenderer::colorForTravelType(EnginePad::TravelType travelType)
+{
+    switch (travelType)
+    {
+    case EnginePad::TravelType::Rebalancing:
+        return QColor(QStringLiteral("#43d17a"));
+    case EnginePad::TravelType::Passenger:
+        return QColor(QStringLiteral("#ff5c35"));
+    case EnginePad::TravelType::Idle:
+        return QColor(QStringLiteral("#9aa3ad"));
+    }
+    return QColor(QStringLiteral("#ff5c35"));
+}
+
 void EngineRenderer::calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const
 {
     const EnginePad &pad = engine.getPad();
@@ -153,9 +183,11 @@ void EngineRenderer::calculateState(const Engine &engine, double simulationTimeS
         state.active = false;
         state.engine = &engine;
         state.route = nullptr;
+        state.travelType = EnginePad::TravelType::Idle;
         state.contractStep = std::numeric_limits<qsizetype>::max();
         return;
     }
+    state.travelType = pad.getTravelType();
     const qsizetype index = pad.getCurrentContractStep();
     const Route *route = pad.getTrajectory();
     if (state.engine != &engine || state.route != route || state.contractStep != index)

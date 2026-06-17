@@ -1,4 +1,5 @@
 #include "garage/Garage.hpp"
+#include "simulator/TrafficBalancer.hpp"
 #include "simulator/TrafficGenerator.hpp"
 #include "simulator/TrafficManager.hpp"
 #include "simulator/TrafficSimulator.hpp"
@@ -27,7 +28,8 @@ int main(int argc, char *argv[])
     Garage garage(50000);
     TrafficManager trafficManager(topology, garage);
     TrafficGenerator trafficGenerator(topology, garage, trafficManager);
-    TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);
+    TrafficBalancer trafficBalancer(topology, garage, trafficManager);
+    TrafficSimulator trafficSimulator(trafficManager, trafficGenerator, trafficBalancer);
     TopologyWidget window(topology, garage, trafficManager);
     QTimer renderTimer;
     renderTimer.setInterval(33);

@@ -4,10 +4,11 @@
 #include <algorithm>
 #include <cmath>
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, QObject *parent)
+TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, TrafficBalancer &trafficBalancer, QObject *parent)
     : QObject(parent),
       trafficManager(trafficManager),
-      trafficGenerator(trafficGenerator)
+      trafficGenerator(trafficGenerator),
+      trafficBalancer(trafficBalancer)
 {
 }
 
@@ -17,6 +18,7 @@ void TrafficSimulator::start()
         return;
     started = true;
     lastGeneratorUpdateSeconds = 0.0;
+    lastBalancerUpdateSeconds = 0.0;
     simulationClock.start();
     trafficManager.processCurrentEvents(0.0);
     scheduleNextWork();
@@ -33,15 +35,17 @@ void TrafficSimulator::processScheduledWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
     trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
+    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
     trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
     lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
+    lastBalancerUpdateSeconds = currentSimulationTimeSeconds;
     scheduleNextWork();
 }
 
 void TrafficSimulator::scheduleNextWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
-    double delaySeconds = trafficGenerator.getSecondsUntilDispatch();
+    double delaySeconds = std::min(trafficGenerator.getSecondsUntilDispatch(), trafficBalancer.getSecondsUntilRebalance());
     const std::optional<double> nextEventTimeSeconds = trafficManager.getNextEventTimeSeconds();
     if (nextEventTimeSeconds.has_value())
         delaySeconds = std::min(delaySeconds, std::max(0.0, *nextEventTimeSeconds - currentSimulationTimeSeconds));

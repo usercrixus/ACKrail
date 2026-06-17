@@ -40,6 +40,9 @@ private:
         float x;
         float y;
         float angleRadians;
+        float red;
+        float green;
+        float blue;
     };
 
     struct RenderState
@@ -50,11 +53,14 @@ private:
         QPointF linkDelta;
         QPointF position;
         double angleRadians = 0.0;
+        EnginePad::TravelType travelType = EnginePad::TravelType::Idle;
         qsizetype contractStep = std::numeric_limits<qsizetype>::max();
         bool active = false;
     };
 
     void updateBuffer();
+    static Instance createInstance(const RenderState &state);
+    static QColor colorForTravelType(EnginePad::TravelType travelType);
     void calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const;
     QString createInformation(const Engine &engine, double simulationTimeSeconds) const;
     QString getInformation(const Engine &engine, const Route &route, double simulationTimeSeconds) const;

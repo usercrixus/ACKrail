@@ -4,6 +4,7 @@ layout(location = 0) in vec2 localPosition;
 layout(location = 1) in vec3 localColor;
 layout(location = 2) in vec2 instancePosition;
 layout(location = 3) in float instanceAngle;
+layout(location = 4) in vec3 instanceBodyColor;
 
 uniform mat4 sceneMatrix;
 uniform vec2 viewportSize;
@@ -22,5 +23,6 @@ void main()
         rotated.x * 2.0 / viewportSize.x,
         -rotated.y * 2.0 / viewportSize.y);
     gl_Position = center + vec4(pixelOffset, 0.0, 0.0);
-    vertexColor = localColor;
+    float bodyMask = step(localColor.g, localColor.r);
+    vertexColor = mix(localColor, instanceBodyColor, bodyMask);
 }

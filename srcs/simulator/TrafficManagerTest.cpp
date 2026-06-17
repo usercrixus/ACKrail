@@ -1,4 +1,5 @@
 #include "TrafficManager.hpp"
+#include "TrafficBalancer.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -120,7 +121,10 @@ int main()
     TrafficManager completionManager(completionTopology, completionGarage);
     double completionSimulationTimeSeconds = 0.0;
     Engine &completionEngine = *completionGarage.getIdleEngine();
+    completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
+    assert(completionGarage.getIdleEnginesByStation().at(completionStationA.getId()).size() == 1);
     assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds));
+    assert(completionGarage.getIdleEnginesByStation().find(completionStationA.getId()) == completionGarage.getIdleEnginesByStation().end());
     const double completionTraversalSeconds =
         completionTopology.getLinks().first().getDistanceKilometers()
         / completionEngine.getPad().getMaximumSpeedKilometersPerHour()
@@ -134,4 +138,44 @@ int main()
     completionManager.processCurrentEvents(completionSimulationTimeSeconds);
     assert(!completionEngine.getPad().isActive());
     assert(completionGarage.getActiveEngineCount() == 0);
+    assert(completionGarage.getIdleEnginesByStation().at(completionStationB.getId()).size() == 1);
+
+    const Node balanceStationA(1, QStringLiteral("A"), 0.0, 0.0);
+    const Node balanceStationB(2, QStringLiteral("B"), 0.0, 0.00001);
+    Topology balanceTopology(
+        {balanceStationA, balanceStationB},
+        {Link(1, balanceStationA, balanceStationB, QStringLiteral("Direct"), QStringLiteral("#000000"))});
+    Garage balanceGarage(8);
+    TrafficManager balanceManager(balanceTopology, balanceGarage);
+    TrafficBalancer balanceBalancer(balanceTopology, balanceGarage, balanceManager);
+    for (Engine *engine : balanceGarage.getIdleEngines())
+        balanceGarage.setIdleEngineParkingStation(*engine, balanceStationA.getId());
+    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 8);
+    balanceBalancer.tryRebalance(0.0, 5.0);
+    assert(balanceGarage.getActiveEngineCount() == 1);
+    assert(balanceGarage.getActiveEngines().back()->getPad().getTravelType() == EnginePad::TravelType::Rebalancing);
+    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 7);
+
+    const Node weightedStationA(1, QStringLiteral("A"), 0.0, 0.0);
+    const Node weightedStationB(2, QStringLiteral("B"), 0.0, 0.00001);
+    const Node weightedStationC(3, QStringLiteral("C"), 0.0, 0.00002);
+    Topology weightedTopology(
+        {weightedStationA, weightedStationB, weightedStationC},
+        {
+            Link(1, weightedStationA, weightedStationB, QStringLiteral("Direct"), QStringLiteral("#000000")),
+            Link(2, weightedStationB, weightedStationC, QStringLiteral("Direct"), QStringLiteral("#000000")),
+        });
+    Garage weightedGarage(70);
+    TrafficManager weightedManager(weightedTopology, weightedGarage);
+    TrafficBalancer weightedBalancer(weightedTopology, weightedGarage, weightedManager);
+    int weightedIndex = 0;
+    for (Engine *engine : weightedGarage.getIdleEngines())
+    {
+        const int stationId = weightedIndex < 35 ? weightedStationA.getId() : weightedStationB.getId();
+        weightedGarage.setIdleEngineParkingStation(*engine, stationId);
+        ++weightedIndex;
+    }
+    assert(weightedGarage.getIdleEnginesByStation().find(weightedStationC.getId()) == weightedGarage.getIdleEnginesByStation().end());
+    weightedBalancer.tryRebalance(0.0, 5.0);
+    assert(weightedGarage.getActiveEngineCount() > 0);
 }

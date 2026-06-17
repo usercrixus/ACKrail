@@ -4,6 +4,7 @@
 #include "engine/Biplace.hpp"
 #include <cstddef>
 #include <random>
+#include <unordered_map>
 
 /**
  * Owns and manages the simulated engine fleet.
@@ -41,6 +42,13 @@ public:
     const IndexedRandomPool<int, Engine *> &getIdleEngines() const;
 
     /**
+     * Returns idle engines grouped by their parking station.
+     *
+     * Engines without a known parking station are not present in this index.
+     */
+    const std::unordered_map<int, IndexedRandomPool<int, Engine *>> &getIdleEnginesByStation() const;
+
+    /**
      * Returns the engines currently executing a route.
      *
      * @return Read-only collection of active engine pointers.
@@ -61,6 +69,12 @@ public:
      * @return A random idle engine, or nullptr when every engine is active.
      */
     Engine *getRandomIdleEngine(std::mt19937 &randomGenerator);
+
+    /**
+     * Updates the parking station for an idle engine and keeps station indexes
+     * synchronized.
+     */
+    void setIdleEngineParkingStation(Engine &engine, int stationId);
 
     /**
      * Checks whether an engine belongs to the idle collection.
@@ -100,6 +114,10 @@ public:
     void recycleInactiveEngines();
 
 private:
+    void addIdleEngineToStationIndex(Engine *engine);
+    void removeIdleEngineFromStationIndex(Engine *engine);
+
     IndexedRandomPool<int, Engine *> idleEngines;
     IndexedRandomPool<int, Engine *> activeEngines;
+    std::unordered_map<int, IndexedRandomPool<int, Engine *>> idleEnginesByStation;
 };

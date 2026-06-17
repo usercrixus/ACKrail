@@ -25,6 +25,11 @@ const IndexedRandomPool<int, Engine *> &Garage::getIdleEngines() const
     return idleEngines;
 }
 
+const std::unordered_map<int, IndexedRandomPool<int, Engine *>> &Garage::getIdleEnginesByStation() const
+{
+    return idleEnginesByStation;
+}
+
 const IndexedRandomPool<int, Engine *> &Garage::getActiveEngines() const
 {
     return activeEngines;
@@ -40,6 +45,16 @@ Engine *Garage::getRandomIdleEngine(std::mt19937 &randomGenerator)
     if (idleEngines.empty())
         return nullptr;
     return idleEngines.random(randomGenerator);
+}
+
+void Garage::setIdleEngineParkingStation(Engine &engine, int stationId)
+{
+    Engine *const *idleEngine = idleEngines.find(engine.getId());
+    if (idleEngine == nullptr || *idleEngine != &engine)
+        return;
+    removeIdleEngineFromStationIndex(&engine);
+    engine.getPad().setParkingStationId(stationId);
+    addIdleEngineToStationIndex(&engine);
 }
 
 bool Garage::isIdleEngine(const Engine &engine) const
@@ -65,6 +80,7 @@ void Garage::activateEngine(Engine *engine)
     Engine *const *idleEngine = idleEngines.find(engine->getId());
     if (idleEngine == nullptr || *idleEngine != engine)
         return;
+    removeIdleEngineFromStationIndex(engine);
     const int movedEngineId = idleEngines.back()->getId();
     idleEngines.erase(engine->getId(), movedEngineId);
     activeEngines.push(engine->getId(), engine);
@@ -84,5 +100,32 @@ void Garage::recycleInactiveEngines()
         const int movedEngineId = activeEngines.back()->getId();
         activeEngines.erase(engine->getId(), movedEngineId);
         idleEngines.push(engine->getId(), engine);
+        addIdleEngineToStationIndex(engine);
     }
+}
+
+void Garage::addIdleEngineToStationIndex(Engine *engine)
+{
+    if (engine == nullptr || !engine->getPad().hasParkingStation())
+        return;
+    idleEnginesByStation[engine->getPad().getParkingStationId()].push(engine->getId(), engine);
+}
+
+void Garage::removeIdleEngineFromStationIndex(Engine *engine)
+{
+    if (engine == nullptr || !engine->getPad().hasParkingStation())
+        return;
+    const auto stationPosition = idleEnginesByStation.find(engine->getPad().getParkingStationId());
+    if (stationPosition == idleEnginesByStation.end())
+        return;
+
+    IndexedRandomPool<int, Engine *> &stationEngines = stationPosition->second;
+    Engine *const *idleEngine = stationEngines.find(engine->getId());
+    if (idleEngine == nullptr || *idleEngine != engine)
+        return;
+
+    const int movedEngineId = stationEngines.back()->getId();
+    stationEngines.erase(engine->getId(), movedEngineId);
+    if (stationEngines.empty())
+        idleEnginesByStation.erase(stationPosition);
 }

@@ -72,7 +72,7 @@ void TrafficGenerator::initializeEngineParkingStations()
     qsizetype stationIndex = 0;
     for (Engine *engine : garage.getIdleEngines())
     {
-        engine->getPad().setParkingStationId(stations[stationIndex].getId());
+        garage.setIdleEngineParkingStation(*engine, stations[stationIndex].getId());
         stationIndex = (stationIndex + 1) % stations.size();
     }
 }

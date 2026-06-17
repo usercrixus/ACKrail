@@ -47,6 +47,7 @@ int main()
     const double secondEntryTimeSeconds = firstExitTimeSeconds + 1.0;
     const double secondExitTimeSeconds = secondEntryTimeSeconds + secondTraversalSeconds;
     assert(engine.getPad().startContractedTrajectory(route, StartTimeSeconds));
+    assert(engine.getPad().getTravelType() == EnginePad::TravelType::Passenger);
     engine.getPad().setTotalTrajectorySeconds(
         3.0 + firstTraversalSeconds + secondTraversalSeconds);
     assert(std::abs(
@@ -78,6 +79,7 @@ int main()
         == engine.getPad().getMaximumSpeedKilometersPerHour());
     engine.getPad().finishContractedTrajectory(secondExitTimeSeconds);
     assert(!engine.getPad().isActive());
+    assert(engine.getPad().getTravelType() == EnginePad::TravelType::Idle);
     assert(engine.getPad().getTrajectory() == nullptr);
     assert(std::abs(
         engine.getPad().getTravelledDistanceKilometers()
