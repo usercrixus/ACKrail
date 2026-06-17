@@ -58,11 +58,7 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
 
     const QVector<Node *> &stations = route->getStations();
     const QVector<Link *> &links = route->getLinks();
-    stations[event.contractStep]->getController().cleanExpiredReservation(
-        links[event.contractStep]->getId(),
-        event.engineId,
-        static_cast<std::size_t>(event.contractStep));
-
+    stations[event.contractStep]->getController().cleanExpiredReservation(links[event.contractStep]->getId(), event.engineId, static_cast<std::size_t>(event.contractStep));
     pad.completeContractStep(event.contractStep, event.timeSeconds);
 
     const qsizetype nextStep = event.contractStep + 1;

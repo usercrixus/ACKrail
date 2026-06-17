@@ -12,6 +12,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QSize>
+#include <limits>
 #include <vector>
 
 class EngineRenderer : protected QOpenGLExtraFunctions
@@ -44,8 +45,12 @@ private:
     struct RenderState
     {
         const Engine *engine = nullptr;
+        const Route *route = nullptr;
+        QPointF linkStart;
+        QPointF linkDelta;
         QPointF position;
         double angleRadians = 0.0;
+        qsizetype contractStep = std::numeric_limits<qsizetype>::max();
         bool active = false;
     };
 

@@ -84,12 +84,9 @@ void Dijkstra::relaxLink(Link *link, const QueueEntry &current, double speedKilo
     state.queue.push({destinationArrivalTime, destinationNodeId});
 }
 
-Route *Dijkstra::buildRoute(
-    int fromNodeId,
-    int toNodeId,
-    const SearchState &state) const
+Route *Dijkstra::buildRoute(int fromNodeId, int toNodeId, const SearchState &state) const
 {
-    QVector<int> nodeIds;
+    QVector<Node *> stations;
     QVector<Link *> links;
     QVector<Route::ContractStep> contract;
     int currentNodeId = toNodeId;
@@ -99,23 +96,18 @@ Route *Dijkstra::buildRoute(
         if (predecessor == state.predecessors.end())
             return nullptr;
 
-        nodeIds.prepend(currentNodeId);
-        links.prepend(predecessor->second.link);
-        contract.prepend({predecessor->second.entryTimeSeconds - state.arrivalTimes.at(predecessor->second.nodeId),
-                          predecessor->second.traversalSeconds});
+        stations.append(nodesById.at(currentNodeId));
+        links.append(predecessor->second.link);
+        contract.append({predecessor->second.entryTimeSeconds - state.arrivalTimes.at(predecessor->second.nodeId), predecessor->second.traversalSeconds});
         currentNodeId = predecessor->second.nodeId;
     }
-    nodeIds.prepend(fromNodeId);
+    stations.append(nodesById.at(fromNodeId));
 
-    QVector<Node *> stations;
-    stations.reserve(nodeIds.size());
-    for (const int nodeId : nodeIds)
-        stations.append(nodesById.at(nodeId));
+    std::reverse(stations.begin(), stations.end());
+    std::reverse(links.begin(), links.end());
+    std::reverse(contract.begin(), contract.end());
 
-    Route *route = new Route(
-        std::move(stations),
-        std::move(links),
-        std::move(contract));
+    Route *route = new Route(std::move(stations), std::move(links), std::move(contract));
     if (!route->hasValidContract())
     {
         delete route;

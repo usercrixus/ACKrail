@@ -113,15 +113,6 @@ qsizetype EnginePad::getCurrentContractStep() const
     return currentContractStep;
 }
 
-double EnginePad::getCurrentLinkProgress() const
-{
-    if (trajectory == nullptr || currentContractStep >= trajectory->getLinks().size())
-        return 0.0;
-    const double linkDistance = trajectory->getLinks()[currentContractStep]->getDistanceKilometers();
-    if (linkDistance <= 0.0)
-        return 0.0;
-    return std::clamp((linkDistance - remainingTraversalKilometers) / linkDistance, 0.0, 1.0);
-}
 
 double EnginePad::getCurrentLinkProgress(double simulationTimeSeconds) const
 {

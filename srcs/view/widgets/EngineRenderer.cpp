@@ -148,18 +148,29 @@ void EngineRenderer::updateBuffer()
 void EngineRenderer::calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const
 {
     const EnginePad &pad = engine.getPad();
-    state.engine = &engine;
     if (!pad.isActive())
     {
         state.active = false;
+        state.engine = &engine;
+        state.route = nullptr;
+        state.contractStep = std::numeric_limits<qsizetype>::max();
         return;
     }
     const qsizetype index = pad.getCurrentContractStep();
-    const QVector<Node *> &stations = pad.getTrajectory()->getStations();
-    const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
-    const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
-    state.position = start + (end - start) * pad.getCurrentLinkProgress(simulationTimeSeconds);
-    state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
+    const Route *route = pad.getTrajectory();
+    if (state.engine != &engine || state.route != route || state.contractStep != index)
+    {
+        const QVector<Node *> &stations = route->getStations();
+        const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
+        const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
+        state.engine = &engine;
+        state.route = route;
+        state.contractStep = index;
+        state.linkStart = start;
+        state.linkDelta = end - start;
+        state.angleRadians = std::atan2(state.linkDelta.y(), state.linkDelta.x());
+    }
+    state.position = state.linkStart + state.linkDelta * pad.getCurrentLinkProgress(simulationTimeSeconds);
     state.active = true;
 }
 

@@ -15,10 +15,11 @@ int NodeController::getNodeId() const
 double NodeController::findEarliestEntryTime(int linkId, double requestedEntryTime, double entrySeparationSeconds) const
 {
     double candidate = requestedEntryTime;
-    const auto schedule = reservationsByLinkId.find(linkId);
-    if (schedule == reservationsByLinkId.end())
+    const auto schedulePosition = reservationsByLinkId.find(linkId);
+    if (schedulePosition == reservationsByLinkId.end())
         return candidate;
-    for (const Reservation &reservation : schedule->second)
+    const std::vector<Reservation> &reservations = schedulePosition->second;
+    for (const Reservation &reservation : reservations)
     {
         if (candidate + entrySeparationSeconds <= reservation.startSeconds)
             break;
@@ -30,26 +31,26 @@ double NodeController::findEarliestEntryTime(int linkId, double requestedEntryTi
 
 void NodeController::reserveEntry(int linkId, int engineId, std::size_t contractStep, double entryTime, double entrySeparationSeconds)
 {
-    std::vector<Reservation> &schedule = reservationsByLinkId[linkId];
+    std::vector<Reservation> &reservations = reservationsByLinkId[linkId];
     const Reservation reservation{entryTime, entryTime + entrySeparationSeconds, engineId, contractStep};
-    const auto insertionPoint = std::lower_bound(schedule.begin(), schedule.end(), reservation.startSeconds, [](const Reservation &existing, double startSeconds)
+    const auto insertionPoint = std::lower_bound(reservations.begin(), reservations.end(), reservation.startSeconds, [](const Reservation &existing, double startSeconds)
                                                  { return existing.startSeconds < startSeconds; });
-    schedule.insert(insertionPoint, reservation);
+    reservations.insert(insertionPoint, reservation);
 }
 
 void NodeController::cleanExpiredReservation(int linkId, int engineId, std::size_t contractStep)
 {
-    const auto schedule = reservationsByLinkId.find(linkId);
-    if (schedule != reservationsByLinkId.end())
+    const auto schedulePosition = reservationsByLinkId.find(linkId);
+    if (schedulePosition != reservationsByLinkId.end())
     {
-        std::vector<Reservation> &reservations = schedule->second;
+        std::vector<Reservation> &reservations = schedulePosition->second;
         const auto reservation = std::find_if(reservations.begin(), reservations.end(), [engineId, contractStep](const Reservation &candidate)
                                               { return candidate.engineId == engineId && candidate.contractStep == contractStep; });
         if (reservation != reservations.end())
         {
             reservations.erase(reservation);
             if (reservations.empty())
-                reservationsByLinkId.erase(schedule);
+                reservationsByLinkId.erase(schedulePosition);
         }
     }
 }

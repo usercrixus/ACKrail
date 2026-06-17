@@ -19,7 +19,7 @@ void TrafficGenerator::tryGenerate(double currentSimulationTimeSeconds, double e
         while (secondsUntilDispatch <= 0.0)
         {
             generate(currentSimulationTimeSeconds);
-            secondsUntilDispatch += 1.0;
+            secondsUntilDispatch += 0.10;
         }
     }
 }
@@ -31,7 +31,7 @@ double TrafficGenerator::getSecondsUntilDispatch() const
 
 void TrafficGenerator::generate(double currentSimulationTimeSeconds)
 {
-    std::uniform_int_distribution<int> dispatchCountDistribution(100, 150);
+    std::uniform_int_distribution<int> dispatchCountDistribution(50, 75);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {

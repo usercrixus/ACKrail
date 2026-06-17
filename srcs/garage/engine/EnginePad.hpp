@@ -104,9 +104,6 @@ public:
      */
     qsizetype getCurrentContractStep() const;
 
-    /** @return Progress on the current link, between 0.0 and 1.0. */
-    double getCurrentLinkProgress() const;
-
     /**
      * Returns progress on the current link at an absolute simulation time.
      *

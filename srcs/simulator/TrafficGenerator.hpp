@@ -49,5 +49,5 @@ private:
     Garage &garage;
     TrafficManager &trafficManager;
     std::mt19937 randomGenerator;
-    double secondsUntilDispatch = 1.0;
+    double secondsUntilDispatch = 0.10;
 };
