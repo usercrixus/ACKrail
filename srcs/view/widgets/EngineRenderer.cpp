@@ -56,14 +56,13 @@ void EngineRenderer::initialize()
 
 void EngineRenderer::refresh()
 {
-    const std::lock_guard lock(garage.getMutex());
     const auto &engines = garage.getActiveEngines();
     const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (states.size() != engines.size())
         states.resize(engines.size());
     bool selectionFound = false;
     std::size_t index = 0;
-    for (const auto &[id, engine] : engines)
+    for (Engine *engine : engines)
     {
         calculateState(*engine, simulationTimeSeconds, states[index]);
         selectionFound = selectionFound || states[index].engine == selectedEngine;
@@ -167,7 +166,6 @@ void EngineRenderer::calculateState(const Engine &engine, double simulationTimeS
 
 void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
 {
-    const std::lock_guard lock(garage.getMutex());
     const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (selectedEngine == nullptr)
         return;

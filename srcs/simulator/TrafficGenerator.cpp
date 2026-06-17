@@ -1,7 +1,6 @@
 #include "TrafficGenerator.hpp"
 
 #include <chrono>
-#include <mutex>
 
 TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage, TrafficManager &trafficManager)
     : topology(topology),
@@ -27,7 +26,7 @@ void TrafficGenerator::tryGenerate(double elapsedSeconds)
 
 void TrafficGenerator::generate()
 {
-    std::uniform_int_distribution<int> dispatchCountDistribution(150, 200);
+    std::uniform_int_distribution<int> dispatchCountDistribution(100, 150);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
@@ -65,9 +64,8 @@ void TrafficGenerator::initializeEngineParkingStations()
     if (stations.isEmpty())
         return;
 
-    const std::lock_guard lock(garage.getMutex());
     qsizetype stationIndex = 0;
-    for (const auto &[id, engine] : garage.getIdleEngines())
+    for (Engine *engine : garage.getIdleEngines())
     {
         engine->getPad().setParkingStationId(stations[stationIndex].getId());
         stationIndex = (stationIndex + 1) % stations.size();

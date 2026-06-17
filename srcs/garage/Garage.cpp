@@ -1,7 +1,5 @@
 #include "Garage.hpp"
 
-#include <iterator>
-
 Garage::Garage(std::size_t engineCount)
 {
     idleEngines.reserve(engineCount);
@@ -9,97 +7,82 @@ Garage::Garage(std::size_t engineCount)
     for (std::size_t index = 0; index < engineCount; ++index)
     {
         const int id = static_cast<int>(index);
-        idleEngines.emplace(id, new Biplace(id));
+        Engine *engine = new Biplace(id);
+        idleEngines.push(id, engine);
     }
 }
 
 Garage::~Garage()
 {
-    const std::lock_guard lock(mutex);
-    for (const auto &[id, engine] : idleEngines)
+    for (Engine *engine : idleEngines)
         delete engine;
-    for (const auto &[id, engine] : activeEngines)
+    for (Engine *engine : activeEngines)
         delete engine;
 }
 
-const std::unordered_map<int, Engine *> &Garage::getIdleEngines() const
+const IndexedRandomPool<int, Engine *> &Garage::getIdleEngines() const
 {
     return idleEngines;
 }
 
-const std::unordered_map<int, Engine *> &Garage::getActiveEngines() const
+const IndexedRandomPool<int, Engine *> &Garage::getActiveEngines() const
 {
     return activeEngines;
 }
 
 Engine *Garage::getIdleEngine()
 {
-    const std::lock_guard lock(mutex);
-    return idleEngines.empty() ? nullptr : idleEngines.begin()->second;
+    return idleEngines.empty() ? nullptr : idleEngines.back();
 }
 
 Engine *Garage::getRandomIdleEngine(std::mt19937 &randomGenerator)
 {
-    const std::lock_guard lock(mutex);
     if (idleEngines.empty())
         return nullptr;
-    std::uniform_int_distribution<std::size_t> idleEngineDistribution(0, idleEngines.size() - 1);
-    auto position = idleEngines.begin();
-    std::advance(position, static_cast<std::ptrdiff_t>(idleEngineDistribution(randomGenerator)));
-    return position->second;
+    return idleEngines.random(randomGenerator);
 }
 
 bool Garage::isIdleEngine(const Engine &engine) const
 {
-    const std::lock_guard lock(mutex);
-    const auto position = idleEngines.find(engine.getId());
-    return position != idleEngines.end() && position->second == &engine;
+    Engine *const *idleEngine = idleEngines.find(engine.getId());
+    return idleEngine != nullptr && *idleEngine == &engine;
 }
 
 std::size_t Garage::getActiveEngineCount() const
 {
-    const std::lock_guard lock(mutex);
     return activeEngines.size();
 }
 
 std::size_t Garage::getEngineCount() const
 {
-    const std::lock_guard lock(mutex);
     return idleEngines.size() + activeEngines.size();
 }
 
 void Garage::activateEngine(Engine *engine)
 {
-    const std::lock_guard lock(mutex);
     if (engine == nullptr)
         return;
-    auto node = idleEngines.extract(engine->getId());
-    if (node.empty() || node.mapped() != engine)
-    {
-        if (!node.empty())
-            idleEngines.insert(std::move(node));
+    Engine *const *idleEngine = idleEngines.find(engine->getId());
+    if (idleEngine == nullptr || *idleEngine != engine)
         return;
-    }
-    activeEngines.insert(std::move(node));
+    const int movedEngineId = idleEngines.back()->getId();
+    idleEngines.erase(engine->getId(), movedEngineId);
+    activeEngines.push(engine->getId(), engine);
 }
 
 void Garage::recycleInactiveEngines()
 {
-    const std::lock_guard lock(mutex);
-    auto position = activeEngines.begin();
-    while (position != activeEngines.end())
+    std::size_t index = 0;
+    while (index < activeEngines.size())
     {
-        if (position->second->getPad().isActive())
+        Engine *engine = activeEngines[index];
+        if (engine->getPad().isActive())
         {
-            ++position;
+            ++index;
             continue;
         }
-        auto current = position++;
-        idleEngines.insert(activeEngines.extract(current));
+        const int movedEngineId = activeEngines.back()->getId();
+        activeEngines.erase(engine->getId(), movedEngineId);
+        idleEngines.push(engine->getId(), engine);
     }
-}
-
-std::recursive_mutex &Garage::getMutex() const
-{
-    return mutex;
 }

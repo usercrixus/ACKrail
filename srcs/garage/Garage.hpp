@@ -1,10 +1,9 @@
 #pragma once
 
+#include "../DesignPatter/IndexedRandomPool.hpp"
 #include "engine/Biplace.hpp"
 #include <cstddef>
-#include <mutex>
 #include <random>
-#include <unordered_map>
 
 /**
  * Owns and manages the simulated engine fleet.
@@ -39,14 +38,14 @@ public:
      *
      * @return Read-only collection of idle engine pointers.
      */
-    const std::unordered_map<int, Engine *> &getIdleEngines() const;
+    const IndexedRandomPool<int, Engine *> &getIdleEngines() const;
 
     /**
      * Returns the engines currently executing a route.
      *
      * @return Read-only collection of active engine pointers.
      */
-    const std::unordered_map<int, Engine *> &getActiveEngines() const;
+    const IndexedRandomPool<int, Engine *> &getActiveEngines() const;
 
     /**
      * Returns an engine available for a new route.
@@ -100,15 +99,7 @@ public:
      */
     void recycleInactiveEngines();
 
-    /**
-     * Returns the mutex protecting engine collections and mutable engine state.
-     *
-     * @return Garage synchronization mutex.
-     */
-    std::recursive_mutex &getMutex() const;
-
 private:
-    mutable std::recursive_mutex mutex;
-    std::unordered_map<int, Engine *> idleEngines;
-    std::unordered_map<int, Engine *> activeEngines;
+    IndexedRandomPool<int, Engine *> idleEngines;
+    IndexedRandomPool<int, Engine *> activeEngines;
 };

@@ -14,7 +14,6 @@ bool TrafficManager::EarlierSimulationEvent::operator()(const SimulationEvent &l
 
 bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId)
 {
-    const std::lock_guard lock(garage.getMutex());
     if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
     const double entrySeparationSeconds = engine.getEntrySeparationSeconds();
@@ -32,12 +31,7 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
         const Route::ContractStep &step = route->getContract()[index];
         const double entryTimeSeconds = arrivalTimeSeconds + step.waitSeconds;
         Node *departureNode = route->getStations()[index];
-        departureNode->getController().reserveEntry(
-            route->getLinks()[index]->getId(),
-            engine.getId(),
-            static_cast<std::size_t>(index),
-            entryTimeSeconds,
-            entrySeparationSeconds);
+        departureNode->getController().reserveEntry(route->getLinks()[index]->getId(), engine.getId(), static_cast<std::size_t>(index), entryTimeSeconds, entrySeparationSeconds);
         arrivalTimeSeconds = entryTimeSeconds + step.traversalSeconds;
     }
     engine.getPad().setTotalTrajectorySeconds(arrivalTimeSeconds - simulationTimeSeconds);
@@ -48,7 +42,6 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
 
 void TrafficManager::advance(double elapsedSeconds)
 {
-    const std::lock_guard lock(garage.getMutex());
     if (elapsedSeconds > 0.0)
     {
         simulationTimeSeconds += elapsedSeconds;
@@ -59,7 +52,6 @@ void TrafficManager::advance(double elapsedSeconds)
 
 double TrafficManager::getSimulationTimeSeconds() const
 {
-    const std::lock_guard lock(garage.getMutex());
     return simulationTimeSeconds;
 }
 
@@ -86,11 +78,11 @@ void TrafficManager::processDueEvents()
 
 void TrafficManager::processStepCompletion(const SimulationEvent &event)
 {
-    const auto enginePosition = garage.getActiveEngines().find(event.engineId);
-    if (enginePosition == garage.getActiveEngines().end())
+    Engine *const *enginePosition = garage.getActiveEngines().find(event.engineId);
+    if (enginePosition == nullptr)
         return;
 
-    Engine &engine = *enginePosition->second;
+    Engine &engine = **enginePosition;
     EnginePad &pad = engine.getPad();
     const Route *route = pad.getTrajectory();
     if (route == nullptr || event.contractStep >= route->getLinks().size())

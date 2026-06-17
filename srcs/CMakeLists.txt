@@ -15,6 +15,7 @@ qt_add_executable(ackrail
     algorithm/Dijkstra.hpp
     algorithm/Route.cpp
     algorithm/Route.hpp
+    DesignPatter/IndexedRandomPool.hpp
     garage/engine/Biplace.cpp
     garage/engine/Biplace.hpp
     garage/engine/Engine.cpp
@@ -150,6 +151,13 @@ if(BUILD_TESTING)
     )
 
     add_test(NAME dijkstra_tests COMMAND dijkstra_tests)
+
+    add_executable(indexed_random_pool_tests
+        DesignPatter/IndexedRandomPool.hpp
+        DesignPatter/IndexedRandomPoolTest.cpp
+    )
+
+    add_test(NAME indexed_random_pool_tests COMMAND indexed_random_pool_tests)
 
     add_executable(traffic_manager_tests
         algorithm/Dijkstra.cpp

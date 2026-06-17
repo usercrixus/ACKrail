@@ -16,7 +16,6 @@ HeaderWidget::HeaderWidget(const Topology &topology, const Garage &garage, QWidg
 
 void HeaderWidget::refresh()
 {
-    const std::lock_guard lock(garage.getMutex());
     activeEngineCount = garage.getActiveEngineCount();
     engineCount = garage.getEngineCount();
     update();

@@ -89,6 +89,6 @@ int main()
         {&stationA, &stationB},
         {&link},
         {{0.0, firstTraversalSeconds}});
-    assert(!engine.getPad().startContractedTrajectory(wrongDepartureRoute));
+    assert(!engine.getPad().startContractedTrajectory(wrongDepartureRoute, secondExitTimeSeconds));
     delete wrongDepartureRoute;
 }
