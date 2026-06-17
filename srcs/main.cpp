@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
     const QString topologyFile = argc > 1 ? QString::fromLocal8Bit(argv[1]) : QStringLiteral(":/map/paris_metro.json");
     topology.load(topologyFile);
 
-    Garage garage(10000);
+    Garage garage(100000);
     TrafficManager trafficManager(topology, garage);
     TrafficGenerator trafficGenerator(topology, garage, trafficManager);
     TrafficSimulator trafficSimulator(trafficManager, trafficGenerator);
-    TopologyWidget window(topology, garage);
+    TopologyWidget window(topology, garage, trafficManager);
     QTimer renderTimer;
     renderTimer.setInterval(33);
     QObject::connect(&renderTimer, &QTimer::timeout, &window, &TopologyWidget::refresh);

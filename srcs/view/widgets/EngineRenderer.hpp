@@ -2,6 +2,7 @@
 
 #include "../helper/MapCamera.hpp"
 #include "../../garage/Garage.hpp"
+#include "../../simulator/TrafficManager.hpp"
 #include "../helper/MapViewport.hpp"
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
@@ -16,7 +17,7 @@
 class EngineRenderer : protected QOpenGLExtraFunctions
 {
 public:
-    EngineRenderer(const Garage &garage, const MapViewport &mapViewport);
+    EngineRenderer(const Garage &garage, const TrafficManager &trafficManager, const MapViewport &mapViewport);
     void initialize();
     void refresh();
     void draw(const QMatrix4x4 &matrix, const QSize &viewportSize);
@@ -49,12 +50,13 @@ private:
     };
 
     void updateBuffer();
-    void calculateState(const Engine &engine, RenderState &state) const;
-    QString createInformation(const Engine &engine) const;
-    QString getInformation(const Engine &engine, const Route &route) const;
+    void calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const;
+    QString createInformation(const Engine &engine, double simulationTimeSeconds) const;
+    QString getInformation(const Engine &engine, const Route &route, double simulationTimeSeconds) const;
     QString getRoadmap(const Route &route) const;
 
     const Garage &garage;
+    const TrafficManager &trafficManager;
     const MapViewport &mapViewport;
     QOpenGLShaderProgram program;
     QOpenGLBuffer shapeBuffer{QOpenGLBuffer::VertexBuffer};

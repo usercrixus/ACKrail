@@ -3,10 +3,10 @@
 #include "widgets/MapWidget.hpp"
 #include <QVBoxLayout>
 
-TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, QWidget *parent)
+TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)
     : QWidget(parent),
       headerWidget(new HeaderWidget(topology, garage, this)),
-      mapWidget(new MapWidget(topology, garage, this))
+      mapWidget(new MapWidget(topology, garage, trafficManager, this))
 {
     setWindowTitle(QStringLiteral("ACKrail"));
     auto *layout = new QVBoxLayout(this);

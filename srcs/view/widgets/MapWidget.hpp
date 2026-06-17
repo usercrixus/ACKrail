@@ -5,6 +5,7 @@
 #include "../helper/MapCamera.hpp"
 #include "NodeRenderer.hpp"
 #include "../../garage/Garage.hpp"
+#include "../../simulator/TrafficManager.hpp"
 #include "../helper/MapViewport.hpp"
 #include "../../topology/Topology.hpp"
 #include <QMouseEvent>
@@ -15,7 +16,7 @@
 class MapWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 public:
-    explicit MapWidget(const Topology &topology, const Garage &garage, QWidget *parent = nullptr);
+    explicit MapWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
     void refresh();
 
 protected:

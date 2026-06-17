@@ -27,7 +27,7 @@ void TrafficGenerator::tryGenerate(double elapsedSeconds)
 
 void TrafficGenerator::generate()
 {
-    std::uniform_int_distribution<int> dispatchCountDistribution(300, 400);
+    std::uniform_int_distribution<int> dispatchCountDistribution(150, 200);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {

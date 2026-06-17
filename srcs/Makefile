@@ -3,8 +3,10 @@ RELEASE_BUILD_DIR ?= /tmp/ackrail-release
 CMAKE ?= cmake
 ARGS ?=
 PERF_DATA ?= perf.data
+PERF_PARANOID ?= /proc/sys/kernel/perf_event_paranoid
+PERF_PARANOID_VALUE ?= 0
 
-.PHONY: all setup topology prepare-build-dir configure build run release-configure release-build run-release perf perf-report clean
+.PHONY: all setup topology prepare-build-dir configure build run release-configure release-build run-release perf-setup perf perf-report clean
 
 all: build
 
@@ -42,8 +44,20 @@ release-build: release-configure
 run-release: release-build
 	$(RELEASE_BUILD_DIR)/ackrail $(ARGS)
 
-perf: release-build
-	perf record -o $(PERF_DATA) -- $(RELEASE_BUILD_DIR)/ackrail $(ARGS)
+perf-setup:
+	@if test -r "$(PERF_PARANOID)"; then \
+		paranoid="$$(cat "$(PERF_PARANOID)")"; \
+		if test "$$paranoid" -ne "$(PERF_PARANOID_VALUE)"; then \
+			echo "Setting kernel.perf_event_paranoid=$(PERF_PARANOID_VALUE) for this boot."; \
+			sudo sysctl kernel.perf_event_paranoid="$(PERF_PARANOID_VALUE)"; \
+		fi; \
+	fi
+
+perf: perf-setup release-build
+	@tmp_data="$(PERF_DATA).tmp"; \
+	trap 'rm -f "$$tmp_data"' EXIT INT TERM; \
+	perf record -o "$$tmp_data" -- $(RELEASE_BUILD_DIR)/ackrail $(ARGS); \
+	mv "$$tmp_data" "$(PERF_DATA)"
 
 perf-report:
 	perf report -i $(PERF_DATA)

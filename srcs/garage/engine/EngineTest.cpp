@@ -41,7 +41,12 @@ int main()
             {1.0, secondTraversalSeconds},
         });
     assert(route->hasValidContract());
-    assert(engine.getPad().startContractedTrajectory(route));
+    constexpr double StartTimeSeconds = 10.0;
+    const double firstEntryTimeSeconds = StartTimeSeconds + 2.0;
+    const double firstExitTimeSeconds = firstEntryTimeSeconds + firstTraversalSeconds;
+    const double secondEntryTimeSeconds = firstExitTimeSeconds + 1.0;
+    const double secondExitTimeSeconds = secondEntryTimeSeconds + secondTraversalSeconds;
+    assert(engine.getPad().startContractedTrajectory(route, StartTimeSeconds));
     engine.getPad().setTotalTrajectorySeconds(
         3.0 + firstTraversalSeconds + secondTraversalSeconds);
     assert(std::abs(
@@ -50,27 +55,28 @@ int main()
         - firstTraversalSeconds
         - secondTraversalSeconds) < 0.000001);
 
-    engine.getPad().advance(1.0);
-    assert(engine.getPad().getCurrentSpeedKilometersPerHour() == 0.0);
-    assert(engine.getPad().getTravelledDistanceKilometers() == 0.0);
+    assert(engine.getPad().getCurrentSpeedKilometersPerHour(StartTimeSeconds + 1.0) == 0.0);
+    assert(engine.getPad().getTravelledDistanceKilometers(StartTimeSeconds + 1.0) == 0.0);
     assert(engine.getPad().getCurrentContractStep() == 0);
-    assert(engine.getPad().getCurrentLinkProgress() == 0.0);
+    assert(engine.getPad().getCurrentLinkProgress(StartTimeSeconds + 1.0) == 0.0);
 
-    engine.getPad().advance(2.0);
-    assert(engine.getPad().getCurrentSpeedKilometersPerHour()
+    assert(engine.getPad().getCurrentSpeedKilometersPerHour(firstEntryTimeSeconds + 1.0)
         == engine.getPad().getMaximumSpeedKilometersPerHour());
-    assert(engine.getPad().getTravelledDistanceKilometers() > 0.0);
+    assert(engine.getPad().getTravelledDistanceKilometers(firstEntryTimeSeconds + 1.0) > 0.0);
     assert(engine.getPad().getCurrentContractStep() == 0);
-    assert(engine.getPad().getCurrentLinkProgress() > 0.0);
-    assert(engine.getPad().getCurrentLinkProgress() < 1.0);
+    assert(engine.getPad().getCurrentLinkProgress(firstEntryTimeSeconds + 1.0) > 0.0);
+    assert(engine.getPad().getCurrentLinkProgress(firstEntryTimeSeconds + 1.0) < 1.0);
     assert(engine.getPad().getTrajectory() != nullptr);
     assert(engine.getPad().getTrajectory()->getLinks()[0] == &link);
 
-    engine.getPad().advance(firstTraversalSeconds);
+    engine.getPad().completeContractStep(0, firstExitTimeSeconds);
     assert(engine.getPad().isActive());
-    assert(engine.getPad().getCurrentSpeedKilometersPerHour() == 0.0);
+    assert(engine.getPad().getCurrentSpeedKilometersPerHour(firstExitTimeSeconds) == 0.0);
 
-    engine.getPad().advance(1.0 + secondTraversalSeconds);
+    engine.getPad().enterContractStep(1, secondEntryTimeSeconds, secondExitTimeSeconds);
+    assert(engine.getPad().getCurrentSpeedKilometersPerHour(secondEntryTimeSeconds + 1.0)
+        == engine.getPad().getMaximumSpeedKilometersPerHour());
+    engine.getPad().finishContractedTrajectory(secondExitTimeSeconds);
     assert(!engine.getPad().isActive());
     assert(engine.getPad().getTrajectory() == nullptr);
     assert(std::abs(

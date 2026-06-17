@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../garage/Garage.hpp"
+#include "../simulator/TrafficManager.hpp"
 #include "../topology/Topology.hpp"
 #include "widgets/HeaderWidget.hpp"
 #include "widgets/MapWidget.hpp"
@@ -9,7 +10,7 @@
 class TopologyWidget : public QWidget
 {
 public:
-    explicit TopologyWidget(const Topology &topology, const Garage &garage, QWidget *parent = nullptr);
+    explicit TopologyWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
     void refresh();
 
 private:

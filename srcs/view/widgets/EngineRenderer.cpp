@@ -8,8 +8,9 @@
 #include <cmath>
 #include <cstddef>
 
-EngineRenderer::EngineRenderer(const Garage &garage, const MapViewport &mapViewport)
+EngineRenderer::EngineRenderer(const Garage &garage, const TrafficManager &trafficManager, const MapViewport &mapViewport)
     : garage(garage),
+      trafficManager(trafficManager),
       mapViewport(mapViewport)
 {
     states.resize(garage.getActiveEngines().size());
@@ -57,13 +58,14 @@ void EngineRenderer::refresh()
 {
     const std::lock_guard lock(garage.getMutex());
     const auto &engines = garage.getActiveEngines();
+    const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (states.size() != engines.size())
         states.resize(engines.size());
     bool selectionFound = false;
     std::size_t index = 0;
     for (const auto &[id, engine] : engines)
     {
-        calculateState(*engine, states[index]);
+        calculateState(*engine, simulationTimeSeconds, states[index]);
         selectionFound = selectionFound || states[index].engine == selectedEngine;
         ++index;
     }
@@ -145,7 +147,7 @@ void EngineRenderer::updateBuffer()
     instanceBuffer.release();
 }
 
-void EngineRenderer::calculateState(const Engine &engine, RenderState &state) const
+void EngineRenderer::calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const
 {
     const EnginePad &pad = engine.getPad();
     state.engine = &engine;
@@ -158,7 +160,7 @@ void EngineRenderer::calculateState(const Engine &engine, RenderState &state) co
     const QVector<Node *> &stations = pad.getTrajectory()->getStations();
     const QPointF start = mapViewport.mapPosition(stations[index]->getLatitude(), stations[index]->getLongitude());
     const QPointF end = mapViewport.mapPosition(stations[index + 1]->getLatitude(), stations[index + 1]->getLongitude());
-    state.position = start + (end - start) * pad.getCurrentLinkProgress();
+    state.position = start + (end - start) * pad.getCurrentLinkProgress(simulationTimeSeconds);
     state.angleRadians = std::atan2(end.y() - start.y(), end.x() - start.x());
     state.active = true;
 }
@@ -166,13 +168,14 @@ void EngineRenderer::calculateState(const Engine &engine, RenderState &state) co
 void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera) const
 {
     const std::lock_guard lock(garage.getMutex());
+    const double simulationTimeSeconds = trafficManager.getSimulationTimeSeconds();
     if (selectedEngine == nullptr)
         return;
     for (const RenderState &state : states)
     {
         if (state.engine == selectedEngine && state.active)
         {
-            const QString information = createInformation(*selectedEngine);
+            const QString information = createInformation(*selectedEngine, simulationTimeSeconds);
             if (!information.isEmpty())
             {
                 const QFont font(QStringLiteral("Sans Serif"), 9);
@@ -215,11 +218,11 @@ void EngineRenderer::drawInformation(QPainter &painter, const MapCamera &camera)
     }
 }
 
-QString EngineRenderer::getInformation(const Engine &engine, const Route &route) const
+QString EngineRenderer::getInformation(const Engine &engine, const Route &route, double simulationTimeSeconds) const
 {
     const QVector<Node *> &stations = route.getStations();
     const double totalDistance = route.getTotalDistanceKilometers();
-    const double travelledDistance = std::clamp(engine.getPad().getTravelledDistanceKilometers(), 0.0, totalDistance);
+    const double travelledDistance = std::clamp(engine.getPad().getTravelledDistanceKilometers(simulationTimeSeconds), 0.0, totalDistance);
     const double progress = totalDistance > 0.0 ? travelledDistance / totalDistance * 100.0 : 0.0;
     return QStringLiteral("%1\n"
                           "%2 -> %3\n"
@@ -229,7 +232,7 @@ QString EngineRenderer::getInformation(const Engine &engine, const Route &route)
         .arg(engine.getModelName())
         .arg(stations.first()->getName())
         .arg(stations.last()->getName())
-        .arg(engine.getPad().getCurrentSpeedKilometersPerHour(), 0, 'f', 1)
+        .arg(engine.getPad().getCurrentSpeedKilometersPerHour(simulationTimeSeconds), 0, 'f', 1)
         .arg(travelledDistance, 0, 'f', 2)
         .arg(totalDistance, 0, 'f', 2)
         .arg(progress, 0, 'f', 1);
@@ -259,12 +262,12 @@ QString EngineRenderer::getRoadmap(const Route &route) const
     return roadmap.join(QLatin1Char('\n'));
 }
 
-QString EngineRenderer::createInformation(const Engine &engine) const
+QString EngineRenderer::createInformation(const Engine &engine, double simulationTimeSeconds) const
 {
     const Route *route = engine.getPad().getTrajectory();
     if (route == nullptr || route->getStations().isEmpty())
         return {};
-    QString information = getInformation(engine, *route);
+    QString information = getInformation(engine, *route, simulationTimeSeconds);
     const QString roadmap = getRoadmap(*route);
     if (!roadmap.isEmpty())
     {

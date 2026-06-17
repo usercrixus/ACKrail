@@ -4,14 +4,14 @@
 #include <QPainter>
 #include <QStyleHints>
 
-MapWidget::MapWidget(const Topology &topology, const Garage &garage, QWidget *parent)
+MapWidget::MapWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)
     : QOpenGLWidget(parent),
       topology(topology),
       mapViewport(topology),
       camera(topology, mapViewport),
       linkRenderer(topology, mapViewport),
       nodeRenderer(topology, mapViewport),
-      engineRenderer(garage, mapViewport)
+      engineRenderer(garage, trafficManager, mapViewport)
 {
     setMouseTracking(true);
     setCursor(Qt::ArrowCursor);

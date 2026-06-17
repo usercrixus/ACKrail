@@ -46,26 +46,28 @@ public:
     void setParkingStationId(int stationId);
 
     /**
-     * Starts a route governed by its timing contract.
+     * Starts a route governed by its timing contract at an absolute simulation
+     * time.
      *
-     * @param route Contracted route whose ownership is transferred on
-     * success.
+     * @param route Contracted route whose ownership is transferred on success.
+     * @param simulationTimeSeconds Current simulation time in seconds.
      * @return true when the contracted route was accepted; otherwise false.
      */
-    bool startContractedTrajectory(Route *route);
-
-    /**
-     * Advances the active route.
-     *
-     * @param elapsedSeconds Elapsed simulation time.
-     */
-    void advance(double elapsedSeconds);
+    bool startContractedTrajectory(Route *route, double simulationTimeSeconds);
 
     /** @return Maximum speed in kilometers per hour. */
     double getMaximumSpeedKilometersPerHour() const;
 
     /** @return Current speed in kilometers per hour. */
     double getCurrentSpeedKilometersPerHour() const;
+
+    /**
+     * Returns the current speed at an absolute simulation time.
+     *
+     * @param simulationTimeSeconds Current simulation time in seconds.
+     * @return Current speed in kilometers per hour.
+     */
+    double getCurrentSpeedKilometersPerHour(double simulationTimeSeconds) const;
 
     /** @return Elapsed trajectory time in seconds. */
     double getElapsedTrajectorySeconds() const;
@@ -89,6 +91,14 @@ public:
     double getTravelledDistanceKilometers() const;
 
     /**
+     * Returns the distance travelled at an absolute simulation time.
+     *
+     * @param simulationTimeSeconds Current simulation time in seconds.
+     * @return Distance travelled on the active trajectory in kilometers.
+     */
+    double getTravelledDistanceKilometers(double simulationTimeSeconds) const;
+
+    /**
      * @return Index of the current contract step, or the completed contract
      * size after the route finishes.
      */
@@ -96,6 +106,14 @@ public:
 
     /** @return Progress on the current link, between 0.0 and 1.0. */
     double getCurrentLinkProgress() const;
+
+    /**
+     * Returns progress on the current link at an absolute simulation time.
+     *
+     * @param simulationTimeSeconds Current simulation time in seconds.
+     * @return Progress on the current link, between 0.0 and 1.0.
+     */
+    double getCurrentLinkProgress(double simulationTimeSeconds) const;
 
     /** @return Active route, or nullptr when idle. */
     const Route *getTrajectory() const;
@@ -108,19 +126,22 @@ public:
      */
     void setMaximumSpeedKilometersPerHour(double maximumSpeedKilometersPerHour);
 
+    /**
+     * Selects the route step currently visible to the simulation and renderer.
+     */
+    void enterContractStep(qsizetype step, double entryTimeSeconds, double exitTimeSeconds);
+
+    /**
+     * Marks one route step as completed.
+     */
+    void completeContractStep(qsizetype step, double completionTimeSeconds);
+
+    /**
+     * Completes the active route at an absolute simulation time.
+     */
+    void finishContractedTrajectory(double completionTimeSeconds);
+
 private:
-    /** Consumes waiting time and returns the number of seconds used. */
-    double advanceWait(double availableSeconds);
-
-    /** Traverses the current link and returns the number of seconds used. */
-    double advanceCurrentLink(double availableSeconds);
-
-    /** Selects the next contract step, if one remains. */
-    bool advanceContractStep();
-
-    /** Adds elapsed time and recalculates the average speed. */
-    void updateTrajectoryMetrics(double activeSeconds);
-
     /** Completes the active route and resets transient state. */
     void finishTrajectory();
 
@@ -134,5 +155,9 @@ private:
     double travelledDistanceKilometers = 0.0;
     double remainingTraversalKilometers = 0.0;
     double remainingWaitSeconds = 0.0;
+    double trajectoryStartSeconds = 0.0;
+    double currentLinkEntryTimeSeconds = 0.0;
+    double currentLinkExitTimeSeconds = 0.0;
+    double completedDistanceKilometers = 0.0;
     int parkingStationId = -1;
 };
