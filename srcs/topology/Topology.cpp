@@ -176,14 +176,14 @@ static bool readJsonFile(const QString &fileName, QJsonObject &root, QString &er
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        error = QStringLiteral("Cannot open topology file: %1").arg(fileName);
+        error = QStringLiteral("Cannot open JSON file: %1").arg(fileName);
         return false;
     }
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
     if (parseError.error != QJsonParseError::NoError || !document.isObject())
     {
-        error = QStringLiteral("Invalid topology JSON: %1").arg(parseError.errorString());
+        error = QStringLiteral("Invalid JSON: %1").arg(parseError.errorString());
         return false;
     }
     root = document.object();
@@ -217,6 +217,56 @@ bool Topology::load(const QString &fileName)
     maximumLongitude = bounds.maximumLongitude;
     nodes = std::move(loadedNodes);
     links = std::move(loadedLinks);
+    resetWeights();
+    return true;
+}
+
+bool Topology::loadWeights(const QString &fileName)
+{
+    QJsonObject root;
+    QString loadError;
+    if (!readJsonFile(fileName, root, loadError))
+    {
+        error = loadError;
+        return false;
+    }
+
+    QHash<int, Node *> nodesById;
+    for (Node &node : nodes)
+        nodesById.insert(node.getId(), &node);
+
+    const QJsonArray stations = root.value(QStringLiteral("stations")).toArray();
+    if (stations.isEmpty())
+    {
+        error = QStringLiteral("The weight file contains no stations.");
+        return false;
+    }
+
+    resetWeights();
+    for (const QJsonValue &value : stations)
+    {
+        const QJsonObject object = value.toObject();
+        const int stationId = object.value(QStringLiteral("stationId")).toInt(-1);
+        const auto node = nodesById.constFind(stationId);
+        if (stationId < 0 || node == nodesById.constEnd())
+        {
+            error = QStringLiteral("Weight file references an unknown station: %1").arg(stationId);
+            resetWeights();
+            return false;
+        }
+
+        const double arrivalWeight = object.value(QStringLiteral("arrivalWeight")).toDouble(-1.0);
+        const double departureWeight = object.value(QStringLiteral("departureWeight")).toDouble(-1.0);
+        if (arrivalWeight < 0.0 || departureWeight < 0.0)
+        {
+            error = QStringLiteral("Invalid station weight for station: %1").arg(stationId);
+            resetWeights();
+            return false;
+        }
+        node.value()->setWeights(arrivalWeight, departureWeight);
+    }
+
+    error.clear();
     return true;
 }
 
@@ -230,4 +280,10 @@ void Topology::clear(const QString &error)
     maximumLongitude = 0.0;
     nodes.clear();
     links.clear();
+}
+
+void Topology::resetWeights()
+{
+    for (Node &node : nodes)
+        node.setWeights(1.0, 1.0);
 }

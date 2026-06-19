@@ -1,0 +1,72 @@
+#include "SimulationSession.hpp"
+
+#include <utility>
+
+SimulationSession::SimulationSession(QString topologyFile, QString weightFile, QObject *parent)
+    : QObject(parent),
+      topologyFile(std::move(topologyFile)),
+      weightFile(std::move(weightFile))
+{
+    renderTimer.setInterval(33);
+    QObject::connect(&renderTimer, &QTimer::timeout, this, [this]()
+                     {
+                         if (topologyWidget != nullptr && trafficSimulator != nullptr)
+                             topologyWidget->refresh(trafficSimulator->getCurrentSimulationTimeSeconds());
+                     });
+}
+
+bool SimulationSession::load()
+{
+    topology = std::make_unique<Topology>();
+    if (!topology->load(topologyFile))
+    {
+        error = topology->getError();
+        return false;
+    }
+    if (!weightFile.isEmpty() && !topology->loadWeights(weightFile))
+    {
+        error = topology->getError();
+        return false;
+    }
+
+    garage = std::make_unique<Garage>(10000);
+    trafficManager = std::make_unique<TrafficManager>(*topology, *garage);
+    trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *trafficManager);
+    trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager);
+    trafficSimulator = std::make_unique<TrafficSimulator>(*trafficManager, *trafficGenerator, *trafficBalancer);
+    error.clear();
+    return true;
+}
+
+TopologyWidget *SimulationSession::createWidget(QWidget *parent)
+{
+    if (topology == nullptr || garage == nullptr || trafficManager == nullptr)
+        return nullptr;
+
+    topologyWidget = new TopologyWidget(*topology, *garage, *trafficManager, parent);
+    return topologyWidget;
+}
+
+void SimulationSession::start()
+{
+    if (trafficSimulator == nullptr)
+        return;
+
+    trafficSimulator->start();
+    renderTimer.start();
+}
+
+const QString &SimulationSession::getError() const
+{
+    return error;
+}
+
+const QString &SimulationSession::getTopologyFile() const
+{
+    return topologyFile;
+}
+
+const QString &SimulationSession::getWeightFile() const
+{
+    return weightFile;
+}

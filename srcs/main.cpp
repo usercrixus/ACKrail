@@ -1,46 +1,23 @@
-#include "garage/Garage.hpp"
-#include "simulator/TrafficBalancer.hpp"
-#include "simulator/TrafficGenerator.hpp"
-#include "simulator/TrafficManager.hpp"
-#include "simulator/TrafficSimulator.hpp"
-#include "topology/Topology.hpp"
-#include "view/TopologyWidget.hpp"
+#include "view/AckRailWindow.hpp"
 
 #include <QApplication>
 #include <QSurfaceFormat>
-#include <QTimer>
 
 int main(int argc, char *argv[])
 {
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSamples(4);
     QSurfaceFormat::setDefaultFormat(format);
-
     QApplication app(argc, argv);
 
-    Topology topology;
-    const QString topologyFile = argc > 1 ? QString::fromLocal8Bit(argv[1]) : QStringLiteral(":/map/paris_metro.json");
-    topology.load(topologyFile);
-
-    Garage garage(10000);
-    TrafficManager trafficManager(topology, garage);
-    TrafficGenerator trafficGenerator(topology, garage, trafficManager);
-    TrafficBalancer trafficBalancer(topology, garage, trafficManager);
-    TrafficSimulator trafficSimulator(trafficManager, trafficGenerator, trafficBalancer);
-    TopologyWidget window(topology, garage, trafficManager);
-    QTimer renderTimer;
-    renderTimer.setInterval(33);
-    QObject::connect(&renderTimer, &QTimer::timeout, [&trafficSimulator, &window]()
-                     {
-                         window.refresh(trafficSimulator.getCurrentSimulationTimeSeconds());
-                     });
+    AckRailWindow window;
     window.resize(1100, 720);
     window.show();
-    trafficSimulator.start();
-    renderTimer.start();
 
     const int result = app.exec();
     return result;

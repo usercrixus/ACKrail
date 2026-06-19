@@ -1,0 +1,3286 @@
+{
+  "map": "paris_metro.json",
+  "weightScale": "normalized_probability",
+  "totalArrivalWeight": 1.0,
+  "totalDepartureWeight": 1.0,
+  "description": "Evening tendency: inverse of the morning commute, with higher departures from central/hub stations and higher arrivals toward outer stations. Weights are doubles normalized so arrivalWeight and departureWeight each sum to 1.0. Multiply by 100 to read as percentages.",
+  "period": "evening",
+  "stations": [
+    {
+      "stationId": 1,
+      "name": "Abbesses",
+      "arrivalWeight": 0.0009119735,
+      "departureWeight": 0.0027031928
+    },
+    {
+      "stationId": 2,
+      "name": "Ablon",
+      "arrivalWeight": 0.0029733818,
+      "departureWeight": 0.0006257369
+    },
+    {
+      "stationId": 3,
+      "name": "Achères Grand Cormier",
+      "arrivalWeight": 0.0030327809,
+      "departureWeight": 0.0005658754
+    },
+    {
+      "stationId": 4,
+      "name": "Achères Ville",
+      "arrivalWeight": 0.0030337744,
+      "departureWeight": 0.0005648741
+    },
+    {
+      "stationId": 5,
+      "name": "Aimé Césaire",
+      "arrivalWeight": 0.0016161836,
+      "departureWeight": 0.0019935006
+    },
+    {
+      "stationId": 6,
+      "name": "Alexandre Dumas",
+      "arrivalWeight": 0.0008687273,
+      "departureWeight": 0.0027467756
+    },
+    {
+      "stationId": 7,
+      "name": "Alma - Marceau",
+      "arrivalWeight": 0.0010335147,
+      "departureWeight": 0.0025807054
+    },
+    {
+      "stationId": 8,
+      "name": "Alésia",
+      "arrivalWeight": 0.0009992506,
+      "departureWeight": 0.0026152362
+    },
+    {
+      "stationId": 9,
+      "name": "Anatole France",
+      "arrivalWeight": 0.0016834844,
+      "departureWeight": 0.0019256759
+    },
+    {
+      "stationId": 10,
+      "name": "Antony",
+      "arrivalWeight": 0.0027644926,
+      "departureWeight": 0.0008362523
+    },
+    {
+      "stationId": 11,
+      "name": "Anvers",
+      "arrivalWeight": 0.0008491207,
+      "departureWeight": 0.0027665349
+    },
+    {
+      "stationId": 12,
+      "name": "Arcueil - Cachan",
+      "arrivalWeight": 0.0017735064,
+      "departureWeight": 0.001834953
+    },
+    {
+      "stationId": 13,
+      "name": "Argentine",
+      "arrivalWeight": 0.0013518768,
+      "departureWeight": 0.0022598649
+    },
+    {
+      "stationId": 14,
+      "name": "Arpajon",
+      "arrivalWeight": 0.0030341361,
+      "departureWeight": 0.0005645096
+    },
+    {
+      "stationId": 15,
+      "name": "Arts et Métiers",
+      "arrivalWeight": 0.000671283,
+      "departureWeight": 0.0032263893
+    },
+    {
+      "stationId": 16,
+      "name": "Asnières - Gennevilliers - Les Courtilles",
+      "arrivalWeight": 0.0023954182,
+      "departureWeight": 0.0010678836
+    },
+    {
+      "stationId": 17,
+      "name": "Assemblée Nationale",
+      "arrivalWeight": 0.0007320345,
+      "departureWeight": 0.0028845325
+    },
+    {
+      "stationId": 18,
+      "name": "Athis-Mons",
+      "arrivalWeight": 0.0029973191,
+      "departureWeight": 0.0006016132
+    },
+    {
+      "stationId": 19,
+      "name": "Auber",
+      "arrivalWeight": 0.0007473862,
+      "departureWeight": 0.0028690614
+    },
+    {
+      "stationId": 20,
+      "name": "Aubervilliers-Pantin Quatre Chemins",
+      "arrivalWeight": 0.0016060907,
+      "departureWeight": 0.002003672
+    },
+    {
+      "stationId": 21,
+      "name": "Aulnay-sous-Bois",
+      "arrivalWeight": 0.0029369542,
+      "departureWeight": 0.0008027642
+    },
+    {
+      "stationId": 22,
+      "name": "Avenue du Président Kennedy Maison de Radio France",
+      "arrivalWeight": 0.0014044552,
+      "departureWeight": 0.0022068772
+    },
+    {
+      "stationId": 23,
+      "name": "Avenue Foch",
+      "arrivalWeight": 0.0015657572,
+      "departureWeight": 0.0020443196
+    },
+    {
+      "stationId": 24,
+      "name": "Avenue Henri Martin",
+      "arrivalWeight": 0.0015740236,
+      "departureWeight": 0.0020359888
+    },
+    {
+      "stationId": 25,
+      "name": "Avenue Émile Zola",
+      "arrivalWeight": 0.0011765016,
+      "departureWeight": 0.0024366054
+    },
+    {
+      "stationId": 26,
+      "name": "Avron",
+      "arrivalWeight": 0.0009471657,
+      "departureWeight": 0.0026677266
+    },
+    {
+      "stationId": 27,
+      "name": "Aéroport CDG (Terminal 2) - TGV",
+      "arrivalWeight": 0.0029811372,
+      "departureWeight": 0.0004776049
+    },
+    {
+      "stationId": 28,
+      "name": "Aéroport CDG 1 (Terminal 3)",
+      "arrivalWeight": 0.0030334483,
+      "departureWeight": 0.0005652027
+    },
+    {
+      "stationId": 29,
+      "name": "Aéroport d’Orly (Terminaux 1-2-3)",
+      "arrivalWeight": 0.002877137,
+      "departureWeight": 0.0005824147
+    },
+    {
+      "stationId": 30,
+      "name": "Bagneux",
+      "arrivalWeight": 0.0019729041,
+      "departureWeight": 0.001634003
+    },
+    {
+      "stationId": 31,
+      "name": "Bagneux - Lucie Aubrac",
+      "arrivalWeight": 0.001665987,
+      "departureWeight": 0.0018029933
+    },
+    {
+      "stationId": 32,
+      "name": "Balard",
+      "arrivalWeight": 0.001516443,
+      "departureWeight": 0.0019537014
+    },
+    {
+      "stationId": 33,
+      "name": "Ballancourt",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 34,
+      "name": "Barbara",
+      "arrivalWeight": 0.0015488602,
+      "departureWeight": 0.0020613481
+    },
+    {
+      "stationId": 35,
+      "name": "Barbès - Rochechouart",
+      "arrivalWeight": 0.0009637339,
+      "departureWeight": 0.0029316618
+    },
+    {
+      "stationId": 36,
+      "name": "Basilique de Saint-Denis / Cité Langevin",
+      "arrivalWeight": 0.0023360086,
+      "departureWeight": 0.0012680719
+    },
+    {
+      "stationId": 37,
+      "name": "Bastille",
+      "arrivalWeight": 0.0007968389,
+      "departureWeight": 0.0033804884
+    },
+    {
+      "stationId": 38,
+      "name": "Bel-Air",
+      "arrivalWeight": 0.0010654233,
+      "departureWeight": 0.0025485484
+    },
+    {
+      "stationId": 39,
+      "name": "Belleville",
+      "arrivalWeight": 0.0008641261,
+      "departureWeight": 0.003032045
+    },
+    {
+      "stationId": 40,
+      "name": "Bercy",
+      "arrivalWeight": 0.0009355299,
+      "departureWeight": 0.0029600853
+    },
+    {
+      "stationId": 41,
+      "name": "Bibliothèque François Mitterrand",
+      "arrivalWeight": 0.0011666795,
+      "departureWeight": 0.0030077686
+    },
+    {
+      "stationId": 42,
+      "name": "Billancourt",
+      "arrivalWeight": 0.0022825345,
+      "departureWeight": 0.0013219622
+    },
+    {
+      "stationId": 43,
+      "name": "Bir-Hakeim",
+      "arrivalWeight": 0.0012251647,
+      "departureWeight": 0.0023875635
+    },
+    {
+      "stationId": 44,
+      "name": "Blanche",
+      "arrivalWeight": 0.0009210388,
+      "departureWeight": 0.0026940569
+    },
+    {
+      "stationId": 45,
+      "name": "Bobigny - Pablo Picasso",
+      "arrivalWeight": 0.0022907208,
+      "departureWeight": 0.001173396
+    },
+    {
+      "stationId": 46,
+      "name": "Bobigny - Pantin - Raymond Queneau",
+      "arrivalWeight": 0.0018484884,
+      "departureWeight": 0.0017593873
+    },
+    {
+      "stationId": 47,
+      "name": "Boigneville",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 48,
+      "name": "Boissise-le-Roi",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 49,
+      "name": "Boissière",
+      "arrivalWeight": 0.0012540106,
+      "departureWeight": 0.002358493
+    },
+    {
+      "stationId": 50,
+      "name": "Boissy-Saint-Léger",
+      "arrivalWeight": 0.0029381307,
+      "departureWeight": 0.0005209462
+    },
+    {
+      "stationId": 51,
+      "name": "Bolivar",
+      "arrivalWeight": 0.0008790589,
+      "departureWeight": 0.0027363636
+    },
+    {
+      "stationId": 52,
+      "name": "Bondy",
+      "arrivalWeight": 0.0025482339,
+      "departureWeight": 0.0010541944
+    },
+    {
+      "stationId": 53,
+      "name": "Bonne Nouvelle",
+      "arrivalWeight": 0.0007252251,
+      "departureWeight": 0.0031720273
+    },
+    {
+      "stationId": 54,
+      "name": "Botzaris",
+      "arrivalWeight": 0.0010657532,
+      "departureWeight": 0.0026885321
+    },
+    {
+      "stationId": 55,
+      "name": "Boucicaut",
+      "arrivalWeight": 0.0013360239,
+      "departureWeight": 0.0022758412
+    },
+    {
+      "stationId": 56,
+      "name": "Boulainvilliers",
+      "arrivalWeight": 0.0015141246,
+      "departureWeight": 0.002096354
+    },
+    {
+      "stationId": 57,
+      "name": "Boulogne Jean Jaurès",
+      "arrivalWeight": 0.0022681104,
+      "departureWeight": 0.0014768148
+    },
+    {
+      "stationId": 58,
+      "name": "Boulogne Pont de Saint-Cloud",
+      "arrivalWeight": 0.0023203069,
+      "departureWeight": 0.0011435797
+    },
+    {
+      "stationId": 59,
+      "name": "Bouray",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 60,
+      "name": "Bourg-la-Reine",
+      "arrivalWeight": 0.0023776252,
+      "departureWeight": 0.0013664475
+    },
+    {
+      "stationId": 61,
+      "name": "Bourse",
+      "arrivalWeight": 0.0006204956,
+      "departureWeight": 0.0029969398
+    },
+    {
+      "stationId": 62,
+      "name": "Boussy-Saint-Antoine",
+      "arrivalWeight": 0.0030337015,
+      "departureWeight": 0.0005649476
+    },
+    {
+      "stationId": 63,
+      "name": "Boutigny",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 64,
+      "name": "Breuillet - Bruyères-le-Châtel",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 65,
+      "name": "Breuillet Village",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 66,
+      "name": "Brochant",
+      "arrivalWeight": 0.0012117734,
+      "departureWeight": 0.002401059
+    },
+    {
+      "stationId": 67,
+      "name": "Brunoy",
+      "arrivalWeight": 0.0030313421,
+      "departureWeight": 0.0005673254
+    },
+    {
+      "stationId": 68,
+      "name": "Bry-sur-Marne",
+      "arrivalWeight": 0.002839806,
+      "departureWeight": 0.0007603525
+    },
+    {
+      "stationId": 69,
+      "name": "Bréguet-Sabin",
+      "arrivalWeight": 0.0005909457,
+      "departureWeight": 0.0030267197
+    },
+    {
+      "stationId": 70,
+      "name": "Brétigny",
+      "arrivalWeight": 0.0031387505,
+      "departureWeight": 0.0007397131
+    },
+    {
+      "stationId": 71,
+      "name": "Buno - Gironville",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 72,
+      "name": "Bures-sur-Yvette",
+      "arrivalWeight": 0.0030333116,
+      "departureWeight": 0.0005653406
+    },
+    {
+      "stationId": 73,
+      "name": "Bussy-Saint-Georges",
+      "arrivalWeight": 0.0030340879,
+      "departureWeight": 0.0005645582
+    },
+    {
+      "stationId": 74,
+      "name": "Buttes Chaumont",
+      "arrivalWeight": 0.0009056099,
+      "departureWeight": 0.0027096059
+    },
+    {
+      "stationId": 75,
+      "name": "Buzenval",
+      "arrivalWeight": 0.0009935982,
+      "departureWeight": 0.0026209327
+    },
+    {
+      "stationId": 76,
+      "name": "Bérault",
+      "arrivalWeight": 0.0015239475,
+      "departureWeight": 0.0020864547
+    },
+    {
+      "stationId": 77,
+      "name": "Cadet",
+      "arrivalWeight": 0.0007159348,
+      "departureWeight": 0.0029007576
+    },
+    {
+      "stationId": 78,
+      "name": "Cambronne",
+      "arrivalWeight": 0.0010365052,
+      "departureWeight": 0.0025776917
+    },
+    {
+      "stationId": 79,
+      "name": "Campo-Formio",
+      "arrivalWeight": 0.0007318164,
+      "departureWeight": 0.0028847524
+    },
+    {
+      "stationId": 80,
+      "name": "Cardinal Lemoine",
+      "arrivalWeight": 0.0005725803,
+      "departureWeight": 0.003045228
+    },
+    {
+      "stationId": 81,
+      "name": "Carrefour Pleyel",
+      "arrivalWeight": 0.0018756629,
+      "departureWeight": 0.0017320013
+    },
+    {
+      "stationId": 82,
+      "name": "Censier - Daubenton",
+      "arrivalWeight": 0.0006467392,
+      "departureWeight": 0.0029704919
+    },
+    {
+      "stationId": 83,
+      "name": "Cergy le Haut",
+      "arrivalWeight": 0.0029818239,
+      "departureWeight": 0.0004769129
+    },
+    {
+      "stationId": 84,
+      "name": "Cergy Préfecture",
+      "arrivalWeight": 0.0030341268,
+      "departureWeight": 0.000564519
+    },
+    {
+      "stationId": 85,
+      "name": "Cergy Saint-Christophe",
+      "arrivalWeight": 0.0030341364,
+      "departureWeight": 0.0005645093
+    },
+    {
+      "stationId": 86,
+      "name": "Cernay",
+      "arrivalWeight": 0.0029862155,
+      "departureWeight": 0.0006128033
+    },
+    {
+      "stationId": 87,
+      "name": "Cesson",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 88,
+      "name": "Chamarande",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 89,
+      "name": "Champ de Mars Tour Eiffel",
+      "arrivalWeight": 0.0012582942,
+      "departureWeight": 0.0024944922
+    },
+    {
+      "stationId": 90,
+      "name": "Champigny",
+      "arrivalWeight": 0.0028450129,
+      "departureWeight": 0.0007551051
+    },
+    {
+      "stationId": 91,
+      "name": "Champs-Élysées - Clemenceau",
+      "arrivalWeight": 0.0009746972,
+      "departureWeight": 0.0029206131
+    },
+    {
+      "stationId": 92,
+      "name": "Chantilly - Gouvieux",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 93,
+      "name": "Chardon Lagache",
+      "arrivalWeight": 0.0017128836,
+      "departureWeight": 0.0018960478
+    },
+    {
+      "stationId": 94,
+      "name": "Charenton - Écoles",
+      "arrivalWeight": 0.0016024804,
+      "departureWeight": 0.0020073105
+    },
+    {
+      "stationId": 95,
+      "name": "Charles de Gaulle - Étoile",
+      "arrivalWeight": 0.0014800728,
+      "departureWeight": 0.0028322517
+    },
+    {
+      "stationId": 96,
+      "name": "Charles Michels",
+      "arrivalWeight": 0.0013234496,
+      "departureWeight": 0.0022885134
+    },
+    {
+      "stationId": 97,
+      "name": "Charonne",
+      "arrivalWeight": 0.0007484098,
+      "departureWeight": 0.0028680298
+    },
+    {
+      "stationId": 98,
+      "name": "Chatou - Croissy",
+      "arrivalWeight": 0.0029509742,
+      "departureWeight": 0.0006483189
+    },
+    {
+      "stationId": 99,
+      "name": "Chaussée d'Antin - La Fayette",
+      "arrivalWeight": 0.0008352718,
+      "departureWeight": 0.0030611239
+    },
+    {
+      "stationId": 100,
+      "name": "Chaville - Vélizy",
+      "arrivalWeight": 0.0029074717,
+      "departureWeight": 0.00069216
+    },
+    {
+      "stationId": 101,
+      "name": "Chelles - Gournay",
+      "arrivalWeight": 0.0030075154,
+      "departureWeight": 0.0005913375
+    },
+    {
+      "stationId": 102,
+      "name": "Chemin d'Antony",
+      "arrivalWeight": 0.0028063012,
+      "departureWeight": 0.0007941181
+    },
+    {
+      "stationId": 103,
+      "name": "Chemin Vert",
+      "arrivalWeight": 0.0005753726,
+      "departureWeight": 0.0030424141
+    },
+    {
+      "stationId": 104,
+      "name": "Chevaleret",
+      "arrivalWeight": 0.0007883728,
+      "departureWeight": 0.0028277557
+    },
+    {
+      "stationId": 105,
+      "name": "Chevilly-Larue (Marché International)",
+      "arrivalWeight": 0.002643184,
+      "departureWeight": 0.0009585052
+    },
+    {
+      "stationId": 106,
+      "name": "Choisy-le-Roi",
+      "arrivalWeight": 0.0028201303,
+      "departureWeight": 0.0012011299
+    },
+    {
+      "stationId": 107,
+      "name": "Château d'Eau",
+      "arrivalWeight": 0.0006425752,
+      "departureWeight": 0.0029746883
+    },
+    {
+      "stationId": 108,
+      "name": "Château de Vincennes",
+      "arrivalWeight": 0.001708858,
+      "departureWeight": 0.0017597885
+    },
+    {
+      "stationId": 109,
+      "name": "Château Landon",
+      "arrivalWeight": 0.0007890629,
+      "departureWeight": 0.0028270602
+    },
+    {
+      "stationId": 110,
+      "name": "Château Rouge",
+      "arrivalWeight": 0.0009477264,
+      "departureWeight": 0.0026671615
+    },
+    {
+      "stationId": 111,
+      "name": "Châtelet",
+      "arrivalWeight": 0.0008934858,
+      "departureWeight": 0.0037040375
+    },
+    {
+      "stationId": 112,
+      "name": "Châtelet - Les Halles",
+      "arrivalWeight": 0.0007509221,
+      "departureWeight": 0.0034267626
+    },
+    {
+      "stationId": 113,
+      "name": "Châtillon - Montrouge",
+      "arrivalWeight": 0.0016240949,
+      "departureWeight": 0.0018452115
+    },
+    {
+      "stationId": 114,
+      "name": "Cité",
+      "arrivalWeight": 0.0005297054,
+      "departureWeight": 0.0030884368
+    },
+    {
+      "stationId": 115,
+      "name": "Cité Universitaire",
+      "arrivalWeight": 0.0010982098,
+      "departureWeight": 0.0025155066
+    },
+    {
+      "stationId": 116,
+      "name": "Cluny - La Sorbonne",
+      "arrivalWeight": 0.0005520495,
+      "departureWeight": 0.0030659187
+    },
+    {
+      "stationId": 117,
+      "name": "Colonel Fabien",
+      "arrivalWeight": 0.0007959707,
+      "departureWeight": 0.0028200986
+    },
+    {
+      "stationId": 118,
+      "name": "Combs-la-Ville - Quincy",
+      "arrivalWeight": 0.0030340341,
+      "departureWeight": 0.0005646124
+    },
+    {
+      "stationId": 119,
+      "name": "Commerce",
+      "arrivalWeight": 0.0011903568,
+      "departureWeight": 0.0024226423
+    },
+    {
+      "stationId": 120,
+      "name": "Concorde",
+      "arrivalWeight": 0.0009568856,
+      "departureWeight": 0.0032191957
+    },
+    {
+      "stationId": 121,
+      "name": "Conflans Fin d'Oise",
+      "arrivalWeight": 0.0030340123,
+      "departureWeight": 0.0005646343
+    },
+    {
+      "stationId": 122,
+      "name": "Convention",
+      "arrivalWeight": 0.0012192351,
+      "departureWeight": 0.0023935392
+    },
+    {
+      "stationId": 123,
+      "name": "Corbeil-Essonnes",
+      "arrivalWeight": 0.0031387541,
+      "departureWeight": 0.0007397095
+    },
+    {
+      "stationId": 124,
+      "name": "Corentin Cariou",
+      "arrivalWeight": 0.0012806971,
+      "departureWeight": 0.0023315988
+    },
+    {
+      "stationId": 125,
+      "name": "Corentin Celton",
+      "arrivalWeight": 0.0016798041,
+      "departureWeight": 0.0019293848
+    },
+    {
+      "stationId": 126,
+      "name": "Corvisart",
+      "arrivalWeight": 0.0008499056,
+      "departureWeight": 0.0027657438
+    },
+    {
+      "stationId": 127,
+      "name": "Coteaux Beauclair",
+      "arrivalWeight": 0.0023187367,
+      "departureWeight": 0.0012854782
+    },
+    {
+      "stationId": 128,
+      "name": "Cour Saint-Emilion",
+      "arrivalWeight": 0.0009857861,
+      "departureWeight": 0.0026288056
+    },
+    {
+      "stationId": 129,
+      "name": "Courcelle-sur-Yvette",
+      "arrivalWeight": 0.0030340339,
+      "departureWeight": 0.0005646126
+    },
+    {
+      "stationId": 130,
+      "name": "Courcelles",
+      "arrivalWeight": 0.0011735766,
+      "departureWeight": 0.0024395531
+    },
+    {
+      "stationId": 131,
+      "name": "Couronnes",
+      "arrivalWeight": 0.0007554863,
+      "departureWeight": 0.0028608982
+    },
+    {
+      "stationId": 132,
+      "name": "Creil",
+      "arrivalWeight": 0.002981824,
+      "departureWeight": 0.0004769127
+    },
+    {
+      "stationId": 133,
+      "name": "Crimée",
+      "arrivalWeight": 0.0011339538,
+      "departureWeight": 0.0024794844
+    },
+    {
+      "stationId": 134,
+      "name": "Croix de Chavaux",
+      "arrivalWeight": 0.0016475887,
+      "departureWeight": 0.001961851
+    },
+    {
+      "stationId": 135,
+      "name": "Créteil - L'Échat",
+      "arrivalWeight": 0.0024621051,
+      "departureWeight": 0.0011409937
+    },
+    {
+      "stationId": 136,
+      "name": "Créteil - Préfecture",
+      "arrivalWeight": 0.0027334375,
+      "departureWeight": 0.0008675491
+    },
+    {
+      "stationId": 137,
+      "name": "Créteil - Université",
+      "arrivalWeight": 0.0025751378,
+      "departureWeight": 0.0010270811
+    },
+    {
+      "stationId": 138,
+      "name": "Créteil Pompadour",
+      "arrivalWeight": 0.0027411557,
+      "departureWeight": 0.001000087
+    },
+    {
+      "stationId": 139,
+      "name": "Danube",
+      "arrivalWeight": 0.0011111579,
+      "departureWeight": 0.0025024578
+    },
+    {
+      "stationId": 140,
+      "name": "Daumesnil",
+      "arrivalWeight": 0.0011146398,
+      "departureWeight": 0.0027795811
+    },
+    {
+      "stationId": 141,
+      "name": "Denfert-Rochereau",
+      "arrivalWeight": 0.0010417227,
+      "departureWeight": 0.0031336981
+    },
+    {
+      "stationId": 142,
+      "name": "Dourdan",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 143,
+      "name": "Dourdan la Forêt",
+      "arrivalWeight": 0.002981824,
+      "departureWeight": 0.0004769127
+    },
+    {
+      "stationId": 144,
+      "name": "Drancy",
+      "arrivalWeight": 0.0026994125,
+      "departureWeight": 0.000901839
+    },
+    {
+      "stationId": 145,
+      "name": "Dugommier",
+      "arrivalWeight": 0.0009216451,
+      "departureWeight": 0.0026934459
+    },
+    {
+      "stationId": 146,
+      "name": "Dupleix",
+      "arrivalWeight": 0.0011801247,
+      "departureWeight": 0.0024329541
+    },
+    {
+      "stationId": 147,
+      "name": "Duroc",
+      "arrivalWeight": 0.0009279392,
+      "departureWeight": 0.0029677351
+    },
+    {
+      "stationId": 148,
+      "name": "Edgar Quinet",
+      "arrivalWeight": 0.0007801505,
+      "departureWeight": 0.002836042
+    },
+    {
+      "stationId": 149,
+      "name": "Ermont - Eaubonne",
+      "arrivalWeight": 0.0029599181,
+      "departureWeight": 0.0006393054
+    },
+    {
+      "stationId": 150,
+      "name": "Esplanade de la Défense",
+      "arrivalWeight": 0.0021578318,
+      "departureWeight": 0.0014476358
+    },
+    {
+      "stationId": 151,
+      "name": "Essonnes Robinson",
+      "arrivalWeight": 0.0030341322,
+      "departureWeight": 0.0005645136
+    },
+    {
+      "stationId": 152,
+      "name": "Etienne Marcel",
+      "arrivalWeight": 0.0005482353,
+      "departureWeight": 0.0030697626
+    },
+    {
+      "stationId": 153,
+      "name": "Europe",
+      "arrivalWeight": 0.000910086,
+      "departureWeight": 0.0027050949
+    },
+    {
+      "stationId": 154,
+      "name": "Exelmans",
+      "arrivalWeight": 0.0018431672,
+      "departureWeight": 0.0017647499
+    },
+    {
+      "stationId": 155,
+      "name": "Faidherbe - Chaligny",
+      "arrivalWeight": 0.0007605559,
+      "departureWeight": 0.0028557891
+    },
+    {
+      "stationId": 156,
+      "name": "Falguière",
+      "arrivalWeight": 0.0008195989,
+      "departureWeight": 0.0027962865
+    },
+    {
+      "stationId": 157,
+      "name": "Filles du Calvaire",
+      "arrivalWeight": 0.0005796797,
+      "departureWeight": 0.0030380734
+    },
+    {
+      "stationId": 158,
+      "name": "Fontaine Michalon",
+      "arrivalWeight": 0.0028666709,
+      "departureWeight": 0.0007332785
+    },
+    {
+      "stationId": 159,
+      "name": "Fontenay-aux-Roses",
+      "arrivalWeight": 0.0022829154,
+      "departureWeight": 0.0013215784
+    },
+    {
+      "stationId": 160,
+      "name": "Fontenay-sous-Bois",
+      "arrivalWeight": 0.0021817889,
+      "departureWeight": 0.0014234921
+    },
+    {
+      "stationId": 161,
+      "name": "Fort d'Aubervilliers",
+      "arrivalWeight": 0.0019936527,
+      "departureWeight": 0.001613093
+    },
+    {
+      "stationId": 162,
+      "name": "Franconville - Le Plessis-Bouchard",
+      "arrivalWeight": 0.0030131749,
+      "departureWeight": 0.000585634
+    },
+    {
+      "stationId": 163,
+      "name": "Franklin D. Roosevelt",
+      "arrivalWeight": 0.001041448,
+      "departureWeight": 0.0028533427
+    },
+    {
+      "stationId": 164,
+      "name": "Front Populaire",
+      "arrivalWeight": 0.0015082272,
+      "departureWeight": 0.0021022974
+    },
+    {
+      "stationId": 165,
+      "name": "Félix Faure",
+      "arrivalWeight": 0.0012358744,
+      "departureWeight": 0.0023767704
+    },
+    {
+      "stationId": 166,
+      "name": "Gabriel Péri",
+      "arrivalWeight": 0.0020917326,
+      "departureWeight": 0.0015142495
+    },
+    {
+      "stationId": 167,
+      "name": "Gagny",
+      "arrivalWeight": 0.0028590809,
+      "departureWeight": 0.0007409276
+    },
+    {
+      "stationId": 168,
+      "name": "Gallieni",
+      "arrivalWeight": 0.0012344125,
+      "departureWeight": 0.0022379275
+    },
+    {
+      "stationId": 169,
+      "name": "Gambetta",
+      "arrivalWeight": 0.0010201573,
+      "departureWeight": 0.0027344829
+    },
+    {
+      "stationId": 170,
+      "name": "Gare d'Austerlitz",
+      "arrivalWeight": 0.0008197693,
+      "departureWeight": 0.0032170633
+    },
+    {
+      "stationId": 171,
+      "name": "Gare de l'Est",
+      "arrivalWeight": 0.0009909753,
+      "departureWeight": 0.0033251568
+    },
+    {
+      "stationId": 172,
+      "name": "Gare de Lyon",
+      "arrivalWeight": 0.0010641192,
+      "departureWeight": 0.0035320758
+    },
+    {
+      "stationId": 173,
+      "name": "Gare du Nord",
+      "arrivalWeight": 0.0011124598,
+      "departureWeight": 0.0033430427
+    },
+    {
+      "stationId": 174,
+      "name": "Gare Montparnasse",
+      "arrivalWeight": 0.0011641972,
+      "departureWeight": 0.0032909025
+    },
+    {
+      "stationId": 175,
+      "name": "Gare Saint-Lazare",
+      "arrivalWeight": 0.0011502147,
+      "departureWeight": 0.0033049939
+    },
+    {
+      "stationId": 176,
+      "name": "Garges - Sarcelles",
+      "arrivalWeight": 0.0028966175,
+      "departureWeight": 0.0007030988
+    },
+    {
+      "stationId": 177,
+      "name": "Garibaldi",
+      "arrivalWeight": 0.0015245522,
+      "departureWeight": 0.0020858453
+    },
+    {
+      "stationId": 178,
+      "name": "Gaîté",
+      "arrivalWeight": 0.0008527656,
+      "departureWeight": 0.0027628616
+    },
+    {
+      "stationId": 179,
+      "name": "Gennevilliers",
+      "arrivalWeight": 0.002353512,
+      "departureWeight": 0.0012504322
+    },
+    {
+      "stationId": 180,
+      "name": "Gentilly",
+      "arrivalWeight": 0.0012350848,
+      "departureWeight": 0.0023775661
+    },
+    {
+      "stationId": 181,
+      "name": "George V",
+      "arrivalWeight": 0.001106783,
+      "departureWeight": 0.0025068668
+    },
+    {
+      "stationId": 182,
+      "name": "Gif-Sur-Yvette",
+      "arrivalWeight": 0.0030337413,
+      "departureWeight": 0.0005649074
+    },
+    {
+      "stationId": 183,
+      "name": "Glacière",
+      "arrivalWeight": 0.0008375312,
+      "departureWeight": 0.0027782146
+    },
+    {
+      "stationId": 184,
+      "name": "Goncourt",
+      "arrivalWeight": 0.0006792541,
+      "departureWeight": 0.0029377239
+    },
+    {
+      "stationId": 185,
+      "name": "Goussainville",
+      "arrivalWeight": 0.0030301486,
+      "departureWeight": 0.0005685281
+    },
+    {
+      "stationId": 186,
+      "name": "Grand Bourg",
+      "arrivalWeight": 0.003033805,
+      "departureWeight": 0.0005648433
+    },
+    {
+      "stationId": 187,
+      "name": "Grands Boulevards",
+      "arrivalWeight": 0.0007432584,
+      "departureWeight": 0.0031538536
+    },
+    {
+      "stationId": 188,
+      "name": "Gretz-Armainvilliers",
+      "arrivalWeight": 0.0030341351,
+      "departureWeight": 0.0005645106
+    },
+    {
+      "stationId": 189,
+      "name": "Grigny Centre",
+      "arrivalWeight": 0.0030333888,
+      "departureWeight": 0.0005652628
+    },
+    {
+      "stationId": 190,
+      "name": "Guy Môquet",
+      "arrivalWeight": 0.0011843031,
+      "departureWeight": 0.0024287431
+    },
+    {
+      "stationId": 191,
+      "name": "Haussmann Saint-Lazare",
+      "arrivalWeight": 0.0007892909,
+      "departureWeight": 0.0028268304
+    },
+    {
+      "stationId": 192,
+      "name": "Havre - Caumartin",
+      "arrivalWeight": 0.0008856346,
+      "departureWeight": 0.003010369
+    },
+    {
+      "stationId": 193,
+      "name": "Hoche",
+      "arrivalWeight": 0.001418541,
+      "departureWeight": 0.0021926818
+    },
+    {
+      "stationId": 194,
+      "name": "Houilles - Carrières-sur-Seine",
+      "arrivalWeight": 0.0029215862,
+      "departureWeight": 0.0006779357
+    },
+    {
+      "stationId": 195,
+      "name": "Hôpital Bicêtre",
+      "arrivalWeight": 0.0013733913,
+      "departureWeight": 0.002238183
+    },
+    {
+      "stationId": 196,
+      "name": "Hôtel de Ville",
+      "arrivalWeight": 0.0006278448,
+      "departureWeight": 0.0032701657
+    },
+    {
+      "stationId": 197,
+      "name": "Invalides / Pont Alexandre III",
+      "arrivalWeight": 0.001034808,
+      "departureWeight": 0.0031406667
+    },
+    {
+      "stationId": 198,
+      "name": "Issy",
+      "arrivalWeight": 0.0021118819,
+      "departureWeight": 0.0014939433
+    },
+    {
+      "stationId": 199,
+      "name": "Issy Val de Seine",
+      "arrivalWeight": 0.0018975538,
+      "departureWeight": 0.00170994
+    },
+    {
+      "stationId": 200,
+      "name": "Ivry-sur-Seine",
+      "arrivalWeight": 0.0015268173,
+      "departureWeight": 0.0022238787
+    },
+    {
+      "stationId": 201,
+      "name": "Iéna",
+      "arrivalWeight": 0.0011638008,
+      "departureWeight": 0.0024494051
+    },
+    {
+      "stationId": 202,
+      "name": "Jacques Bonsergent",
+      "arrivalWeight": 0.0006357073,
+      "departureWeight": 0.0029816097
+    },
+    {
+      "stationId": 203,
+      "name": "Jasmin",
+      "arrivalWeight": 0.0016516056,
+      "departureWeight": 0.0019578028
+    },
+    {
+      "stationId": 204,
+      "name": "Jaurès",
+      "arrivalWeight": 0.0011003089,
+      "departureWeight": 0.0030746559
+    },
+    {
+      "stationId": 205,
+      "name": "Javel",
+      "arrivalWeight": 0.0016465987,
+      "departureWeight": 0.0023837972
+    },
+    {
+      "stationId": 206,
+      "name": "Joinville-le-Pont",
+      "arrivalWeight": 0.0023478026,
+      "departureWeight": 0.0012561861
+    },
+    {
+      "stationId": 207,
+      "name": "Jourdain",
+      "arrivalWeight": 0.000930286,
+      "departureWeight": 0.0026847377
+    },
+    {
+      "stationId": 208,
+      "name": "Jules Joffrin",
+      "arrivalWeight": 0.0010895904,
+      "departureWeight": 0.0025241932
+    },
+    {
+      "stationId": 209,
+      "name": "Jussieu",
+      "arrivalWeight": 0.0006813423,
+      "departureWeight": 0.0032162517
+    },
+    {
+      "stationId": 210,
+      "name": "Juvisy",
+      "arrivalWeight": 0.0033900026,
+      "departureWeight": 0.0011880859
+    },
+    {
+      "stationId": 211,
+      "name": "Kléber",
+      "arrivalWeight": 0.0012357716,
+      "departureWeight": 0.002376874
+    },
+    {
+      "stationId": 212,
+      "name": "L'Haÿ-les-Roses",
+      "arrivalWeight": 0.002325954,
+      "departureWeight": 0.0012782048
+    },
+    {
+      "stationId": 213,
+      "name": "La Borne Blanche (Gare)",
+      "arrivalWeight": 0.0030341365,
+      "departureWeight": 0.0005645092
+    },
+    {
+      "stationId": 214,
+      "name": "La Chapelle",
+      "arrivalWeight": 0.000885341,
+      "departureWeight": 0.0027300326
+    },
+    {
+      "stationId": 215,
+      "name": "La Courneuve - 8 Mai 1945",
+      "arrivalWeight": 0.0021091898,
+      "departureWeight": 0.0013563403
+    },
+    {
+      "stationId": 216,
+      "name": "La Courneuve - Aubervilliers",
+      "arrivalWeight": 0.0020716113,
+      "departureWeight": 0.0015345275
+    },
+    {
+      "stationId": 217,
+      "name": "La Croix de Berny",
+      "arrivalWeight": 0.0026643131,
+      "departureWeight": 0.0009372116
+    },
+    {
+      "stationId": 218,
+      "name": "La Dhuys",
+      "arrivalWeight": 0.0022488875,
+      "departureWeight": 0.0013558712
+    },
+    {
+      "stationId": 219,
+      "name": "La Défense",
+      "arrivalWeight": 0.0025068001,
+      "departureWeight": 0.0015168993
+    },
+    {
+      "stationId": 220,
+      "name": "La Ferté-Alais",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 221,
+      "name": "La Fourche",
+      "arrivalWeight": 0.0011223137,
+      "departureWeight": 0.0026315313
+    },
+    {
+      "stationId": 222,
+      "name": "La Hacquinière",
+      "arrivalWeight": 0.0030335779,
+      "departureWeight": 0.0005650721
+    },
+    {
+      "stationId": 223,
+      "name": "La Motte-Picquet - Grenelle",
+      "arrivalWeight": 0.0012940424,
+      "departureWeight": 0.0028794142
+    },
+    {
+      "stationId": 224,
+      "name": "La Muette",
+      "arrivalWeight": 0.0015335323,
+      "departureWeight": 0.0020767953
+    },
+    {
+      "stationId": 225,
+      "name": "La Norville - Saint-Germain-lès-Arpajon",
+      "arrivalWeight": 0.0030341351,
+      "departureWeight": 0.0005645106
+    },
+    {
+      "stationId": 226,
+      "name": "La Plaine Stade de France",
+      "arrivalWeight": 0.0018423896,
+      "departureWeight": 0.0017655336
+    },
+    {
+      "stationId": 227,
+      "name": "La Tour-Maubourg",
+      "arrivalWeight": 0.0008730886,
+      "departureWeight": 0.0027423804
+    },
+    {
+      "stationId": 228,
+      "name": "La Varenne - Chennevières",
+      "arrivalWeight": 0.0028991855,
+      "departureWeight": 0.0007005108
+    },
+    {
+      "stationId": 229,
+      "name": "Lamarck - Caulaincourt",
+      "arrivalWeight": 0.0010261899,
+      "departureWeight": 0.0025880872
+    },
+    {
+      "stationId": 230,
+      "name": "Laplace",
+      "arrivalWeight": 0.0014754724,
+      "departureWeight": 0.0021353072
+    },
+    {
+      "stationId": 231,
+      "name": "Lardy",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 232,
+      "name": "Laumière",
+      "arrivalWeight": 0.0010142792,
+      "departureWeight": 0.0026000907
+    },
+    {
+      "stationId": 233,
+      "name": "Le Blanc-Mesnil",
+      "arrivalWeight": 0.0028085915,
+      "departureWeight": 0.00079181
+    },
+    {
+      "stationId": 234,
+      "name": "Le Bourget",
+      "arrivalWeight": 0.0024871822,
+      "departureWeight": 0.0011157215
+    },
+    {
+      "stationId": 235,
+      "name": "Le Bras de Fer",
+      "arrivalWeight": 0.0030341085,
+      "departureWeight": 0.0005645374
+    },
+    {
+      "stationId": 236,
+      "name": "Le Chénay Gagny",
+      "arrivalWeight": 0.0029540242,
+      "departureWeight": 0.0006452452
+    },
+    {
+      "stationId": 237,
+      "name": "Le Coudray-Montceaux",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 238,
+      "name": "Le Guichet",
+      "arrivalWeight": 0.0030304888,
+      "departureWeight": 0.0005681853
+    },
+    {
+      "stationId": 239,
+      "name": "Le Kremlin-Bicêtre",
+      "arrivalWeight": 0.00138788,
+      "departureWeight": 0.0022235815
+    },
+    {
+      "stationId": 240,
+      "name": "Le Mée",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 241,
+      "name": "Le Parc de Saint-Maur",
+      "arrivalWeight": 0.0027013566,
+      "departureWeight": 0.0008998797
+    },
+    {
+      "stationId": 242,
+      "name": "Le Peletier",
+      "arrivalWeight": 0.0007080455,
+      "departureWeight": 0.0029087083
+    },
+    {
+      "stationId": 243,
+      "name": "Le Plessis Chenet",
+      "arrivalWeight": 0.0030341366,
+      "departureWeight": 0.0005645091
+    },
+    {
+      "stationId": 244,
+      "name": "Le Raincy - Villemomble - Montfermeil",
+      "arrivalWeight": 0.0027929894,
+      "departureWeight": 0.0008075336
+    },
+    {
+      "stationId": 245,
+      "name": "Le Vert de Maisons",
+      "arrivalWeight": 0.0024318842,
+      "departureWeight": 0.0011714499
+    },
+    {
+      "stationId": 246,
+      "name": "Le Vésinet - Centre",
+      "arrivalWeight": 0.0029959337,
+      "departureWeight": 0.0006030094
+    },
+    {
+      "stationId": 247,
+      "name": "Le Vésinet - Le Pecq",
+      "arrivalWeight": 0.0030132535,
+      "departureWeight": 0.0005855548
+    },
+    {
+      "stationId": 248,
+      "name": "Ledru-Rollin",
+      "arrivalWeight": 0.0006514889,
+      "departureWeight": 0.0029657052
+    },
+    {
+      "stationId": 249,
+      "name": "Les Agnettes",
+      "arrivalWeight": 0.0022865115,
+      "departureWeight": 0.0013179543
+    },
+    {
+      "stationId": 250,
+      "name": "Les Ardoines",
+      "arrivalWeight": 0.0024614749,
+      "departureWeight": 0.0014222612
+    },
+    {
+      "stationId": 251,
+      "name": "Les Baconnets",
+      "arrivalWeight": 0.0029074248,
+      "departureWeight": 0.0006922074
+    },
+    {
+      "stationId": 252,
+      "name": "Les Boullereaux Champigny",
+      "arrivalWeight": 0.0027848611,
+      "departureWeight": 0.0008157251
+    },
+    {
+      "stationId": 253,
+      "name": "Les Gobelins",
+      "arrivalWeight": 0.000710879,
+      "departureWeight": 0.0029058527
+    },
+    {
+      "stationId": 254,
+      "name": "Les Grésillons",
+      "arrivalWeight": 0.0020139067,
+      "departureWeight": 0.0015926813
+    },
+    {
+      "stationId": 255,
+      "name": "Les Halles",
+      "arrivalWeight": 0.0005479387,
+      "departureWeight": 0.0030700615
+    },
+    {
+      "stationId": 256,
+      "name": "Les Noues",
+      "arrivalWeight": 0.0030324716,
+      "departureWeight": 0.000566187
+    },
+    {
+      "stationId": 257,
+      "name": "Les Sablons",
+      "arrivalWeight": 0.0017310489,
+      "departureWeight": 0.0018777411
+    },
+    {
+      "stationId": 258,
+      "name": "Les Saules",
+      "arrivalWeight": 0.002868674,
+      "departureWeight": 0.0007312598
+    },
+    {
+      "stationId": 259,
+      "name": "Les Yvris Noisy-le-Grand",
+      "arrivalWeight": 0.0030089026,
+      "departureWeight": 0.0005899395
+    },
+    {
+      "stationId": 260,
+      "name": "Liberté",
+      "arrivalWeight": 0.0014054509,
+      "departureWeight": 0.0022058738
+    },
+    {
+      "stationId": 261,
+      "name": "Lieusaint - Moissy",
+      "arrivalWeight": 0.0030341347,
+      "departureWeight": 0.000564511
+    },
+    {
+      "stationId": 262,
+      "name": "Liège",
+      "arrivalWeight": 0.0008756467,
+      "departureWeight": 0.0027398024
+    },
+    {
+      "stationId": 263,
+      "name": "Lognes",
+      "arrivalWeight": 0.0030309866,
+      "departureWeight": 0.0005676836
+    },
+    {
+      "stationId": 264,
+      "name": "Louis Blanc",
+      "arrivalWeight": 0.0008933226,
+      "departureWeight": 0.002862305
+    },
+    {
+      "stationId": 265,
+      "name": "Louise Michel",
+      "arrivalWeight": 0.0015745997,
+      "departureWeight": 0.0020354082
+    },
+    {
+      "stationId": 266,
+      "name": "Lourmel",
+      "arrivalWeight": 0.0014670205,
+      "departureWeight": 0.0021438248
+    },
+    {
+      "stationId": 267,
+      "name": "Louvre - Rivoli",
+      "arrivalWeight": 0.0005599773,
+      "departureWeight": 0.0030579292
+    },
+    {
+      "stationId": 268,
+      "name": "Louvres",
+      "arrivalWeight": 0.0030338448,
+      "departureWeight": 0.0005648032
+    },
+    {
+      "stationId": 269,
+      "name": "Lozère",
+      "arrivalWeight": 0.0030281703,
+      "departureWeight": 0.0005705219
+    },
+    {
+      "stationId": 270,
+      "name": "Luxembourg",
+      "arrivalWeight": 0.0006009963,
+      "departureWeight": 0.0030165909
+    },
+    {
+      "stationId": 271,
+      "name": "Mabillon",
+      "arrivalWeight": 0.0005830084,
+      "departureWeight": 0.0030347188
+    },
+    {
+      "stationId": 272,
+      "name": "Madeleine",
+      "arrivalWeight": 0.0009672623,
+      "departureWeight": 0.0032087382
+    },
+    {
+      "stationId": 273,
+      "name": "Magenta",
+      "arrivalWeight": 0.0008004472,
+      "departureWeight": 0.0028155873
+    },
+    {
+      "stationId": 274,
+      "name": "Mairie d'Aubervilliers",
+      "arrivalWeight": 0.0017480154,
+      "departureWeight": 0.0017203263
+    },
+    {
+      "stationId": 275,
+      "name": "Mairie d'Issy",
+      "arrivalWeight": 0.0017546211,
+      "departureWeight": 0.0017136692
+    },
+    {
+      "stationId": 276,
+      "name": "Mairie d'Ivry",
+      "arrivalWeight": 0.0014389011,
+      "departureWeight": 0.002031847
+    },
+    {
+      "stationId": 277,
+      "name": "Mairie de Clichy",
+      "arrivalWeight": 0.0016657193,
+      "departureWeight": 0.0019435792
+    },
+    {
+      "stationId": 278,
+      "name": "Mairie de Montreuil",
+      "arrivalWeight": 0.0017203974,
+      "departureWeight": 0.0017481594
+    },
+    {
+      "stationId": 279,
+      "name": "Mairie de Montrouge",
+      "arrivalWeight": 0.0012858156,
+      "departureWeight": 0.0023264404
+    },
+    {
+      "stationId": 280,
+      "name": "Mairie de Saint-Ouen",
+      "arrivalWeight": 0.0018046922,
+      "departureWeight": 0.0020841568
+    },
+    {
+      "stationId": 281,
+      "name": "Mairie des Lilas",
+      "arrivalWeight": 0.0014239514,
+      "departureWeight": 0.0021872293
+    },
+    {
+      "stationId": 282,
+      "name": "Maison Blanche",
+      "arrivalWeight": 0.0012095155,
+      "departureWeight": 0.002824283
+    },
+    {
+      "stationId": 283,
+      "name": "Maisons-Alfort - Alfortville",
+      "arrivalWeight": 0.0021631758,
+      "departureWeight": 0.0014422502
+    },
+    {
+      "stationId": 284,
+      "name": "Maisons-Alfort - Les Juilliottes",
+      "arrivalWeight": 0.0023237258,
+      "departureWeight": 0.0012804503
+    },
+    {
+      "stationId": 285,
+      "name": "Maisons-Alfort - Stade",
+      "arrivalWeight": 0.0021262946,
+      "departureWeight": 0.0014794185
+    },
+    {
+      "stationId": 286,
+      "name": "Maisons-Laffitte",
+      "arrivalWeight": 0.0030720397,
+      "departureWeight": 0.0006666271
+    },
+    {
+      "stationId": 287,
+      "name": "Maisse",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 288,
+      "name": "Malakoff - Plateau de Vanves",
+      "arrivalWeight": 0.0014536798,
+      "departureWeight": 0.0021572694
+    },
+    {
+      "stationId": 289,
+      "name": "Malakoff - Rue Etienne Dolet",
+      "arrivalWeight": 0.0016526268,
+      "departureWeight": 0.0019567736
+    },
+    {
+      "stationId": 290,
+      "name": "Malesherbes",
+      "arrivalWeight": 0.002981824,
+      "departureWeight": 0.0004769127
+    },
+    {
+      "stationId": 291,
+      "name": "Malesherbes",
+      "arrivalWeight": 0.0011503925,
+      "departureWeight": 0.0024629177
+    },
+    {
+      "stationId": 292,
+      "name": "Maraîchers",
+      "arrivalWeight": 0.0010715934,
+      "departureWeight": 0.0025423303
+    },
+    {
+      "stationId": 293,
+      "name": "Marcadet - Poissonniers / Eugène Sue",
+      "arrivalWeight": 0.0011527707,
+      "departureWeight": 0.0027411534
+    },
+    {
+      "stationId": 294,
+      "name": "Marcel Sembat",
+      "arrivalWeight": 0.0021914335,
+      "departureWeight": 0.0014137724
+    },
+    {
+      "stationId": 295,
+      "name": "Marne-la-Vallée Chessy",
+      "arrivalWeight": 0.0029818236,
+      "departureWeight": 0.0004769132
+    },
+    {
+      "stationId": 296,
+      "name": "Marolles-en-Hurepoix",
+      "arrivalWeight": 0.0030341366,
+      "departureWeight": 0.0005645091
+    },
+    {
+      "stationId": 297,
+      "name": "Marx Dormoy",
+      "arrivalWeight": 0.0010332008,
+      "departureWeight": 0.0025810217
+    },
+    {
+      "stationId": 298,
+      "name": "Massy - Palaiseau",
+      "arrivalWeight": 0.0030453259,
+      "departureWeight": 0.0006935489
+    },
+    {
+      "stationId": 299,
+      "name": "Massy - Verrières",
+      "arrivalWeight": 0.0030510763,
+      "departureWeight": 0.0008280698
+    },
+    {
+      "stationId": 300,
+      "name": "Maubert - Mutualité",
+      "arrivalWeight": 0.0005482206,
+      "departureWeight": 0.0030697774
+    },
+    {
+      "stationId": 301,
+      "name": "Melun",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 302,
+      "name": "Mennecy",
+      "arrivalWeight": 0.0030341365,
+      "departureWeight": 0.0005645092
+    },
+    {
+      "stationId": 303,
+      "name": "Meudon Val Fleury",
+      "arrivalWeight": 0.002470192,
+      "departureWeight": 0.0011328439
+    },
+    {
+      "stationId": 304,
+      "name": "Michel Bizot",
+      "arrivalWeight": 0.0011529178,
+      "departureWeight": 0.0024603728
+    },
+    {
+      "stationId": 305,
+      "name": "Michel-Ange - Auteuil",
+      "arrivalWeight": 0.0018358093,
+      "departureWeight": 0.0020527974
+    },
+    {
+      "stationId": 306,
+      "name": "Michel-Ange - Molitor",
+      "arrivalWeight": 0.0019030212,
+      "departureWeight": 0.0019850623
+    },
+    {
+      "stationId": 307,
+      "name": "Mirabeau",
+      "arrivalWeight": 0.0015635002,
+      "departureWeight": 0.0020465941
+    },
+    {
+      "stationId": 308,
+      "name": "Miromesnil",
+      "arrivalWeight": 0.0010334468,
+      "departureWeight": 0.0028614062
+    },
+    {
+      "stationId": 309,
+      "name": "Mitry - Claye",
+      "arrivalWeight": 0.0029816875,
+      "departureWeight": 0.0004770504
+    },
+    {
+      "stationId": 310,
+      "name": "Monceau",
+      "arrivalWeight": 0.0011116174,
+      "departureWeight": 0.0025019947
+    },
+    {
+      "stationId": 311,
+      "name": "Montgallet",
+      "arrivalWeight": 0.0008730672,
+      "departureWeight": 0.002742402
+    },
+    {
+      "stationId": 312,
+      "name": "Montgeron - Crosne",
+      "arrivalWeight": 0.0030212485,
+      "departureWeight": 0.0005774975
+    },
+    {
+      "stationId": 313,
+      "name": "Montigny - Beauchamp",
+      "arrivalWeight": 0.00303003,
+      "departureWeight": 0.0005686477
+    },
+    {
+      "stationId": 314,
+      "name": "Montreuil - Hôpital",
+      "arrivalWeight": 0.0020795965,
+      "departureWeight": 0.0015264801
+    },
+    {
+      "stationId": 315,
+      "name": "Moulin Galant",
+      "arrivalWeight": 0.0030341362,
+      "departureWeight": 0.0005645095
+    },
+    {
+      "stationId": 316,
+      "name": "Mouton-Duvernet",
+      "arrivalWeight": 0.0009121383,
+      "departureWeight": 0.0027030267
+    },
+    {
+      "stationId": 317,
+      "name": "Musée d'Orsay",
+      "arrivalWeight": 0.0006759621,
+      "departureWeight": 0.0029410415
+    },
+    {
+      "stationId": 318,
+      "name": "Ménilmontant",
+      "arrivalWeight": 0.0007654849,
+      "departureWeight": 0.0028508217
+    },
+    {
+      "stationId": 319,
+      "name": "Nanterre Préfecture",
+      "arrivalWeight": 0.0026385821,
+      "departureWeight": 0.001103459
+    },
+    {
+      "stationId": 320,
+      "name": "Nanterre Université",
+      "arrivalWeight": 0.0026893742,
+      "departureWeight": 0.0009119554
+    },
+    {
+      "stationId": 321,
+      "name": "Nanterre Ville",
+      "arrivalWeight": 0.0028010177,
+      "departureWeight": 0.0007994427
+    },
+    {
+      "stationId": 322,
+      "name": "Nanterre-La-Folie",
+      "arrivalWeight": 0.0024999752,
+      "departureWeight": 0.0009625127
+    },
+    {
+      "stationId": 323,
+      "name": "Nation",
+      "arrivalWeight": 0.0012399632,
+      "departureWeight": 0.0032145467
+    },
+    {
+      "stationId": 324,
+      "name": "Nationale",
+      "arrivalWeight": 0.0008092225,
+      "departureWeight": 0.0028067436
+    },
+    {
+      "stationId": 325,
+      "name": "Neuilly - Porte Maillot",
+      "arrivalWeight": 0.0017118037,
+      "departureWeight": 0.0024584007
+    },
+    {
+      "stationId": 326,
+      "name": "Neuilly-Plaisance",
+      "arrivalWeight": 0.0027556157,
+      "departureWeight": 0.0008451982
+    },
+    {
+      "stationId": 327,
+      "name": "Neuville Université",
+      "arrivalWeight": 0.0030340974,
+      "departureWeight": 0.0005645486
+    },
+    {
+      "stationId": 328,
+      "name": "Nogent - Le Perreux",
+      "arrivalWeight": 0.0025960069,
+      "departureWeight": 0.0010060496
+    },
+    {
+      "stationId": 329,
+      "name": "Nogent-sur-Marne",
+      "arrivalWeight": 0.0023466435,
+      "departureWeight": 0.0012573542
+    },
+    {
+      "stationId": 330,
+      "name": "Noisiel",
+      "arrivalWeight": 0.0030270448,
+      "departureWeight": 0.0005716561
+    },
+    {
+      "stationId": 331,
+      "name": "Noisy - Champs",
+      "arrivalWeight": 0.0030035239,
+      "departureWeight": 0.0005953601
+    },
+    {
+      "stationId": 332,
+      "name": "Noisy-le-Grand - Mont d'Est",
+      "arrivalWeight": 0.0029451924,
+      "departureWeight": 0.0006541457
+    },
+    {
+      "stationId": 333,
+      "name": "Noisy-le-Sec",
+      "arrivalWeight": 0.0024562304,
+      "departureWeight": 0.0014275465
+    },
+    {
+      "stationId": 334,
+      "name": "Notre-Dame-de-Lorette",
+      "arrivalWeight": 0.0007369331,
+      "departureWeight": 0.0028795959
+    },
+    {
+      "stationId": 335,
+      "name": "Notre-Dame-des-Champs",
+      "arrivalWeight": 0.0006987819,
+      "departureWeight": 0.002918044
+    },
+    {
+      "stationId": 336,
+      "name": "Oberkampf",
+      "arrivalWeight": 0.0007177703,
+      "departureWeight": 0.0031795401
+    },
+    {
+      "stationId": 337,
+      "name": "Odéon",
+      "arrivalWeight": 0.0006702341,
+      "departureWeight": 0.0032274464
+    },
+    {
+      "stationId": 338,
+      "name": "Olympiades",
+      "arrivalWeight": 0.0009578051,
+      "departureWeight": 0.0026570044
+    },
+    {
+      "stationId": 339,
+      "name": "Opéra",
+      "arrivalWeight": 0.0009165685,
+      "departureWeight": 0.0032598266
+    },
+    {
+      "stationId": 340,
+      "name": "Orangis Bois de l'Épine",
+      "arrivalWeight": 0.0030339725,
+      "departureWeight": 0.0005646745
+    },
+    {
+      "stationId": 341,
+      "name": "Orly Ville",
+      "arrivalWeight": 0.0028770397,
+      "departureWeight": 0.0007228289
+    },
+    {
+      "stationId": 342,
+      "name": "Orry-la-Ville - Coye",
+      "arrivalWeight": 0.0030341366,
+      "departureWeight": 0.0005645091
+    },
+    {
+      "stationId": 343,
+      "name": "Orsay Ville",
+      "arrivalWeight": 0.0030324584,
+      "departureWeight": 0.0005662003
+    },
+    {
+      "stationId": 344,
+      "name": "Ourcq",
+      "arrivalWeight": 0.0011422468,
+      "departureWeight": 0.0024711269
+    },
+    {
+      "stationId": 345,
+      "name": "Ozoir-la-Ferrière",
+      "arrivalWeight": 0.0030340954,
+      "departureWeight": 0.0005645506
+    },
+    {
+      "stationId": 346,
+      "name": "Palais Royal - Musée du Louvre",
+      "arrivalWeight": 0.00069905,
+      "departureWeight": 0.0031984061
+    },
+    {
+      "stationId": 347,
+      "name": "Palaiseau",
+      "arrivalWeight": 0.003011425,
+      "departureWeight": 0.0005873975
+    },
+    {
+      "stationId": 348,
+      "name": "Palaiseau - Villebon",
+      "arrivalWeight": 0.0030229289,
+      "departureWeight": 0.000575804
+    },
+    {
+      "stationId": 349,
+      "name": "Pantin",
+      "arrivalWeight": 0.0015468653,
+      "departureWeight": 0.0020633585
+    },
+    {
+      "stationId": 350,
+      "name": "Parc de Sceaux",
+      "arrivalWeight": 0.002521234,
+      "departureWeight": 0.0010814046
+    },
+    {
+      "stationId": 351,
+      "name": "Parc des Expositions",
+      "arrivalWeight": 0.0030145954,
+      "departureWeight": 0.0005842024
+    },
+    {
+      "stationId": 352,
+      "name": "Parmentier",
+      "arrivalWeight": 0.0006634397,
+      "departureWeight": 0.0029536614
+    },
+    {
+      "stationId": 353,
+      "name": "Passy",
+      "arrivalWeight": 0.0013077532,
+      "departureWeight": 0.002304332
+    },
+    {
+      "stationId": 354,
+      "name": "Pasteur",
+      "arrivalWeight": 0.0010219834,
+      "departureWeight": 0.0028729588
+    },
+    {
+      "stationId": 355,
+      "name": "Pelleport",
+      "arrivalWeight": 0.0010390546,
+      "departureWeight": 0.0025751224
+    },
+    {
+      "stationId": 356,
+      "name": "Pernety",
+      "arrivalWeight": 0.0009735475,
+      "departureWeight": 0.0026411394
+    },
+    {
+      "stationId": 357,
+      "name": "Philippe Auguste",
+      "arrivalWeight": 0.0008105538,
+      "departureWeight": 0.002805402
+    },
+    {
+      "stationId": 358,
+      "name": "Picpus",
+      "arrivalWeight": 0.0010484567,
+      "departureWeight": 0.0025656471
+    },
+    {
+      "stationId": 359,
+      "name": "Pierre et Marie Curie",
+      "arrivalWeight": 0.0013099498,
+      "departureWeight": 0.0023021183
+    },
+    {
+      "stationId": 360,
+      "name": "Pierrefitte - Stains",
+      "arrivalWeight": 0.0027544861,
+      "departureWeight": 0.0008463366
+    },
+    {
+      "stationId": 361,
+      "name": "Pierrelaye",
+      "arrivalWeight": 0.0030335915,
+      "departureWeight": 0.0005650584
+    },
+    {
+      "stationId": 362,
+      "name": "Pigalle",
+      "arrivalWeight": 0.0009690242,
+      "departureWeight": 0.0029263303
+    },
+    {
+      "stationId": 363,
+      "name": "Place d'Italie",
+      "arrivalWeight": 0.0009734944,
+      "departureWeight": 0.0030621414
+    },
+    {
+      "stationId": 364,
+      "name": "Place de Clichy",
+      "arrivalWeight": 0.0010681999,
+      "departureWeight": 0.0028263825
+    },
+    {
+      "stationId": 365,
+      "name": "Place des Fêtes",
+      "arrivalWeight": 0.0011310731,
+      "departureWeight": 0.0027630198
+    },
+    {
+      "stationId": 366,
+      "name": "Place Monge",
+      "arrivalWeight": 0.0006095923,
+      "departureWeight": 0.0030079279
+    },
+    {
+      "stationId": 367,
+      "name": "Plaisance",
+      "arrivalWeight": 0.0010595974,
+      "departureWeight": 0.0025544196
+    },
+    {
+      "stationId": 368,
+      "name": "Pointe du Lac",
+      "arrivalWeight": 0.0027836194,
+      "departureWeight": 0.0006766604
+    },
+    {
+      "stationId": 369,
+      "name": "Poissonnière",
+      "arrivalWeight": 0.0007294522,
+      "departureWeight": 0.002887135
+    },
+    {
+      "stationId": 370,
+      "name": "Poissy",
+      "arrivalWeight": 0.0029815861,
+      "departureWeight": 0.0004771526
+    },
+    {
+      "stationId": 371,
+      "name": "Pont Cardinet",
+      "arrivalWeight": 0.0011822108,
+      "departureWeight": 0.0024308517
+    },
+    {
+      "stationId": 372,
+      "name": "Pont de l'Alma",
+      "arrivalWeight": 0.001042933,
+      "departureWeight": 0.0025712138
+    },
+    {
+      "stationId": 373,
+      "name": "Pont de Levallois - Bécon",
+      "arrivalWeight": 0.0018084443,
+      "departureWeight": 0.0016594269
+    },
+    {
+      "stationId": 374,
+      "name": "Pont de Neuilly",
+      "arrivalWeight": 0.0019877909,
+      "departureWeight": 0.0016190004
+    },
+    {
+      "stationId": 375,
+      "name": "Pont de Sèvres",
+      "arrivalWeight": 0.0023472807,
+      "departureWeight": 0.0011163959
+    },
+    {
+      "stationId": 376,
+      "name": "Pont du Garigliano - Hôpital Européen G. Pompidou",
+      "arrivalWeight": 0.001684954,
+      "departureWeight": 0.0019241948
+    },
+    {
+      "stationId": 377,
+      "name": "Pont Marie (Cité des Arts)",
+      "arrivalWeight": 0.0005309174,
+      "departureWeight": 0.0030872153
+    },
+    {
+      "stationId": 378,
+      "name": "Pont Neuf",
+      "arrivalWeight": 0.0005436131,
+      "departureWeight": 0.0030744208
+    },
+    {
+      "stationId": 379,
+      "name": "Ponthierry - Pringy",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 380,
+      "name": "Pontoise",
+      "arrivalWeight": 0.0029818148,
+      "departureWeight": 0.0004769221
+    },
+    {
+      "stationId": 381,
+      "name": "Porchefontaine",
+      "arrivalWeight": 0.0029884206,
+      "departureWeight": 0.000610581
+    },
+    {
+      "stationId": 382,
+      "name": "Port Royal",
+      "arrivalWeight": 0.0007040696,
+      "departureWeight": 0.0029127152
+    },
+    {
+      "stationId": 383,
+      "name": "Porte d'Auteuil",
+      "arrivalWeight": 0.0018430431,
+      "departureWeight": 0.001764875
+    },
+    {
+      "stationId": 384,
+      "name": "Porte d'Italie",
+      "arrivalWeight": 0.0011418746,
+      "departureWeight": 0.0024715019
+    },
+    {
+      "stationId": 385,
+      "name": "Porte d'Ivry",
+      "arrivalWeight": 0.0011082822,
+      "departureWeight": 0.0025053559
+    },
+    {
+      "stationId": 386,
+      "name": "Porte d'Orléans",
+      "arrivalWeight": 0.0011471099,
+      "departureWeight": 0.0024662258
+    },
+    {
+      "stationId": 387,
+      "name": "Porte Dauphine",
+      "arrivalWeight": 0.0014962813,
+      "departureWeight": 0.0019740201
+    },
+    {
+      "stationId": 388,
+      "name": "Porte de Bagnolet",
+      "arrivalWeight": 0.001142162,
+      "departureWeight": 0.0024712124
+    },
+    {
+      "stationId": 389,
+      "name": "Porte de Champerret",
+      "arrivalWeight": 0.0014462316,
+      "departureWeight": 0.0021647756
+    },
+    {
+      "stationId": 390,
+      "name": "Porte de Charenton",
+      "arrivalWeight": 0.0011850608,
+      "departureWeight": 0.0024279795
+    },
+    {
+      "stationId": 391,
+      "name": "Porte de Choisy",
+      "arrivalWeight": 0.0011287821,
+      "departureWeight": 0.0024846963
+    },
+    {
+      "stationId": 392,
+      "name": "Porte de Clichy",
+      "arrivalWeight": 0.0015607038,
+      "departureWeight": 0.0026106769
+    },
+    {
+      "stationId": 393,
+      "name": "Porte de Clignancourt",
+      "arrivalWeight": 0.0011926971,
+      "departureWeight": 0.0022799677
+    },
+    {
+      "stationId": 394,
+      "name": "Porte de la Chapelle",
+      "arrivalWeight": 0.0012290786,
+      "departureWeight": 0.0023836191
+    },
+    {
+      "stationId": 395,
+      "name": "Porte de la Villette",
+      "arrivalWeight": 0.0013858114,
+      "departureWeight": 0.0022256662
+    },
+    {
+      "stationId": 396,
+      "name": "Porte de Montreuil",
+      "arrivalWeight": 0.0011571968,
+      "departureWeight": 0.0024560605
+    },
+    {
+      "stationId": 397,
+      "name": "Porte de Pantin",
+      "arrivalWeight": 0.0012622993,
+      "departureWeight": 0.0023501398
+    },
+    {
+      "stationId": 398,
+      "name": "Porte de Saint-Cloud",
+      "arrivalWeight": 0.0019326411,
+      "departureWeight": 0.0016745795
+    },
+    {
+      "stationId": 399,
+      "name": "Porte de Saint-Ouen",
+      "arrivalWeight": 0.0013038443,
+      "departureWeight": 0.0023082714
+    },
+    {
+      "stationId": 400,
+      "name": "Porte de Vanves",
+      "arrivalWeight": 0.0012698083,
+      "departureWeight": 0.0023425723
+    },
+    {
+      "stationId": 401,
+      "name": "Porte de Versailles",
+      "arrivalWeight": 0.0014449987,
+      "departureWeight": 0.0021660181
+    },
+    {
+      "stationId": 402,
+      "name": "Porte de Vincennes",
+      "arrivalWeight": 0.0011544282,
+      "departureWeight": 0.0024588506
+    },
+    {
+      "stationId": 403,
+      "name": "Porte des Lilas",
+      "arrivalWeight": 0.0013074665,
+      "departureWeight": 0.0024449371
+    },
+    {
+      "stationId": 404,
+      "name": "Porte Dorée",
+      "arrivalWeight": 0.0012398441,
+      "departureWeight": 0.0023727698
+    },
+    {
+      "stationId": 405,
+      "name": "Pré-Saint-Gervais",
+      "arrivalWeight": 0.0011405144,
+      "departureWeight": 0.0024728728
+    },
+    {
+      "stationId": 406,
+      "name": "Pyramides",
+      "arrivalWeight": 0.0007389817,
+      "departureWeight": 0.0031581636
+    },
+    {
+      "stationId": 407,
+      "name": "Pyrénées",
+      "arrivalWeight": 0.0008697124,
+      "departureWeight": 0.0027457828
+    },
+    {
+      "stationId": 408,
+      "name": "Père Lachaise",
+      "arrivalWeight": 0.0008895344,
+      "departureWeight": 0.0030064389
+    },
+    {
+      "stationId": 409,
+      "name": "Péreire Levallois",
+      "arrivalWeight": 0.0014711231,
+      "departureWeight": 0.0024203226
+    },
+    {
+      "stationId": 410,
+      "name": "Quai de la Gare",
+      "arrivalWeight": 0.0007878813,
+      "departureWeight": 0.002828251
+    },
+    {
+      "stationId": 411,
+      "name": "Quai de la Rapée",
+      "arrivalWeight": 0.00062732,
+      "departureWeight": 0.0029900622
+    },
+    {
+      "stationId": 412,
+      "name": "Quatre Septembre",
+      "arrivalWeight": 0.0006471151,
+      "departureWeight": 0.0029701131
+    },
+    {
+      "stationId": 413,
+      "name": "Rambuteau",
+      "arrivalWeight": 0.0005308271,
+      "departureWeight": 0.0030873063
+    },
+    {
+      "stationId": 414,
+      "name": "Ranelagh",
+      "arrivalWeight": 0.0016009966,
+      "departureWeight": 0.0020088058
+    },
+    {
+      "stationId": 415,
+      "name": "Raspail",
+      "arrivalWeight": 0.0008678149,
+      "departureWeight": 0.0030283275
+    },
+    {
+      "stationId": 416,
+      "name": "Rennes",
+      "arrivalWeight": 0.0006694255,
+      "departureWeight": 0.002947629
+    },
+    {
+      "stationId": 417,
+      "name": "Reuilly - Diderot",
+      "arrivalWeight": 0.000898148,
+      "departureWeight": 0.0029977582
+    },
+    {
+      "stationId": 418,
+      "name": "Richard-Lenoir",
+      "arrivalWeight": 0.0006035637,
+      "departureWeight": 0.0030140035
+    },
+    {
+      "stationId": 419,
+      "name": "Richelieu - Drouot",
+      "arrivalWeight": 0.0007749067,
+      "departureWeight": 0.0031219589
+    },
+    {
+      "stationId": 420,
+      "name": "Riquet",
+      "arrivalWeight": 0.0010483595,
+      "departureWeight": 0.0025657451
+    },
+    {
+      "stationId": 421,
+      "name": "Ris-Orangis",
+      "arrivalWeight": 0.0030855008,
+      "departureWeight": 0.0006530612
+    },
+    {
+      "stationId": 422,
+      "name": "Robespierre",
+      "arrivalWeight": 0.0013696601,
+      "departureWeight": 0.0022419432
+    },
+    {
+      "stationId": 423,
+      "name": "Robinson",
+      "arrivalWeight": 0.002457662,
+      "departureWeight": 0.0010051553
+    },
+    {
+      "stationId": 424,
+      "name": "Roissy-en-Brie",
+      "arrivalWeight": 0.0030334192,
+      "departureWeight": 0.0005652321
+    },
+    {
+      "stationId": 425,
+      "name": "Romainville - Carnot",
+      "arrivalWeight": 0.0019005286,
+      "departureWeight": 0.001706942
+    },
+    {
+      "stationId": 426,
+      "name": "Rome",
+      "arrivalWeight": 0.0009967248,
+      "departureWeight": 0.0026177817
+    },
+    {
+      "stationId": 427,
+      "name": "Rosa Parks",
+      "arrivalWeight": 0.0013228424,
+      "departureWeight": 0.0024294415
+    },
+    {
+      "stationId": 428,
+      "name": "Rosny Bois Perrier",
+      "arrivalWeight": 0.0025440608,
+      "departureWeight": 0.0011987162
+    },
+    {
+      "stationId": 429,
+      "name": "Rosny-sous-Bois",
+      "arrivalWeight": 0.0025020674,
+      "departureWeight": 0.0011007204
+    },
+    {
+      "stationId": 430,
+      "name": "Rue de la Pompe",
+      "arrivalWeight": 0.0014674592,
+      "departureWeight": 0.0021433827
+    },
+    {
+      "stationId": 431,
+      "name": "Rue des Boulets",
+      "arrivalWeight": 0.0008088862,
+      "departureWeight": 0.0028070826
+    },
+    {
+      "stationId": 432,
+      "name": "Rue du Bac",
+      "arrivalWeight": 0.0006658095,
+      "departureWeight": 0.0029512731
+    },
+    {
+      "stationId": 433,
+      "name": "Rue Saint-Maur",
+      "arrivalWeight": 0.000706652,
+      "departureWeight": 0.0029101126
+    },
+    {
+      "stationId": 434,
+      "name": "Rueil-Malmaison",
+      "arrivalWeight": 0.0028976503,
+      "departureWeight": 0.0007020579
+    },
+    {
+      "stationId": 435,
+      "name": "Rungis la Fraternelle",
+      "arrivalWeight": 0.0028438057,
+      "departureWeight": 0.0007563217
+    },
+    {
+      "stationId": 436,
+      "name": "Réaumur - Sébastopol",
+      "arrivalWeight": 0.0006712109,
+      "departureWeight": 0.003226462
+    },
+    {
+      "stationId": 437,
+      "name": "République",
+      "arrivalWeight": 0.0010299333,
+      "departureWeight": 0.0037068439
+    },
+    {
+      "stationId": 438,
+      "name": "Saint-Ambroise",
+      "arrivalWeight": 0.0006469351,
+      "departureWeight": 0.0029702944
+    },
+    {
+      "stationId": 439,
+      "name": "Saint-Augustin",
+      "arrivalWeight": 0.0008761189,
+      "departureWeight": 0.0027393265
+    },
+    {
+      "stationId": 440,
+      "name": "Saint-Chéron",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 441,
+      "name": "Saint-Cyr",
+      "arrivalWeight": 0.0030321634,
+      "departureWeight": 0.0005664976
+    },
+    {
+      "stationId": 442,
+      "name": "Saint-Denis",
+      "arrivalWeight": 0.0022725665,
+      "departureWeight": 0.0013320079
+    },
+    {
+      "stationId": 443,
+      "name": "Saint-Denis - Pleyel",
+      "arrivalWeight": 0.0017719165,
+      "departureWeight": 0.0016962391
+    },
+    {
+      "stationId": 444,
+      "name": "Saint-Denis - Porte de Paris",
+      "arrivalWeight": 0.0021415373,
+      "departureWeight": 0.0014640571
+    },
+    {
+      "stationId": 445,
+      "name": "Saint-Denis - Université",
+      "arrivalWeight": 0.0024574319,
+      "departureWeight": 0.0010053872
+    },
+    {
+      "stationId": 446,
+      "name": "Saint-Fargeau",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 447,
+      "name": "Saint-Fargeau",
+      "arrivalWeight": 0.0011239695,
+      "departureWeight": 0.0024895464
+    },
+    {
+      "stationId": 448,
+      "name": "Saint-François-Xavier",
+      "arrivalWeight": 0.0008194102,
+      "departureWeight": 0.0027964767
+    },
+    {
+      "stationId": 449,
+      "name": "Saint-Georges",
+      "arrivalWeight": 0.0007904886,
+      "departureWeight": 0.0028256234
+    },
+    {
+      "stationId": 450,
+      "name": "Saint-Germain-des-Prés",
+      "arrivalWeight": 0.0006008372,
+      "departureWeight": 0.0030167512
+    },
+    {
+      "stationId": 451,
+      "name": "Saint-Germain-en-Laye",
+      "arrivalWeight": 0.002974873,
+      "departureWeight": 0.0004839178
+    },
+    {
+      "stationId": 452,
+      "name": "Saint-Gratien",
+      "arrivalWeight": 0.0028431492,
+      "departureWeight": 0.0007569833
+    },
+    {
+      "stationId": 453,
+      "name": "Saint-Jacques",
+      "arrivalWeight": 0.0008246548,
+      "departureWeight": 0.0027911912
+    },
+    {
+      "stationId": 454,
+      "name": "Saint-Mandé",
+      "arrivalWeight": 0.0013390965,
+      "departureWeight": 0.0022727447
+    },
+    {
+      "stationId": 455,
+      "name": "Saint-Marcel",
+      "arrivalWeight": 0.0006832097,
+      "departureWeight": 0.0029337374
+    },
+    {
+      "stationId": 456,
+      "name": "Saint-Martin d'Étampes",
+      "arrivalWeight": 0.002981824,
+      "departureWeight": 0.0004769127
+    },
+    {
+      "stationId": 457,
+      "name": "Saint-Maur - Créteil",
+      "arrivalWeight": 0.0025722696,
+      "departureWeight": 0.0010299716
+    },
+    {
+      "stationId": 458,
+      "name": "Saint-Michel Notre-Dame",
+      "arrivalWeight": 0.0007510953,
+      "departureWeight": 0.003426588
+    },
+    {
+      "stationId": 459,
+      "name": "Saint-Michel-sur-Orge",
+      "arrivalWeight": 0.0030339694,
+      "departureWeight": 0.0005646776
+    },
+    {
+      "stationId": 460,
+      "name": "Saint-Ouen",
+      "arrivalWeight": 0.0016463746,
+      "departureWeight": 0.0022437068
+    },
+    {
+      "stationId": 461,
+      "name": "Saint-Ouen-l'Aumône",
+      "arrivalWeight": 0.0030341205,
+      "departureWeight": 0.0005645253
+    },
+    {
+      "stationId": 462,
+      "name": "Saint-Ouen-l'Aumône Liesse",
+      "arrivalWeight": 0.0030340516,
+      "departureWeight": 0.0005645948
+    },
+    {
+      "stationId": 463,
+      "name": "Saint-Paul (Le Marais)",
+      "arrivalWeight": 0.0005424372,
+      "departureWeight": 0.0030756059
+    },
+    {
+      "stationId": 464,
+      "name": "Saint-Philippe-du-Roule",
+      "arrivalWeight": 0.0009648484,
+      "departureWeight": 0.0026499063
+    },
+    {
+      "stationId": 465,
+      "name": "Saint-Placide",
+      "arrivalWeight": 0.0007017295,
+      "departureWeight": 0.0029150735
+    },
+    {
+      "stationId": 466,
+      "name": "Saint-Quentin en Yvelines - Montigny-le-Bretonneux",
+      "arrivalWeight": 0.0029814533,
+      "departureWeight": 0.0004772863
+    },
+    {
+      "stationId": 467,
+      "name": "Saint-Rémy-lès-Chevreuse",
+      "arrivalWeight": 0.0029817903,
+      "departureWeight": 0.0004769467
+    },
+    {
+      "stationId": 468,
+      "name": "Saint-Sulpice",
+      "arrivalWeight": 0.0006199368,
+      "departureWeight": 0.0029975029
+    },
+    {
+      "stationId": 469,
+      "name": "Saint-Sébastien - Froissart",
+      "arrivalWeight": 0.0005794224,
+      "departureWeight": 0.0030383327
+    },
+    {
+      "stationId": 470,
+      "name": "Sainte-Geneviève-des-Bois",
+      "arrivalWeight": 0.0030333826,
+      "departureWeight": 0.000565269
+    },
+    {
+      "stationId": 471,
+      "name": "Sartrouville",
+      "arrivalWeight": 0.0030042259,
+      "departureWeight": 0.0005946527
+    },
+    {
+      "stationId": 472,
+      "name": "Savigny-le-Temple - Nandy",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 473,
+      "name": "Savigny-sur-Orge",
+      "arrivalWeight": 0.0030296717,
+      "departureWeight": 0.0005690088
+    },
+    {
+      "stationId": 474,
+      "name": "Sceaux",
+      "arrivalWeight": 0.0023711053,
+      "departureWeight": 0.0012327019
+    },
+    {
+      "stationId": 475,
+      "name": "Sentier",
+      "arrivalWeight": 0.0005860962,
+      "departureWeight": 0.0030316069
+    },
+    {
+      "stationId": 476,
+      "name": "Serge Gainsbourg",
+      "arrivalWeight": 0.0016492959,
+      "departureWeight": 0.0019601304
+    },
+    {
+      "stationId": 477,
+      "name": "Sermaise",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 478,
+      "name": "Sevran - Beaudottes",
+      "arrivalWeight": 0.0029912515,
+      "departureWeight": 0.000607728
+    },
+    {
+      "stationId": 479,
+      "name": "Sevran - Livry",
+      "arrivalWeight": 0.0029872686,
+      "departureWeight": 0.000611742
+    },
+    {
+      "stationId": 480,
+      "name": "Simplon / Albert Kahn",
+      "arrivalWeight": 0.0011514869,
+      "departureWeight": 0.0024618148
+    },
+    {
+      "stationId": 481,
+      "name": "Solférino",
+      "arrivalWeight": 0.0006954971,
+      "departureWeight": 0.0029213544
+    },
+    {
+      "stationId": 482,
+      "name": "Stade de France Saint-Denis",
+      "arrivalWeight": 0.0018364688,
+      "departureWeight": 0.0017715005
+    },
+    {
+      "stationId": 483,
+      "name": "Stalingrad",
+      "arrivalWeight": 0.001112865,
+      "departureWeight": 0.0030620021
+    },
+    {
+      "stationId": 484,
+      "name": "Strasbourg - Saint-Denis",
+      "arrivalWeight": 0.0008090334,
+      "departureWeight": 0.0033681989
+    },
+    {
+      "stationId": 485,
+      "name": "Sucy - Bonneuil",
+      "arrivalWeight": 0.0029511645,
+      "departureWeight": 0.0006481271
+    },
+    {
+      "stationId": 486,
+      "name": "Sully - Morland",
+      "arrivalWeight": 0.0005603123,
+      "departureWeight": 0.0030575915
+    },
+    {
+      "stationId": 487,
+      "name": "Survilliers - Fosses",
+      "arrivalWeight": 0.0030341345,
+      "departureWeight": 0.0005645112
+    },
+    {
+      "stationId": 488,
+      "name": "Sèvres - Babylone",
+      "arrivalWeight": 0.0007699721,
+      "departureWeight": 0.003126932
+    },
+    {
+      "stationId": 489,
+      "name": "Sèvres-Lecourbe",
+      "arrivalWeight": 0.0009202843,
+      "departureWeight": 0.0026948173
+    },
+    {
+      "stationId": 490,
+      "name": "Ségur",
+      "arrivalWeight": 0.0009545687,
+      "departureWeight": 0.002660266
+    },
+    {
+      "stationId": 491,
+      "name": "Temple",
+      "arrivalWeight": 0.0005869383,
+      "departureWeight": 0.0030307584
+    },
+    {
+      "stationId": 492,
+      "name": "Ternes",
+      "arrivalWeight": 0.0012392092,
+      "departureWeight": 0.0023734096
+    },
+    {
+      "stationId": 493,
+      "name": "Thiais - Orly (Pont de Rungis)",
+      "arrivalWeight": 0.0028982662,
+      "departureWeight": 0.0009820695
+    },
+    {
+      "stationId": 494,
+      "name": "Tolbiac",
+      "arrivalWeight": 0.0009523318,
+      "departureWeight": 0.0026625203
+    },
+    {
+      "stationId": 495,
+      "name": "Torcy",
+      "arrivalWeight": 0.0030330458,
+      "departureWeight": 0.0005656084
+    },
+    {
+      "stationId": 496,
+      "name": "Tournan",
+      "arrivalWeight": 0.0029818239,
+      "departureWeight": 0.0004769129
+    },
+    {
+      "stationId": 497,
+      "name": "Trinité - d'Estienne d'Orves",
+      "arrivalWeight": 0.0007887124,
+      "departureWeight": 0.0028274135
+    },
+    {
+      "stationId": 498,
+      "name": "Trocadéro",
+      "arrivalWeight": 0.0013920624,
+      "departureWeight": 0.0024999988
+    },
+    {
+      "stationId": 499,
+      "name": "Tuileries",
+      "arrivalWeight": 0.0006454844,
+      "departureWeight": 0.0029717564
+    },
+    {
+      "stationId": 500,
+      "name": "Télégraphe",
+      "arrivalWeight": 0.0010717864,
+      "departureWeight": 0.0025421357
+    },
+    {
+      "stationId": 501,
+      "name": "Vaires - Torcy",
+      "arrivalWeight": 0.0029794384,
+      "departureWeight": 0.0004793169
+    },
+    {
+      "stationId": 502,
+      "name": "Val d'Europe",
+      "arrivalWeight": 0.0030341359,
+      "departureWeight": 0.0005645098
+    },
+    {
+      "stationId": 503,
+      "name": "Val de Fontenay",
+      "arrivalWeight": 0.0027013422,
+      "departureWeight": 0.0014611589
+    },
+    {
+      "stationId": 504,
+      "name": "Vaneau",
+      "arrivalWeight": 0.0007415572,
+      "departureWeight": 0.0028749358
+    },
+    {
+      "stationId": 505,
+      "name": "Varenne",
+      "arrivalWeight": 0.0007980374,
+      "departureWeight": 0.0028180158
+    },
+    {
+      "stationId": 506,
+      "name": "Vaugirard",
+      "arrivalWeight": 0.0011197538,
+      "departureWeight": 0.002493795
+    },
+    {
+      "stationId": 507,
+      "name": "Vavin",
+      "arrivalWeight": 0.0007300891,
+      "departureWeight": 0.0028864931
+    },
+    {
+      "stationId": 508,
+      "name": "Versailles Chantiers",
+      "arrivalWeight": 0.0030103336,
+      "departureWeight": 0.0005884974
+    },
+    {
+      "stationId": 509,
+      "name": "Versailles Château Rive Gauche",
+      "arrivalWeight": 0.0029611942,
+      "departureWeight": 0.0004977032
+    },
+    {
+      "stationId": 510,
+      "name": "Vert Galant",
+      "arrivalWeight": 0.0030225785,
+      "departureWeight": 0.0005761572
+    },
+    {
+      "stationId": 511,
+      "name": "Victor Hugo",
+      "arrivalWeight": 0.0013659632,
+      "departureWeight": 0.0022456688
+    },
+    {
+      "stationId": 512,
+      "name": "Vigneux-sur-Seine",
+      "arrivalWeight": 0.0030085319,
+      "departureWeight": 0.0005903131
+    },
+    {
+      "stationId": 513,
+      "name": "Villabé",
+      "arrivalWeight": 0.0030341354,
+      "departureWeight": 0.0005645103
+    },
+    {
+      "stationId": 514,
+      "name": "Villejuif - Gustave Roussy",
+      "arrivalWeight": 0.0018793157,
+      "departureWeight": 0.00172832
+    },
+    {
+      "stationId": 515,
+      "name": "Villejuif - Louis Aragon",
+      "arrivalWeight": 0.0019989681,
+      "departureWeight": 0.00146742
+    },
+    {
+      "stationId": 516,
+      "name": "Villejuif Léo Lagrange",
+      "arrivalWeight": 0.001549989,
+      "departureWeight": 0.0020602104
+    },
+    {
+      "stationId": 517,
+      "name": "Villejuif Paul Vaillant-Couturier",
+      "arrivalWeight": 0.0018172723,
+      "departureWeight": 0.0017908464
+    },
+    {
+      "stationId": 518,
+      "name": "Villeneuve Triage",
+      "arrivalWeight": 0.0029080568,
+      "departureWeight": 0.0006915704
+    },
+    {
+      "stationId": 519,
+      "name": "Villeneuve-le-Roi",
+      "arrivalWeight": 0.0029190923,
+      "departureWeight": 0.000680449
+    },
+    {
+      "stationId": 520,
+      "name": "Villeneuve-Saint-Georges",
+      "arrivalWeight": 0.0030838759,
+      "departureWeight": 0.0007950149
+    },
+    {
+      "stationId": 521,
+      "name": "Villeparisis - Mitry-le-Neuf",
+      "arrivalWeight": 0.0030320391,
+      "departureWeight": 0.000566623
+    },
+    {
+      "stationId": 522,
+      "name": "Villepinte",
+      "arrivalWeight": 0.0030011501,
+      "departureWeight": 0.0005977524
+    },
+    {
+      "stationId": 523,
+      "name": "Villiers",
+      "arrivalWeight": 0.0011489349,
+      "departureWeight": 0.0027450191
+    },
+    {
+      "stationId": 524,
+      "name": "Villiers-le-Bel - Gonesse - Arnouville",
+      "arrivalWeight": 0.0029891144,
+      "departureWeight": 0.0006098818
+    },
+    {
+      "stationId": 525,
+      "name": "Villiers-sur-Marne - Le Plessis-Trévise",
+      "arrivalWeight": 0.0029909575,
+      "departureWeight": 0.0007483405
+    },
+    {
+      "stationId": 526,
+      "name": "Vincennes",
+      "arrivalWeight": 0.0016913311,
+      "departureWeight": 0.0020580843
+    },
+    {
+      "stationId": 527,
+      "name": "Viroflay Rive Gauche",
+      "arrivalWeight": 0.0029974956,
+      "departureWeight": 0.0007417515
+    },
+    {
+      "stationId": 528,
+      "name": "Viry-Châtillon",
+      "arrivalWeight": 0.0030823148,
+      "departureWeight": 0.000656272
+    },
+    {
+      "stationId": 529,
+      "name": "Vitry-sur-Seine",
+      "arrivalWeight": 0.0019766585,
+      "departureWeight": 0.0017705356
+    },
+    {
+      "stationId": 530,
+      "name": "Volontaires",
+      "arrivalWeight": 0.0009905934,
+      "departureWeight": 0.0026239609
+    },
+    {
+      "stationId": 531,
+      "name": "Voltaire",
+      "arrivalWeight": 0.0006802981,
+      "departureWeight": 0.0029366718
+    },
+    {
+      "stationId": 532,
+      "name": "Vosves",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 533,
+      "name": "Wagram",
+      "arrivalWeight": 0.0012374736,
+      "departureWeight": 0.0023751587
+    },
+    {
+      "stationId": 534,
+      "name": "Yerres",
+      "arrivalWeight": 0.0030264765,
+      "departureWeight": 0.0005722289
+    },
+    {
+      "stationId": 535,
+      "name": "École Militaire",
+      "arrivalWeight": 0.0009418349,
+      "departureWeight": 0.0026730989
+    },
+    {
+      "stationId": 536,
+      "name": "École Vétérinaire de Maisons-Alfort",
+      "arrivalWeight": 0.0018632513,
+      "departureWeight": 0.0017445095
+    },
+    {
+      "stationId": 537,
+      "name": "Église d'Auteuil",
+      "arrivalWeight": 0.0016350766,
+      "departureWeight": 0.0019744604
+    },
+    {
+      "stationId": 538,
+      "name": "Église de Pantin",
+      "arrivalWeight": 0.0016252663,
+      "departureWeight": 0.0019843471
+    },
+    {
+      "stationId": 539,
+      "name": "Égly",
+      "arrivalWeight": 0.0030341364,
+      "departureWeight": 0.0005645093
+    },
+    {
+      "stationId": 540,
+      "name": "Émerainville - Pontault-Combault",
+      "arrivalWeight": 0.0030299607,
+      "departureWeight": 0.0005687175
+    },
+    {
+      "stationId": 541,
+      "name": "Épinay-sur-Orge",
+      "arrivalWeight": 0.0030312663,
+      "departureWeight": 0.0005674017
+    },
+    {
+      "stationId": 542,
+      "name": "Épinay-sur-Seine",
+      "arrivalWeight": 0.0027196517,
+      "departureWeight": 0.0008814422
+    },
+    {
+      "stationId": 543,
+      "name": "Étampes",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 544,
+      "name": "Étréchy",
+      "arrivalWeight": 0.0030341367,
+      "departureWeight": 0.000564509
+    },
+    {
+      "stationId": 545,
+      "name": "Évry - Courcouronnes",
+      "arrivalWeight": 0.0030340866,
+      "departureWeight": 0.0005645595
+    },
+    {
+      "stationId": 546,
+      "name": "Évry - Val de Seine",
+      "arrivalWeight": 0.003034064,
+      "departureWeight": 0.0005645823
+    }
+  ]
+}

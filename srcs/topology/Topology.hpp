@@ -25,9 +25,11 @@ public:
     double getMaximumLongitude() const;
 
     bool load(const QString &fileName);
+    bool loadWeights(const QString &fileName);
 
 private:
     void clear(const QString &error);
+    void resetWeights();
 
     QVector<Node> nodes;
     QVector<Link> links;

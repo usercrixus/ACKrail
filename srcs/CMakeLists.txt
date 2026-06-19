@@ -29,6 +29,8 @@ qt_add_executable(ackrail
     geography/Point.cpp
     geography/Point.hpp
     main.cpp
+    simulator/SimulationSession.cpp
+    simulator/SimulationSession.hpp
     simulator/TrafficBalancer.cpp
     simulator/TrafficBalancer.hpp
     simulator/TrafficGenerator.cpp
@@ -49,6 +51,8 @@ qt_add_executable(ackrail
     topology/Node.hpp
     topology/Topology.cpp
     topology/Topology.hpp
+    view/AckRailWindow.cpp
+    view/AckRailWindow.hpp
     view/TopologyWidget.cpp
     view/TopologyWidget.hpp
     view/helper/MapCamera.cpp
