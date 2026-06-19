@@ -1,13 +1,14 @@
 #include "TrafficGenerator.hpp"
 
 #include <chrono>
-#include <vector>
 
 TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage, TrafficManager &trafficManager)
     : topology(topology),
       garage(garage),
       trafficManager(trafficManager),
-      randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()))
+      randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count())),
+      arrivalStationDistribution(topology.getArrivalWeights().begin(), topology.getArrivalWeights().end()),
+      departureStationDistribution(topology.getDepartureWeights().begin(), topology.getDepartureWeights().end())
 {
     initializeEngineParkingStations();
 }
@@ -50,16 +51,10 @@ bool TrafficGenerator::dispatchEngine(Engine &engine, double currentSimulationTi
     if (stations.size() < 2 || !engine.getPad().hasParkingStation())
         return false;
 
-    std::vector<double> arrivalWeights;
-    arrivalWeights.reserve(static_cast<std::size_t>(stations.size()));
-    for (const Node &station : stations)
-        arrivalWeights.push_back(station.getArrivalWeight());
-    std::discrete_distribution<int> stationDistribution(arrivalWeights.begin(), arrivalWeights.end());
-
     const int fromStationId = engine.getPad().getParkingStationId();
     for (int attempt = 0; attempt < 20; ++attempt)
     {
-        const Node &toStation = stations[static_cast<qsizetype>(stationDistribution(randomGenerator))];
+        const Node &toStation = stations[static_cast<qsizetype>(arrivalStationDistribution(randomGenerator))];
         if (fromStationId != toStation.getId())
         {
             if (trafficManager.contractRoute(engine, fromStationId, toStation.getId(), currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
@@ -75,12 +70,6 @@ void TrafficGenerator::initializeEngineParkingStations()
     if (stations.isEmpty())
         return;
 
-    std::vector<double> departureWeights;
-    departureWeights.reserve(static_cast<std::size_t>(stations.size()));
-    for (const Node &station : stations)
-        departureWeights.push_back(station.getDepartureWeight());
-    std::discrete_distribution<int> stationDistribution(departureWeights.begin(), departureWeights.end());
-
     for (Engine *engine : garage.getIdleEngines())
-        garage.setIdleEngineParkingStation(*engine, stations[static_cast<qsizetype>(stationDistribution(randomGenerator))].getId());
+        garage.setIdleEngineParkingStation(*engine, stations[static_cast<qsizetype>(departureStationDistribution(randomGenerator))].getId());
 }

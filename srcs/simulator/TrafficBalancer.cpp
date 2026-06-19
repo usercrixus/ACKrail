@@ -11,7 +11,7 @@ TrafficBalancer::TrafficBalancer(const Topology &topology, Garage &garage, Traff
       trafficManager(trafficManager),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()))
 {
-    initializeStationWeights();
+    initializeStationWeightsFromTopology();
 }
 
 void TrafficBalancer::tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds)
@@ -32,22 +32,37 @@ double TrafficBalancer::getSecondsUntilRebalance() const
     return secondsUntilRebalance;
 }
 
-void TrafficBalancer::initializeStationWeights()
+void TrafficBalancer::initializeStationWeightsFromTopology()
 {
     stationWeights.clear();
     totalStationWeight = 0.0;
 
-    for (const Node &station : topology.getNodes())
-        stationWeights[station.getId()] = 1.0;
+    const QVector<Node> &stations = topology.getNodes();
+    const std::vector<double> &arrivalWeights = topology.getArrivalWeights();
+    const std::vector<double> &departureWeights = topology.getDepartureWeights();
 
-    for (const Link &link : topology.getLinks())
+    for (qsizetype stationIndex = 0; stationIndex < stations.size(); ++stationIndex)
     {
-        stationWeights[link.getFromNode().getId()] += 1.0;
-        stationWeights[link.getToNode().getId()] += 1.0;
+        const std::size_t weightIndex = static_cast<std::size_t>(stationIndex);
+        const double arrivalWeight = weightIndex < arrivalWeights.size() ? arrivalWeights[weightIndex] : 1.0;
+        const double departureWeight = weightIndex < departureWeights.size() ? departureWeights[weightIndex] : 1.0;
+        const double stationWeight = std::max(0.0, departureWeight - arrivalWeight);
+        stationWeights[stations[stationIndex].getId()] = stationWeight;
+        totalStationWeight += stationWeight;
     }
 
-    for (const auto &stationWeight : stationWeights)
-        totalStationWeight += stationWeight.second;
+    if (totalStationWeight > 0.0)
+        return;
+
+    stationWeights.clear();
+    totalStationWeight = 0.0;
+    for (qsizetype stationIndex = 0; stationIndex < stations.size(); ++stationIndex)
+    {
+        const std::size_t weightIndex = static_cast<std::size_t>(stationIndex);
+        const double stationWeight = weightIndex < departureWeights.size() ? departureWeights[weightIndex] : 1.0;
+        stationWeights[stations[stationIndex].getId()] = stationWeight;
+        totalStationWeight += stationWeight;
+    }
 }
 
 void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)

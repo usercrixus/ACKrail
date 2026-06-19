@@ -36,6 +36,7 @@ Topology::Topology(QVector<Node> nodes, QVector<Link> links)
         minimumLongitude = qMin(minimumLongitude, node.getLongitude());
         maximumLongitude = qMax(maximumLongitude, node.getLongitude());
     }
+    resetWeights();
 }
 
 QVector<Node> &Topology::getNodes()
@@ -106,6 +107,16 @@ double Topology::getMinimumLongitude() const
 double Topology::getMaximumLongitude() const
 {
     return maximumLongitude;
+}
+
+const std::vector<double> &Topology::getArrivalWeights() const
+{
+    return arrivalWeights;
+}
+
+const std::vector<double> &Topology::getDepartureWeights() const
+{
+    return departureWeights;
 }
 
 struct Bounds
@@ -242,7 +253,8 @@ bool Topology::loadWeights(const QString &fileName)
         return false;
     }
 
-    resetWeights();
+    QHash<int, double> arrivalWeightByNodeId;
+    QHash<int, double> departureWeightByNodeId;
     for (const QJsonValue &value : stations)
     {
         const QJsonObject object = value.toObject();
@@ -263,7 +275,18 @@ bool Topology::loadWeights(const QString &fileName)
             resetWeights();
             return false;
         }
-        node.value()->setWeights(arrivalWeight, departureWeight);
+        arrivalWeightByNodeId.insert(stationId, arrivalWeight);
+        departureWeightByNodeId.insert(stationId, departureWeight);
+    }
+
+    arrivalWeights.clear();
+    departureWeights.clear();
+    arrivalWeights.reserve(static_cast<std::size_t>(nodes.size()));
+    departureWeights.reserve(static_cast<std::size_t>(nodes.size()));
+    for (const Node &node : nodes)
+    {
+        arrivalWeights.push_back(arrivalWeightByNodeId.value(node.getId(), 1.0));
+        departureWeights.push_back(departureWeightByNodeId.value(node.getId(), 1.0));
     }
 
     error.clear();
@@ -280,10 +303,12 @@ void Topology::clear(const QString &error)
     maximumLongitude = 0.0;
     nodes.clear();
     links.clear();
+    arrivalWeights.clear();
+    departureWeights.clear();
 }
 
 void Topology::resetWeights()
 {
-    for (Node &node : nodes)
-        node.setWeights(1.0, 1.0);
+    arrivalWeights.assign(static_cast<std::size_t>(nodes.size()), 1.0);
+    departureWeights.assign(static_cast<std::size_t>(nodes.size()), 1.0);
 }

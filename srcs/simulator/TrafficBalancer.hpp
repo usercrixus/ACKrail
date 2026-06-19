@@ -15,7 +15,7 @@ public:
     double getSecondsUntilRebalance() const;
 
 private:
-    void initializeStationWeights();
+    void initializeStationWeightsFromTopology();
     void rebalance(double currentSimulationTimeSeconds);
     std::size_t getIdleEngineCountAtStation(int stationId) const;
     double getTargetIdleEngineCountAtStation(int stationId) const;

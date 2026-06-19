@@ -1,6 +1,7 @@
 #include "TrafficManager.hpp"
 #include "TrafficBalancer.hpp"
 
+#include <QTemporaryFile>
 #include <cassert>
 #include <cmath>
 
@@ -167,17 +168,29 @@ int main()
             Link(1, weightedStationA, weightedStationB, QStringLiteral("Direct"), QStringLiteral("#000000")),
             Link(2, weightedStationB, weightedStationC, QStringLiteral("Direct"), QStringLiteral("#000000")),
         });
+    QTemporaryFile weightedFile;
+    assert(weightedFile.open());
+    assert(weightedFile.write(R"({
+        "stations": [
+            { "stationId": 1, "arrivalWeight": 0.0, "departureWeight": 1.0 },
+            { "stationId": 2, "arrivalWeight": 1.0, "departureWeight": 0.0 },
+            { "stationId": 3, "arrivalWeight": 1.0, "departureWeight": 0.0 }
+        ]
+    })") > 0);
+    weightedFile.flush();
+    assert(weightedTopology.loadWeights(weightedFile.fileName()));
     Garage weightedGarage(70);
     TrafficManager weightedManager(weightedTopology, weightedGarage);
     TrafficBalancer weightedBalancer(weightedTopology, weightedGarage, weightedManager);
     int weightedIndex = 0;
     for (Engine *engine : weightedGarage.getIdleEngines())
     {
-        const int stationId = weightedIndex < 35 ? weightedStationA.getId() : weightedStationB.getId();
+        const int stationId = weightedIndex < 35 ? weightedStationB.getId() : weightedStationC.getId();
         weightedGarage.setIdleEngineParkingStation(*engine, stationId);
         ++weightedIndex;
     }
-    assert(weightedGarage.getIdleEnginesByStation().find(weightedStationC.getId()) == weightedGarage.getIdleEnginesByStation().end());
+    assert(weightedGarage.getIdleEnginesByStation().find(weightedStationA.getId()) == weightedGarage.getIdleEnginesByStation().end());
     weightedBalancer.tryRebalance(0.0, 5.0);
     assert(weightedGarage.getActiveEngineCount() > 0);
+    assert(weightedGarage.getActiveEngines().back()->getPad().getTrajectory()->getStations().back()->getId() == weightedStationA.getId());
 }
