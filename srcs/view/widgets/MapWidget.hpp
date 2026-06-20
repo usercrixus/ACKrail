@@ -18,6 +18,8 @@ class MapWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 public:
     explicit MapWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
     void refresh(double simulationTimeSeconds);
+    void setPassengerEnginesVisible(bool visible);
+    void setRebalancingEnginesVisible(bool visible);
 
 protected:
     void initializeGL() override;

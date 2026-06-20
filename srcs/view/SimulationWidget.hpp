@@ -7,11 +7,13 @@
 #include "widgets/MapWidget.hpp"
 #include <QWidget>
 
-class TopologyWidget : public QWidget
+class SimulationWidget : public QWidget
 {
 public:
-    explicit TopologyWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
+    explicit SimulationWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent = nullptr);
     void refresh(double simulationTimeSeconds);
+    void setPassengerEnginesVisible(bool visible);
+    void setRebalancingEnginesVisible(bool visible);
 
 private:
     HeaderWidget *headerWidget;

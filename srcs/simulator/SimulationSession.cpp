@@ -10,8 +10,8 @@ SimulationSession::SimulationSession(QString topologyFile, QString weightFile, Q
     renderTimer.setInterval(33);
     QObject::connect(&renderTimer, &QTimer::timeout, this, [this]()
                      {
-                         if (topologyWidget != nullptr && trafficSimulator != nullptr)
-                             topologyWidget->refresh(trafficSimulator->getCurrentSimulationTimeSeconds()); });
+                         if (simulationWidget != nullptr && trafficSimulator != nullptr)
+                             simulationWidget->refresh(trafficSimulator->getCurrentSimulationTimeSeconds()); });
 }
 
 bool SimulationSession::load()
@@ -36,12 +36,12 @@ bool SimulationSession::load()
     return true;
 }
 
-TopologyWidget *SimulationSession::createWidget(QWidget *parent)
+SimulationWidget *SimulationSession::createWidget(QWidget *parent)
 {
     if (topology == nullptr || garage == nullptr || trafficManager == nullptr)
         return nullptr;
-    topologyWidget = new TopologyWidget(*topology, *garage, *trafficManager, parent);
-    return topologyWidget;
+    simulationWidget = new SimulationWidget(*topology, *garage, *trafficManager, parent);
+    return simulationWidget;
 }
 
 void SimulationSession::start()

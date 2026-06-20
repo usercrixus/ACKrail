@@ -25,6 +25,7 @@ private:
     void stopSimulation();
     void clearSimulation();
     void updateStatus();
+    void applyEngineVisibilitySettings();
     QString chooseJsonFile(const QString &title, const QString &currentPath);
     QLineEdit *addPathRow(QFormLayout *formLayout, QDialog *dialog, const QString &label, const QString &path, const QString &browseTitle);
     void showDimOverlay(QWidget &overlay);
@@ -34,7 +35,9 @@ private:
     std::unique_ptr<SimulationSession> simulationSession;
     QStackedWidget *centralStack = nullptr;
     QWidget *emptyPage = nullptr;
-    QWidget *simulationPage = nullptr;
+    SimulationWidget *simulationPage = nullptr;
     QAction *launchAction = nullptr;
     QAction *stopAction = nullptr;
+    QAction *showPassengerEnginesAction = nullptr;
+    QAction *showRebalancingEnginesAction = nullptr;
 };

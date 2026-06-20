@@ -24,6 +24,20 @@ void MapWidget::refresh(double simulationTimeSeconds)
     update();
 }
 
+void MapWidget::setPassengerEnginesVisible(bool visible)
+{
+    engineRenderer.setPassengerEnginesVisible(visible);
+    engineRenderer.refresh(simulationTimeSeconds);
+    update();
+}
+
+void MapWidget::setRebalancingEnginesVisible(bool visible)
+{
+    engineRenderer.setRebalancingEnginesVisible(visible);
+    engineRenderer.refresh(simulationTimeSeconds);
+    update();
+}
+
 void MapWidget::initializeGL()
 {
     initializeOpenGLFunctions();

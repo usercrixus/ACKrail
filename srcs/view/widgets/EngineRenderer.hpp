@@ -24,6 +24,8 @@ public:
     void draw(const QMatrix4x4 &matrix, const QSize &viewportSize);
     void selectAt(const QPointF &screenPosition, const MapCamera &camera);
     void drawInformation(QPainter &painter, const MapCamera &camera, double simulationTimeSeconds) const;
+    void setPassengerEnginesVisible(bool visible);
+    void setRebalancingEnginesVisible(bool visible);
 
 private:
     struct Vertex
@@ -62,6 +64,7 @@ private:
     static Instance createInstance(const RenderState &state);
     static QColor colorForTravelType(EnginePad::TravelType travelType);
     void calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const;
+    bool isTravelTypeVisible(EnginePad::TravelType travelType) const;
     QString createInformation(const Engine &engine, double simulationTimeSeconds) const;
     QString getInformation(const Engine &engine, const Route &route, double simulationTimeSeconds) const;
     QString getRoadmap(const Route &route) const;
@@ -78,5 +81,7 @@ private:
     int shapeVertexCount = 0;
     int activeEngineCount = 0;
     int bufferCapacity = 0;
+    bool passengerEnginesVisible = true;
+    bool rebalancingEnginesVisible = true;
     const Engine *selectedEngine = nullptr;
 };

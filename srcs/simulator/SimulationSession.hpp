@@ -2,7 +2,7 @@
 
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
-#include "../view/TopologyWidget.hpp"
+#include "../view/SimulationWidget.hpp"
 #include "TrafficBalancer.hpp"
 #include "TrafficGenerator.hpp"
 #include "TrafficManager.hpp"
@@ -20,7 +20,7 @@ public:
     SimulationSession(QString topologyFile, QString weightFile = QString(), QObject *parent = nullptr);
 
     bool load();
-    TopologyWidget *createWidget(QWidget *parent = nullptr);
+    SimulationWidget *createWidget(QWidget *parent = nullptr);
     void start();
 
     const QString &getError() const;
@@ -37,6 +37,6 @@ private:
     std::unique_ptr<TrafficGenerator> trafficGenerator;
     std::unique_ptr<TrafficBalancer> trafficBalancer;
     std::unique_ptr<TrafficSimulator> trafficSimulator;
-    QPointer<TopologyWidget> topologyWidget;
+    QPointer<SimulationWidget> simulationWidget;
     QTimer renderTimer;
 };

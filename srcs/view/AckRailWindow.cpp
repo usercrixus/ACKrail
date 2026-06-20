@@ -51,8 +51,7 @@ QLineEdit *AckRailWindow::addPathRow(QFormLayout *formLayout, QDialog *dialog, c
                      {
                          const QString selectedFile = chooseJsonFile(browseTitle, pathEdit->text());
                          if (!selectedFile.isEmpty())
-                             pathEdit->setText(selectedFile);
-                     });
+                             pathEdit->setText(selectedFile); });
 
     return pathEdit;
 }
@@ -96,6 +95,19 @@ void AckRailWindow::createMenus()
     QObject::connect(stopAction, &QAction::triggered, this, [this]()
                      { stopSimulation(); });
 
+    QMenu *viewMenu = simulationMenu->addMenu(QStringLiteral("&View"));
+    showPassengerEnginesAction = viewMenu->addAction(QStringLiteral("Show &Passenger Engines"));
+    showPassengerEnginesAction->setCheckable(true);
+    showPassengerEnginesAction->setChecked(true);
+    QObject::connect(showPassengerEnginesAction, &QAction::toggled, this, [this]()
+                     { applyEngineVisibilitySettings(); });
+
+    showRebalancingEnginesAction = viewMenu->addAction(QStringLiteral("Show &Rebalancing Engines"));
+    showRebalancingEnginesAction->setCheckable(true);
+    showRebalancingEnginesAction->setChecked(true);
+    QObject::connect(showRebalancingEnginesAction, &QAction::toggled, this, [this]()
+                     { applyEngineVisibilitySettings(); });
+
     updateStatus();
 }
 
@@ -118,7 +130,6 @@ void AckRailWindow::setSimulation()
     auto *formLayout = new QFormLayout;
     QLineEdit *topologyEdit = addPathRow(formLayout, &dialog, QStringLiteral("Topology"), topologyFile, QStringLiteral("Open topology file"));
     QLineEdit *weightEdit = addPathRow(formLayout, &dialog, QStringLiteral("Weight"), weightFile, QStringLiteral("Open weight file"));
-
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
 
     auto *dialogLayout = new QVBoxLayout(&dialog);
@@ -163,7 +174,7 @@ void AckRailWindow::launchSimulation()
         return;
     }
 
-    TopologyWidget *widget = nextSession->createWidget(centralStack);
+    SimulationWidget *widget = nextSession->createWidget(centralStack);
     if (widget == nullptr)
     {
         QMessageBox::warning(this, QStringLiteral("Cannot launch simulation"), QStringLiteral("Simulation view could not be created."));
@@ -175,6 +186,7 @@ void AckRailWindow::launchSimulation()
     centralStack->addWidget(simulationPage);
     centralStack->setCurrentWidget(simulationPage);
     simulationSession = std::move(nextSession);
+    applyEngineVisibilitySettings();
     simulationSession->start();
     updateStatus();
 }
@@ -202,13 +214,21 @@ void AckRailWindow::clearSimulation()
 void AckRailWindow::updateStatus()
 {
     const QString topologyName = topologyFile.startsWith(QStringLiteral(":/")) ? topologyFile : QFileInfo(topologyFile).fileName();
-    const QString weightName = weightFile.isEmpty()
-                                   ? QStringLiteral("none")
-                                   : QFileInfo(weightFile).fileName();
+    const QString weightName = weightFile.isEmpty() ? QStringLiteral("none") : QFileInfo(weightFile).fileName();
     const QString simulationState = simulationSession == nullptr ? QStringLiteral("stopped") : QStringLiteral("running");
     statusBar()->showMessage(QStringLiteral("Topology: %1 | Weights: %2 | Simulation: %3").arg(topologyName, weightName, simulationState));
     if (launchAction != nullptr)
         launchAction->setEnabled(!topologyFile.isEmpty());
     if (stopAction != nullptr)
         stopAction->setEnabled(simulationSession != nullptr);
+}
+
+void AckRailWindow::applyEngineVisibilitySettings()
+{
+    if (simulationPage == nullptr)
+        return;
+    if (showPassengerEnginesAction != nullptr)
+        simulationPage->setPassengerEnginesVisible(showPassengerEnginesAction->isChecked());
+    if (showRebalancingEnginesAction != nullptr)
+        simulationPage->setRebalancingEnginesVisible(showRebalancingEnginesAction->isChecked());
 }

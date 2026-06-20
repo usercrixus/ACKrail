@@ -64,7 +64,9 @@ void EngineRenderer::refresh(double simulationTimeSeconds)
     for (Engine *engine : engines)
     {
         calculateState(*engine, simulationTimeSeconds, states[index]);
-        selectionFound = selectionFound || states[index].engine == selectedEngine;
+        if (states[index].active && !isTravelTypeVisible(states[index].travelType))
+            states[index].active = false;
+        selectionFound = selectionFound || (states[index].active && states[index].engine == selectedEngine);
         ++index;
     }
     if (!selectionFound)
@@ -173,6 +175,34 @@ QColor EngineRenderer::colorForTravelType(EnginePad::TravelType travelType)
         return QColor(QStringLiteral("#9aa3ad"));
     }
     return QColor(QStringLiteral("#ff5c35"));
+}
+
+void EngineRenderer::setPassengerEnginesVisible(bool visible)
+{
+    passengerEnginesVisible = visible;
+    if (!visible && selectedEngine != nullptr && selectedEngine->getPad().getTravelType() == EnginePad::TravelType::Passenger)
+        selectedEngine = nullptr;
+}
+
+void EngineRenderer::setRebalancingEnginesVisible(bool visible)
+{
+    rebalancingEnginesVisible = visible;
+    if (!visible && selectedEngine != nullptr && selectedEngine->getPad().getTravelType() == EnginePad::TravelType::Rebalancing)
+        selectedEngine = nullptr;
+}
+
+bool EngineRenderer::isTravelTypeVisible(EnginePad::TravelType travelType) const
+{
+    switch (travelType)
+    {
+    case EnginePad::TravelType::Passenger:
+        return passengerEnginesVisible;
+    case EnginePad::TravelType::Rebalancing:
+        return rebalancingEnginesVisible;
+    case EnginePad::TravelType::Idle:
+        return true;
+    }
+    return true;
 }
 
 void EngineRenderer::calculateState(const Engine &engine, double simulationTimeSeconds, RenderState &state) const

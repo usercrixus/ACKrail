@@ -1,9 +1,9 @@
-#include "TopologyWidget.hpp"
+#include "SimulationWidget.hpp"
 #include "widgets/HeaderWidget.hpp"
 #include "widgets/MapWidget.hpp"
 #include <QVBoxLayout>
 
-TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)
+SimulationWidget::SimulationWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)
     : QWidget(parent),
       headerWidget(new HeaderWidget(topology, garage, this)),
       mapWidget(new MapWidget(topology, garage, trafficManager, this))
@@ -16,8 +16,18 @@ TopologyWidget::TopologyWidget(const Topology &topology, const Garage &garage, c
     layout->addWidget(mapWidget, 1);
 }
 
-void TopologyWidget::refresh(double simulationTimeSeconds)
+void SimulationWidget::refresh(double simulationTimeSeconds)
 {
     headerWidget->refresh();
     mapWidget->refresh(simulationTimeSeconds);
+}
+
+void SimulationWidget::setPassengerEnginesVisible(bool visible)
+{
+    mapWidget->setPassengerEnginesVisible(visible);
+}
+
+void SimulationWidget::setRebalancingEnginesVisible(bool visible)
+{
+    mapWidget->setRebalancingEnginesVisible(visible);
 }

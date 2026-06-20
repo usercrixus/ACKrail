@@ -53,8 +53,8 @@ qt_add_executable(ackrail
     topology/Topology.hpp
     view/AckRailWindow.cpp
     view/AckRailWindow.hpp
-    view/TopologyWidget.cpp
-    view/TopologyWidget.hpp
+    view/SimulationWidget.cpp
+    view/SimulationWidget.hpp
     view/helper/MapCamera.cpp
     view/helper/MapCamera.hpp
     view/helper/MapViewport.cpp
