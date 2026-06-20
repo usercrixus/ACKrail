@@ -37,28 +37,32 @@ void TrafficGenerator::generate(double currentSimulationTimeSeconds)
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
-        Engine *engine = garage.getRandomIdleEngine(randomGenerator);
-        if (engine == nullptr || !dispatchEngine(*engine, currentSimulationTimeSeconds))
+        if (!dispatchPassengerRoute(currentSimulationTimeSeconds))
             break;
         else
             --remainingDispatches;
     }
 }
 
-bool TrafficGenerator::dispatchEngine(Engine &engine, double currentSimulationTimeSeconds)
+bool TrafficGenerator::dispatchPassengerRoute(double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
-    if (stations.size() < 2 || !engine.getPad().hasParkingStation())
+    if (stations.size() < 2 || garage.getIdleEngines().empty())
         return false;
 
-    const int fromStationId = engine.getPad().getParkingStationId();
     for (int attempt = 0; attempt < 20; ++attempt)
     {
+        const Node &fromStation = stations[static_cast<qsizetype>(departureStationDistribution(randomGenerator))];
         const Node &toStation = stations[static_cast<qsizetype>(arrivalStationDistribution(randomGenerator))];
-        if (fromStationId != toStation.getId())
+        if (fromStation.getId() != toStation.getId())
         {
-            if (trafficManager.contractRoute(engine, fromStationId, toStation.getId(), currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
-                return true;
+            const auto stationPool = garage.getIdleEnginesByStation().find(fromStation.getId());
+            if (stationPool != garage.getIdleEnginesByStation().end() && !stationPool->second.empty())
+            {
+                Engine *engine = stationPool->second[0];
+                if (trafficManager.contractRoute(*engine, fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
+                    return true;
+            }
         }
     }
     return false;

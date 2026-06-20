@@ -35,12 +35,12 @@ private:
     void generate(double currentSimulationTimeSeconds);
 
     /**
-     * Assigns a random reachable trip from an idle engine's parking station.
+     * Assigns a weighted passenger trip to an idle engine parked at the
+     * sampled departure station.
      *
-     * @param engine Engine to dispatch.
      * @return true when a route was assigned; otherwise false.
      */
-    bool dispatchEngine(Engine &engine, double currentSimulationTimeSeconds);
+    bool dispatchPassengerRoute(double currentSimulationTimeSeconds);
 
     /** Parks idle engines evenly across topology stations. */
     void initializeEngineParkingStations();

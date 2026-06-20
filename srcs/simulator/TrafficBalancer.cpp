@@ -16,14 +16,14 @@ TrafficBalancer::TrafficBalancer(const Topology &topology, Garage &garage, Traff
 
 void TrafficBalancer::tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds)
 {
-    if (elapsedSeconds <= 0.0)
-        return;
-
-    secondsUntilRebalance -= elapsedSeconds;
-    while (secondsUntilRebalance <= 0.0)
+    if (elapsedSeconds > 0.0)
     {
-        rebalance(currentSimulationTimeSeconds);
-        secondsUntilRebalance += 5.0;
+        secondsUntilRebalance -= elapsedSeconds;
+        while (secondsUntilRebalance <= 0.0)
+        {
+            rebalance(currentSimulationTimeSeconds);
+            secondsUntilRebalance += 5.0;
+        }
     }
 }
 
