@@ -55,6 +55,8 @@ qt_add_executable(ackrail
     view/AckRailWindow.hpp
     view/dialogs/SimulationConfigDialog.cpp
     view/dialogs/SimulationConfigDialog.hpp
+    view/SimulationController.cpp
+    view/SimulationController.hpp
     view/simulation/SimulationWidget.cpp
     view/simulation/SimulationWidget.hpp
     view/helper/MapCamera.cpp
