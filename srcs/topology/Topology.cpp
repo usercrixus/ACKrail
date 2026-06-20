@@ -201,7 +201,7 @@ static bool readJsonFile(const QString &fileName, QJsonObject &root, QString &er
     return true;
 }
 
-bool Topology::load(const QString &fileName)
+bool Topology::loadTopology(const QString &fileName)
 {
     QJsonObject root;
     QString loadError;

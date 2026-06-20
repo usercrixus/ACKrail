@@ -154,10 +154,10 @@ int main()
     for (Engine *engine : balanceGarage.getIdleEngines())
         balanceGarage.setIdleEngineParkingStation(*engine, balanceStationA.getId());
     assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 8);
-    balanceBalancer.tryRebalance(0.0, 5.0);
-    assert(balanceGarage.getActiveEngineCount() == 1);
+    balanceBalancer.tryRebalance(0.0, 30.0);
+    assert(balanceGarage.getActiveEngineCount() == 4);
     assert(balanceGarage.getActiveEngines().back()->getPad().getTravelType() == EnginePad::TravelType::Rebalancing);
-    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 7);
+    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 4);
 
     const Node weightedStationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node weightedStationB(2, QStringLiteral("B"), 0.0, 0.00001);
@@ -190,7 +190,7 @@ int main()
         ++weightedIndex;
     }
     assert(weightedGarage.getIdleEnginesByStation().find(weightedStationA.getId()) == weightedGarage.getIdleEnginesByStation().end());
-    weightedBalancer.tryRebalance(0.0, 5.0);
+    weightedBalancer.tryRebalance(0.0, 30.0);
     assert(weightedGarage.getActiveEngineCount() > 0);
     assert(weightedGarage.getActiveEngines().back()->getPad().getTrajectory()->getStations().back()->getId() == weightedStationA.getId());
 }

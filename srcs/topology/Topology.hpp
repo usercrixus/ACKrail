@@ -27,7 +27,7 @@ public:
     const std::vector<double> &getArrivalWeights() const;
     const std::vector<double> &getDepartureWeights() const;
 
-    bool load(const QString &fileName);
+    bool loadTopology(const QString &fileName);
     bool loadWeights(const QString &fileName);
 
 private:

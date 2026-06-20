@@ -4,11 +4,10 @@
 
 #include <QAction>
 #include <QMainWindow>
+#include <QStackedWidget>
 #include <QString>
+#include <QWidget>
 #include <memory>
-
-class QStackedWidget;
-class QWidget;
 
 class AckRailWindow : public QMainWindow
 {

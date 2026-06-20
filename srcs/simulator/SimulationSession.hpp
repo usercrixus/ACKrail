@@ -17,7 +17,7 @@
 class SimulationSession : public QObject
 {
 public:
-    explicit SimulationSession(QString topologyFile, QString weightFile = QString(), QObject *parent = nullptr);
+    SimulationSession(QString topologyFile, QString weightFile = QString(), QObject *parent = nullptr);
 
     bool load();
     TopologyWidget *createWidget(QWidget *parent = nullptr);
