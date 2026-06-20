@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../garage/Garage.hpp"
-#include "../simulator/TrafficManager.hpp"
-#include "../topology/Topology.hpp"
-#include "widgets/HeaderWidget.hpp"
-#include "widgets/MapWidget.hpp"
+#include "../../garage/Garage.hpp"
+#include "../../simulator/TrafficManager.hpp"
+#include "../../topology/Topology.hpp"
+#include "header/HeaderWidget.hpp"
+#include "map/MapWidget.hpp"
 #include <QWidget>
 
 class SimulationWidget : public QWidget

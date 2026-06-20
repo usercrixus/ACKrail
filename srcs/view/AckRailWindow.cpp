@@ -1,20 +1,13 @@
 #include "AckRailWindow.hpp"
 
-#include "widgets/EmptyPageWidget.hpp"
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QFileDialog>
+#include "dialogs/SimulationConfigDialog.hpp"
+#include "simulation/EmptyPageWidget.hpp"
 #include <QFileInfo>
-#include <QFormLayout>
-#include <QHBoxLayout>
-#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QStackedWidget>
 #include <QStatusBar>
-#include <QVBoxLayout>
 #include <QWidget>
 
 AckRailWindow::AckRailWindow(QWidget *parent)
@@ -23,37 +16,6 @@ AckRailWindow::AckRailWindow(QWidget *parent)
     setWindowTitle(QStringLiteral("ACKrail"));
     createCentralView();
     createMenus();
-}
-
-QString AckRailWindow::chooseJsonFile(const QString &title, const QString &currentPath)
-{
-    const QString startDirectory = currentPath.startsWith(QStringLiteral(":/"))
-                                       ? QString()
-                                       : QFileInfo(currentPath).absolutePath();
-    return QFileDialog::getOpenFileName(
-        this,
-        title,
-        startDirectory,
-        QStringLiteral("JSON files (*.json);;All files (*)"));
-}
-
-QLineEdit *AckRailWindow::addPathRow(QFormLayout *formLayout, QDialog *dialog, const QString &label, const QString &path, const QString &browseTitle)
-{
-    QLineEdit *pathEdit = new QLineEdit(path, dialog);
-    QPushButton *browseButton = new QPushButton(QStringLiteral("Browse..."), dialog);
-
-    auto *pathLayout = new QHBoxLayout;
-    pathLayout->addWidget(pathEdit, 1);
-    pathLayout->addWidget(browseButton);
-    formLayout->addRow(label, pathLayout);
-
-    QObject::connect(browseButton, &QPushButton::clicked, dialog, [this, pathEdit, browseTitle]()
-                     {
-                         const QString selectedFile = chooseJsonFile(browseTitle, pathEdit->text());
-                         if (!selectedFile.isEmpty())
-                             pathEdit->setText(selectedFile); });
-
-    return pathEdit;
 }
 
 void AckRailWindow::showDimOverlay(QWidget &overlay)
@@ -76,6 +38,13 @@ void AckRailWindow::createCentralView()
 
 void AckRailWindow::createMenus()
 {
+    createFileMenu();
+    createSimulationMenu();
+    updateStatus();
+}
+
+void AckRailWindow::createFileMenu()
+{
     QMenu *fileMenu = menuBar()->addMenu(QStringLiteral("&File"));
     QAction *setSimulationAction = fileMenu->addAction(QStringLiteral("Set &Simulation..."));
     QObject::connect(setSimulationAction, &QAction::triggered, this, [this]()
@@ -85,7 +54,10 @@ void AckRailWindow::createMenus()
     QAction *quitAction = fileMenu->addAction(QStringLiteral("&Quit"));
     QObject::connect(quitAction, &QAction::triggered, this, [this]()
                      { close(); });
+}
 
+void AckRailWindow::createSimulationMenu()
+{
     QMenu *simulationMenu = menuBar()->addMenu(QStringLiteral("&Simulation"));
     launchAction = simulationMenu->addAction(QStringLiteral("&Launch Simulation"));
     QObject::connect(launchAction, &QAction::triggered, this, [this]()
@@ -95,6 +67,11 @@ void AckRailWindow::createMenus()
     QObject::connect(stopAction, &QAction::triggered, this, [this]()
                      { stopSimulation(); });
 
+    createSimulationViewMenu(simulationMenu);
+}
+
+void AckRailWindow::createSimulationViewMenu(QMenu *simulationMenu)
+{
     QMenu *viewMenu = simulationMenu->addMenu(QStringLiteral("&View"));
     showPassengerEnginesAction = viewMenu->addAction(QStringLiteral("Show &Passenger Engines"));
     showPassengerEnginesAction->setCheckable(true);
@@ -107,8 +84,6 @@ void AckRailWindow::createMenus()
     showRebalancingEnginesAction->setChecked(true);
     QObject::connect(showRebalancingEnginesAction, &QAction::toggled, this, [this]()
                      { applyEngineVisibilitySettings(); });
-
-    updateStatus();
 }
 
 void AckRailWindow::setSimulation()
@@ -117,8 +92,7 @@ void AckRailWindow::setSimulation()
     if (simulationWasVisible)
         centralStack->setCurrentWidget(emptyPage);
 
-    QDialog dialog(this);
-    dialog.setWindowTitle(QStringLiteral("Set simulation"));
+    SimulationConfigDialog dialog(topologyFile, weightFile, this);
     QWidget overlay(this);
 
     const auto restoreSimulationPage = [this, simulationWasVisible]()
@@ -126,19 +100,6 @@ void AckRailWindow::setSimulation()
         if (simulationWasVisible && simulationPage != nullptr)
             centralStack->setCurrentWidget(simulationPage);
     };
-
-    auto *formLayout = new QFormLayout;
-    QLineEdit *topologyEdit = addPathRow(formLayout, &dialog, QStringLiteral("Topology"), topologyFile, QStringLiteral("Open topology file"));
-    QLineEdit *weightEdit = addPathRow(formLayout, &dialog, QStringLiteral("Weight"), weightFile, QStringLiteral("Open weight file"));
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
-
-    auto *dialogLayout = new QVBoxLayout(&dialog);
-    dialogLayout->addLayout(formLayout);
-    dialogLayout->addWidget(buttonBox);
-    dialog.resize(640, dialog.sizeHint().height());
-
-    QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-    QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     showDimOverlay(overlay);
 
@@ -148,7 +109,7 @@ void AckRailWindow::setSimulation()
         return;
     }
 
-    const QString nextTopologyFile = topologyEdit->text().trimmed();
+    const QString nextTopologyFile = dialog.getTopologyFile();
     if (nextTopologyFile.isEmpty())
     {
         QMessageBox::warning(this, QStringLiteral("Cannot set simulation"), QStringLiteral("Topology path cannot be empty."));
@@ -158,7 +119,7 @@ void AckRailWindow::setSimulation()
 
     stopSimulation();
     topologyFile = nextTopologyFile;
-    weightFile = weightEdit->text().trimmed();
+    weightFile = dialog.getWeightFile();
     updateStatus();
 }
 

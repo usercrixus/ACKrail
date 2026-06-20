@@ -53,24 +53,26 @@ qt_add_executable(ackrail
     topology/Topology.hpp
     view/AckRailWindow.cpp
     view/AckRailWindow.hpp
-    view/SimulationWidget.cpp
-    view/SimulationWidget.hpp
+    view/dialogs/SimulationConfigDialog.cpp
+    view/dialogs/SimulationConfigDialog.hpp
+    view/simulation/SimulationWidget.cpp
+    view/simulation/SimulationWidget.hpp
     view/helper/MapCamera.cpp
     view/helper/MapCamera.hpp
     view/helper/MapViewport.cpp
     view/helper/MapViewport.hpp
-    view/widgets/EmptyPageWidget.cpp
-    view/widgets/EmptyPageWidget.hpp
-    view/widgets/HeaderWidget.cpp
-    view/widgets/HeaderWidget.hpp
-    view/widgets/EngineRenderer.cpp
-    view/widgets/EngineRenderer.hpp
-    view/widgets/LinkRenderer.cpp
-    view/widgets/LinkRenderer.hpp
-    view/widgets/MapWidget.cpp
-    view/widgets/MapWidget.hpp
-    view/widgets/NodeRenderer.cpp
-    view/widgets/NodeRenderer.hpp
+    view/simulation/EmptyPageWidget.cpp
+    view/simulation/EmptyPageWidget.hpp
+    view/simulation/header/HeaderWidget.cpp
+    view/simulation/header/HeaderWidget.hpp
+    view/simulation/engine/EngineRenderer.cpp
+    view/simulation/engine/EngineRenderer.hpp
+    view/simulation/topology/LinkRenderer.cpp
+    view/simulation/topology/LinkRenderer.hpp
+    view/simulation/map/MapWidget.cpp
+    view/simulation/map/MapWidget.hpp
+    view/simulation/topology/NodeRenderer.cpp
+    view/simulation/topology/NodeRenderer.hpp
 )
 
 set_source_files_properties(map/paris_metro.json PROPERTIES

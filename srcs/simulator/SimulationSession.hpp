@@ -2,7 +2,7 @@
 
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
-#include "../view/SimulationWidget.hpp"
+#include "../view/simulation/SimulationWidget.hpp"
 #include "TrafficBalancer.hpp"
 #include "TrafficGenerator.hpp"
 #include "TrafficManager.hpp"

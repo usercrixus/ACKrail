@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../helper/MapCamera.hpp"
-#include "../../garage/Garage.hpp"
-#include "../../simulator/TrafficManager.hpp"
-#include "../helper/MapViewport.hpp"
+#include "../../helper/MapCamera.hpp"
+#include "../../../garage/Garage.hpp"
+#include "../../../simulator/TrafficManager.hpp"
+#include "../../helper/MapViewport.hpp"
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
 #include <QOpenGLExtraFunctions>

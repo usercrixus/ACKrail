@@ -1,6 +1,4 @@
 #include "SimulationWidget.hpp"
-#include "widgets/HeaderWidget.hpp"
-#include "widgets/MapWidget.hpp"
 #include <QVBoxLayout>
 
 SimulationWidget::SimulationWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)

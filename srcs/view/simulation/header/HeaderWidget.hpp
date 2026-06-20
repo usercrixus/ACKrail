@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../garage/Garage.hpp"
-#include "../../topology/Topology.hpp"
+#include "../../../garage/Garage.hpp"
+#include "../../../topology/Topology.hpp"
 #include <QWidget>
 #include <cstddef>
 
