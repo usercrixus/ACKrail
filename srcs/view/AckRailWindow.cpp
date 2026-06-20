@@ -1,5 +1,6 @@
 #include "AckRailWindow.hpp"
 
+#include "widgets/EmptyPageWidget.hpp"
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFileDialog>
@@ -10,79 +11,11 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QOpenGLFunctions>
-#include <QOpenGLWidget>
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QVBoxLayout>
 #include <QWidget>
-
-namespace
-{
-class EmptyOpenGLPage : public QOpenGLWidget, protected QOpenGLFunctions
-{
-public:
-    explicit EmptyOpenGLPage(QWidget *parent = nullptr)
-        : QOpenGLWidget(parent)
-    {
-    }
-
-protected:
-    void initializeGL() override
-    {
-        initializeOpenGLFunctions();
-        glClearColor(0.043f, 0.067f, 0.094f, 1.0f);
-    }
-
-    void paintGL() override
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
-};
-
-QString chooseJsonFile(QWidget *parent, const QString &title, const QString &currentPath)
-{
-    const QString startDirectory = currentPath.startsWith(QStringLiteral(":/"))
-                                       ? QString()
-                                       : QFileInfo(currentPath).absolutePath();
-    return QFileDialog::getOpenFileName(
-        parent,
-        title,
-        startDirectory,
-        QStringLiteral("JSON files (*.json);;All files (*)"));
-}
-
-QLineEdit *addPathRow(QFormLayout *formLayout, QDialog *dialog, const QString &label, const QString &path, const QString &browseTitle)
-{
-    QLineEdit *pathEdit = new QLineEdit(path, dialog);
-    QPushButton *browseButton = new QPushButton(QStringLiteral("Browse..."), dialog);
-
-    auto *pathLayout = new QHBoxLayout;
-    pathLayout->addWidget(pathEdit, 1);
-    pathLayout->addWidget(browseButton);
-    formLayout->addRow(label, pathLayout);
-
-    QObject::connect(browseButton, &QPushButton::clicked, dialog, [dialog, pathEdit, browseTitle]()
-                     {
-                         const QString selectedFile = chooseJsonFile(dialog, browseTitle, pathEdit->text());
-                         if (!selectedFile.isEmpty())
-                             pathEdit->setText(selectedFile);
-                     });
-
-    return pathEdit;
-}
-
-void showDimOverlay(QWidget &overlay, QWidget *parent)
-{
-    overlay.setAttribute(Qt::WA_StyledBackground, true);
-    overlay.setStyleSheet(QStringLiteral("background-color: rgba(0, 0, 0, 150);"));
-    overlay.setGeometry(parent->rect());
-    overlay.show();
-    overlay.raise();
-}
-
-}
 
 AckRailWindow::AckRailWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -92,10 +25,51 @@ AckRailWindow::AckRailWindow(QWidget *parent)
     createMenus();
 }
 
+QString AckRailWindow::chooseJsonFile(const QString &title, const QString &currentPath)
+{
+    const QString startDirectory = currentPath.startsWith(QStringLiteral(":/"))
+                                       ? QString()
+                                       : QFileInfo(currentPath).absolutePath();
+    return QFileDialog::getOpenFileName(
+        this,
+        title,
+        startDirectory,
+        QStringLiteral("JSON files (*.json);;All files (*)"));
+}
+
+QLineEdit *AckRailWindow::addPathRow(QFormLayout *formLayout, QDialog *dialog, const QString &label, const QString &path, const QString &browseTitle)
+{
+    QLineEdit *pathEdit = new QLineEdit(path, dialog);
+    QPushButton *browseButton = new QPushButton(QStringLiteral("Browse..."), dialog);
+
+    auto *pathLayout = new QHBoxLayout;
+    pathLayout->addWidget(pathEdit, 1);
+    pathLayout->addWidget(browseButton);
+    formLayout->addRow(label, pathLayout);
+
+    QObject::connect(browseButton, &QPushButton::clicked, dialog, [this, pathEdit, browseTitle]()
+                     {
+                         const QString selectedFile = chooseJsonFile(browseTitle, pathEdit->text());
+                         if (!selectedFile.isEmpty())
+                             pathEdit->setText(selectedFile);
+                     });
+
+    return pathEdit;
+}
+
+void AckRailWindow::showDimOverlay(QWidget &overlay)
+{
+    overlay.setAttribute(Qt::WA_StyledBackground, true);
+    overlay.setStyleSheet(QStringLiteral("background-color: rgba(0, 0, 0, 150);"));
+    overlay.setGeometry(rect());
+    overlay.show();
+    overlay.raise();
+}
+
 void AckRailWindow::createCentralView()
 {
     centralStack = new QStackedWidget(this);
-    emptyPage = new EmptyOpenGLPage(centralStack);
+    emptyPage = new EmptyPageWidget(centralStack);
     simulationPage = nullptr;
     centralStack->addWidget(emptyPage);
     setCentralWidget(centralStack);
@@ -155,7 +129,7 @@ void AckRailWindow::setSimulation()
     QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    showDimOverlay(overlay, this);
+    showDimOverlay(overlay);
 
     if (dialog.exec() != QDialog::Accepted)
     {

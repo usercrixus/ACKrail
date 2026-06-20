@@ -59,6 +59,8 @@ qt_add_executable(ackrail
     view/helper/MapCamera.hpp
     view/helper/MapViewport.cpp
     view/helper/MapViewport.hpp
+    view/widgets/EmptyPageWidget.cpp
+    view/widgets/EmptyPageWidget.hpp
     view/widgets/HeaderWidget.cpp
     view/widgets/HeaderWidget.hpp
     view/widgets/EngineRenderer.cpp

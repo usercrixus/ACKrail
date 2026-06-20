@@ -3,6 +3,9 @@
 #include "../simulator/SimulationSession.hpp"
 
 #include <QAction>
+#include <QDialog>
+#include <QFormLayout>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QString>
@@ -22,6 +25,9 @@ private:
     void stopSimulation();
     void clearSimulation();
     void updateStatus();
+    QString chooseJsonFile(const QString &title, const QString &currentPath);
+    QLineEdit *addPathRow(QFormLayout *formLayout, QDialog *dialog, const QString &label, const QString &path, const QString &browseTitle);
+    void showDimOverlay(QWidget &overlay);
 
     QString topologyFile = QStringLiteral(":/map/paris_metro.json");
     QString weightFile;
