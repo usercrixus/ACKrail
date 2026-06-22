@@ -1,3 +1,10 @@
+Fix engine_tests.
+Add configurable random seed.
+Add MetricsCollector: completed trips, passenger distance, rebalancing distance, average travel time, utilization, failed dispatches.
+Cap rebalancing dispatches per pass.
+Add scenario config: fleet size, dispatch rate, seed, weight file, duration.
+Export one CSV/JSON summary per run.
+
 Look in /media/sf_vmShared/ACKrail/srcs/simulator/NodeController.cpp
 verify that linkId is linked to the current node, return a bool or use exception if not
 

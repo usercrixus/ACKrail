@@ -85,11 +85,7 @@ void TrafficBalancer::initializeStationPressuresFromTopology()
 void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
-    if (stations.size() < 2
-        || garage.getIdleEngines().empty()
-        || totalDeficitPressure <= 0.0
-        || deficitStations.empty()
-        || surplusStations.empty())
+    if (stations.size() < 2 || garage.getIdleEngines().empty() || totalDeficitPressure <= 0.0 || deficitStations.empty() || surplusStations.empty())
         return;
 
     const std::size_t baseReserveCount = getBaseReserveCountPerStation();
@@ -102,15 +98,11 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
         for (const StationPressure &surplusStation : surplusStations)
             surplusStationsByCost.push_back(&surplusStation);
         std::sort(surplusStationsByCost.begin(), surplusStationsByCost.end(), [this, &deficitStation](const StationPressure *left, const StationPressure *right)
-                  {
-                      return trafficManager.getStaticRouteDistanceKilometers(left->stationId, deficitStation.stationId)
-                             < trafficManager.getStaticRouteDistanceKilometers(right->stationId, deficitStation.stationId);
-                  });
+                  { return trafficManager.getStaticRouteDistanceKilometers(left->stationId, deficitStation.stationId) < trafficManager.getStaticRouteDistanceKilometers(right->stationId, deficitStation.stationId); });
 
         for (const StationPressure *surplusStation : surplusStationsByCost)
         {
-            while (getProjectedEngineCountAtStation(deficitStation.stationId) < targetEngineCount
-                   && getIdleEngineCountAtStation(surplusStation->stationId) > baseReserveCount)
+            while (getProjectedEngineCountAtStation(deficitStation.stationId) < targetEngineCount && getIdleEngineCountAtStation(surplusStation->stationId) > baseReserveCount)
             {
                 const auto stationPool = garage.getIdleEnginesByStation().find(surplusStation->stationId);
                 if (stationPool == garage.getIdleEnginesByStation().end() || stationPool->second.empty())

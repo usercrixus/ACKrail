@@ -47,6 +47,14 @@ qt_add_executable(ackrail
     simulator/TrafficRouteManager.hpp
     simulator/TrafficSimulator.cpp
     simulator/TrafficSimulator.hpp
+    statistics/EngineStatistics.cpp
+    statistics/EngineStatistics.hpp
+    statistics/NumericSummary.cpp
+    statistics/NumericSummary.hpp
+    statistics/SimulationStatistics.cpp
+    statistics/SimulationStatistics.hpp
+    statistics/StationStatistics.cpp
+    statistics/StationStatistics.hpp
     topology/Link.cpp
     topology/Link.hpp
     topology/Node.cpp
