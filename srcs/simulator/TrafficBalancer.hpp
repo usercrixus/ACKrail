@@ -4,7 +4,7 @@
 #include "../topology/Topology.hpp"
 #include "TrafficManager.hpp"
 #include <random>
-#include <unordered_map>
+#include <vector>
 
 class TrafficBalancer
 {
@@ -13,20 +13,30 @@ public:
 
     void tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds);
     double getSecondsUntilRebalance() const;
+    double getNetworkBalancePercent() const;
 
 private:
-    void initializeStationWeightsFromTopology();
+    struct StationPressure
+    {
+        int stationId;
+        double pressure;
+    };
+
+    void initializeStationPressuresFromTopology();
     void rebalance(double currentSimulationTimeSeconds);
     std::size_t getIdleEngineCountAtStation(int stationId) const;
-    double getTargetIdleEngineCountAtStation(int stationId) const;
+    std::size_t getProjectedEngineCountAtStation(int stationId) const;
+    std::size_t getBaseReserveCountPerStation() const;
+    std::size_t getTargetEngineCountAtStation(int stationId) const;
+    std::size_t getTargetEngineCountAtStation(const StationPressure &stationPressure) const;
 
     const Topology &topology;
     Garage &garage;
     TrafficManager &trafficManager;
     std::mt19937 randomGenerator;
-    std::unordered_map<int, double> stationWeights;
-    double totalStationWeight = 0.0;
-    double secondsUntilRebalance = 5.0;
-    std::size_t maxRebalanceDispatchesPerPass = 50;
-    std::size_t stationBalanceMargin = 2;
+    std::vector<StationPressure> deficitStations;
+    std::vector<StationPressure> surplusStations;
+    double totalDeficitPressure = 0.0;
+    double secondsUntilRebalance = 0.10;
+    double baseReserveRatio = 0.20;
 };

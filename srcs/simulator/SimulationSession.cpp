@@ -38,9 +38,9 @@ bool SimulationSession::load()
 
 SimulationWidget *SimulationSession::createWidget(QWidget *parent)
 {
-    if (topology == nullptr || garage == nullptr || trafficManager == nullptr)
+    if (topology == nullptr || garage == nullptr || trafficManager == nullptr || trafficBalancer == nullptr)
         return nullptr;
-    simulationWidget = new SimulationWidget(*topology, *garage, *trafficManager, parent);
+    simulationWidget = new SimulationWidget(*topology, *garage, *trafficManager, *trafficBalancer, parent);
     return simulationWidget;
 }
 

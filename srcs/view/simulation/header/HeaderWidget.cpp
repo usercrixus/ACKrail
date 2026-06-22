@@ -5,10 +5,11 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-HeaderWidget::HeaderWidget(const Topology &topology, const Garage &garage, QWidget *parent)
+HeaderWidget::HeaderWidget(const Topology &topology, const Garage &garage, const TrafficBalancer &trafficBalancer, QWidget *parent)
     : QWidget(parent),
       topology(topology),
-      garage(garage)
+      garage(garage),
+      trafficBalancer(trafficBalancer)
 {
     setFixedHeight(Height);
     refresh();
@@ -18,6 +19,7 @@ void HeaderWidget::refresh()
 {
     activeEngineCount = garage.getActiveEngineCount();
     engineCount = garage.getEngineCount();
+    networkBalancePercent = trafficBalancer.getNetworkBalancePercent();
     update();
 }
 
@@ -32,5 +34,10 @@ void HeaderWidget::paintEvent(QPaintEvent *event)
     painter.setPen(QColor(QStringLiteral("#91a4b5")));
     painter.setFont(QFont(QStringLiteral("Sans Serif"), 11));
     painter.drawText(QRectF(130, 0, width() - 154, Height), Qt::AlignLeft | Qt::AlignVCenter, topology.getName());
-    painter.drawText(QRectF(width() - 260, 0, 236, Height), Qt::AlignRight | Qt::AlignVCenter, QStringLiteral("%1 / %2 engines active").arg(activeEngineCount).arg(engineCount));
+    painter.drawText(QRectF(width() - 360, 0, 336, Height),
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QStringLiteral("%1% balanced | %2 / %3 active")
+                         .arg(networkBalancePercent, 0, 'f', 0)
+                         .arg(activeEngineCount)
+                         .arg(engineCount));
 }

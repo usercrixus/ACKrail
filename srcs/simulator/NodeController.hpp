@@ -34,6 +34,10 @@ public:
      */
     void cleanExpiredReservation(int linkId, int engineId, std::size_t contractStep);
 
+    void addExpectedArrival();
+    void removeExpectedArrival();
+    std::size_t getExpectedArrivalCount() const;
+
 private:
     struct Reservation
     {
@@ -44,5 +48,6 @@ private:
     };
 
     int nodeId;
+    std::size_t expectedArrivalCount = 0;
     std::unordered_map<int, std::vector<Reservation>> reservationsByLinkId;
 };

@@ -24,6 +24,8 @@ public:
      * Finds and commits the earliest-arrival route contract for an engine.
      */
     bool contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
+    bool contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
+    double getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const;
 
     /** Processes every scheduled event due at the current simulation time. */
     void processCurrentEvents(double currentSimulationTimeSeconds);

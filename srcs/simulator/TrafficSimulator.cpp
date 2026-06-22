@@ -34,8 +34,8 @@ double TrafficSimulator::getCurrentSimulationTimeSeconds() const
 void TrafficSimulator::processScheduledWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
-    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
     trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
+    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
     trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
     lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
     lastBalancerUpdateSeconds = currentSimulationTimeSeconds;

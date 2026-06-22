@@ -54,3 +54,19 @@ void NodeController::cleanExpiredReservation(int linkId, int engineId, std::size
         }
     }
 }
+
+void NodeController::addExpectedArrival()
+{
+    ++expectedArrivalCount;
+}
+
+void NodeController::removeExpectedArrival()
+{
+    if (expectedArrivalCount > 0)
+        --expectedArrivalCount;
+}
+
+std::size_t NodeController::getExpectedArrivalCount() const
+{
+    return expectedArrivalCount;
+}

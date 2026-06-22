@@ -15,6 +15,8 @@ qt_add_executable(ackrail
     algorithm/Dijkstra.hpp
     algorithm/Route.cpp
     algorithm/Route.hpp
+    algorithm/StaticRouteCostMatrix.cpp
+    algorithm/StaticRouteCostMatrix.hpp
     DesignPatter/IndexedRandomPool.hpp
     garage/engine/Biplace.cpp
     garage/engine/Biplace.hpp
@@ -148,6 +150,8 @@ if(BUILD_TESTING)
         algorithm/DijkstraTest.cpp
         algorithm/Route.cpp
         algorithm/Route.hpp
+        algorithm/StaticRouteCostMatrix.cpp
+        algorithm/StaticRouteCostMatrix.hpp
         geography/Geography.cpp
         geography/Geography.hpp
         geography/Point.cpp
@@ -180,6 +184,8 @@ if(BUILD_TESTING)
         algorithm/Dijkstra.hpp
         algorithm/Route.cpp
         algorithm/Route.hpp
+        algorithm/StaticRouteCostMatrix.cpp
+        algorithm/StaticRouteCostMatrix.hpp
         garage/engine/Biplace.cpp
         garage/engine/Biplace.hpp
         garage/engine/Engine.cpp

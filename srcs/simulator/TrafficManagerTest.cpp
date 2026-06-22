@@ -127,6 +127,7 @@ int main()
     completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
     assert(completionGarage.getIdleEnginesByStation().at(completionStationA.getId()).size() == 1);
     assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds, EnginePad::TravelType::Passenger));
+    assert(completionTopology.getNodes()[1].getController().getExpectedArrivalCount() == 1);
     assert(completionGarage.getIdleEnginesByStation().find(completionStationA.getId()) == completionGarage.getIdleEnginesByStation().end());
     const double completionTraversalSeconds =
         completionTopology.getLinks().first().getDistanceKilometers()
@@ -140,6 +141,7 @@ int main()
     completionSimulationTimeSeconds += completionTraversalSeconds + 1.0;
     completionManager.processCurrentEvents(completionSimulationTimeSeconds);
     assert(!completionEngine.getPad().isActive());
+    assert(completionTopology.getNodes()[1].getController().getExpectedArrivalCount() == 0);
     assert(completionGarage.getActiveEngineCount() == 0);
     assert(completionGarage.getIdleEnginesByStation().at(completionStationB.getId()).size() == 1);
 
@@ -148,16 +150,28 @@ int main()
     Topology balanceTopology(
         {balanceStationA, balanceStationB},
         {Link(1, balanceStationA, balanceStationB, QStringLiteral("Direct"), QStringLiteral("#000000"))});
+    QTemporaryFile balanceFile;
+    assert(balanceFile.open());
+    assert(balanceFile.write(R"({
+        "stations": [
+            { "stationId": 1, "arrivalWeight": 1.0, "departureWeight": 0.0 },
+            { "stationId": 2, "arrivalWeight": 0.0, "departureWeight": 1.0 }
+        ]
+    })") > 0);
+    balanceFile.flush();
+    assert(balanceTopology.loadWeights(balanceFile.fileName()));
     Garage balanceGarage(8);
     TrafficManager balanceManager(balanceTopology, balanceGarage);
     TrafficBalancer balanceBalancer(balanceTopology, balanceGarage, balanceManager);
     for (Engine *engine : balanceGarage.getIdleEngines())
         balanceGarage.setIdleEngineParkingStation(*engine, balanceStationA.getId());
     assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 8);
+    assert(std::abs(balanceBalancer.getNetworkBalancePercent() - 12.5) < 0.000001);
     balanceBalancer.tryRebalance(0.0, 30.0);
-    assert(balanceGarage.getActiveEngineCount() == 4);
+    assert(balanceGarage.getActiveEngineCount() == 7);
     assert(balanceGarage.getActiveEngines().back()->getPad().getTravelType() == EnginePad::TravelType::Rebalancing);
-    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 4);
+    assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 1);
+    assert(std::abs(balanceBalancer.getNetworkBalancePercent() - 100.0) < 0.000001);
 
     const Node weightedStationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node weightedStationB(2, QStringLiteral("B"), 0.0, 0.00001);

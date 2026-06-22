@@ -64,6 +64,7 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
     const qsizetype nextStep = event.contractStep + 1;
     if (nextStep >= route->getContract().size())
     {
+        stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
         return;
     }

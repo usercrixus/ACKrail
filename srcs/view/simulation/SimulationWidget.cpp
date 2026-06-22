@@ -1,9 +1,13 @@
 #include "SimulationWidget.hpp"
 #include <QVBoxLayout>
 
-SimulationWidget::SimulationWidget(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, QWidget *parent)
+SimulationWidget::SimulationWidget(const Topology &topology,
+                                   const Garage &garage,
+                                   const TrafficManager &trafficManager,
+                                   const TrafficBalancer &trafficBalancer,
+                                   QWidget *parent)
     : QWidget(parent),
-      headerWidget(new HeaderWidget(topology, garage, this)),
+      headerWidget(new HeaderWidget(topology, garage, trafficBalancer, this)),
       mapWidget(new MapWidget(topology, garage, trafficManager, this))
 {
     setWindowTitle(QStringLiteral("ACKrail"));
