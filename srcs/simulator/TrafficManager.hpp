@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../garage/Garage.hpp"
+#include "../statistics/SimulationStatistics.hpp"
 #include "TrafficEventManager.hpp"
 #include "TrafficRouteManager.hpp"
 #include "../topology/Topology.hpp"
@@ -18,7 +19,7 @@ public:
      * @param topology Topology whose nodes control directional link entries.
      * @param garage Garage containing the simulated engines.
      */
-    TrafficManager(Topology &topology, Garage &garage);
+    TrafficManager(Topology &topology, Garage &garage, SimulationStatistics &statistics);
 
     /**
      * Finds and commits the earliest-arrival route contract for an engine.
@@ -35,6 +36,7 @@ public:
 
 private:
     Garage &garage;
+    SimulationStatistics &statistics;
     TrafficRouteManager routeManager;
     TrafficEventManager eventManager;
 };

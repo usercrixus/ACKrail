@@ -4,11 +4,20 @@
 #include <algorithm>
 #include <cmath>
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, TrafficBalancer &trafficBalancer, QObject *parent)
+TrafficSimulator::TrafficSimulator(const Topology &topology,
+                                   const Garage &garage,
+                                   TrafficManager &trafficManager,
+                                   TrafficGenerator &trafficGenerator,
+                                   TrafficBalancer &trafficBalancer,
+                                   SimulationStatistics &statistics,
+                                   QObject *parent)
     : QObject(parent),
+      topology(topology),
+      garage(garage),
       trafficManager(trafficManager),
       trafficGenerator(trafficGenerator),
-      trafficBalancer(trafficBalancer)
+      trafficBalancer(trafficBalancer),
+      statistics(statistics)
 {
 }
 
@@ -19,8 +28,10 @@ void TrafficSimulator::start()
     started = true;
     lastGeneratorUpdateSeconds = 0.0;
     lastBalancerUpdateSeconds = 0.0;
+    lastStationStatisticsUpdateSeconds = 0.0;
     simulationClock.start();
     trafficManager.processCurrentEvents(0.0);
+    recordStationSnapshots(0.0);
     scheduleNextWork();
 }
 
@@ -37,9 +48,25 @@ void TrafficSimulator::processScheduledWork()
     trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
     trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
     trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
+    recordStationSnapshots(currentSimulationTimeSeconds);
     lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
     lastBalancerUpdateSeconds = currentSimulationTimeSeconds;
     scheduleNextWork();
+}
+
+void TrafficSimulator::recordStationSnapshots(double currentSimulationTimeSeconds)
+{
+    if (currentSimulationTimeSeconds - lastStationStatisticsUpdateSeconds < 1.0 && currentSimulationTimeSeconds > 0.0)
+        return;
+
+    for (const Node &station : topology.getNodes())
+    {
+        const auto stationPool = garage.getIdleEnginesByStation().find(station.getId());
+        const std::size_t idleEngineCount = stationPool == garage.getIdleEnginesByStation().end() ? 0 : stationPool->second.size();
+        statistics.getStationStatistics().setTargetIdleEngines(station.getId(), static_cast<double>(trafficBalancer.getTargetEngineCountAtStation(station.getId())));
+        statistics.getStationStatistics().recordSnapshot(station.getId(), static_cast<double>(idleEngineCount), currentSimulationTimeSeconds);
+    }
+    lastStationStatisticsUpdateSeconds = currentSimulationTimeSeconds;
 }
 
 void TrafficSimulator::scheduleNextWork()

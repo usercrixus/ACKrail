@@ -1,5 +1,6 @@
 #include "TrafficManager.hpp"
 #include "TrafficBalancer.hpp"
+#include "../statistics/SimulationStatistics.hpp"
 
 #include <QTemporaryFile>
 #include <cassert>
@@ -25,7 +26,8 @@ int main()
             QStringLiteral("Direct"),
             QStringLiteral("#000000"))});
     Garage headwayGarage(2);
-    TrafficManager headwayManager(headwayTopology, headwayGarage);
+    SimulationStatistics headwayStatistics;
+    TrafficManager headwayManager(headwayTopology, headwayGarage, headwayStatistics);
     double headwaySimulationTimeSeconds = 0.0;
     Engine &headwayLeader = *headwayGarage.getIdleEngine();
     assert(headwayGarage.getIdleEngines().at(headwayLeader.getId()) == &headwayLeader);
@@ -77,7 +79,8 @@ int main()
         });
 
     Garage garage(3);
-    TrafficManager trafficManager(topology, garage);
+    SimulationStatistics statistics;
+    TrafficManager trafficManager(topology, garage, statistics);
     double simulationTimeSeconds = 0.0;
     Engine &firstEngine = *garage.getIdleEngine();
 
@@ -121,7 +124,8 @@ int main()
         {completionStationA, completionStationB},
         {Link(1, completionStationA, completionStationB, QStringLiteral("Direct"), QStringLiteral("#000000"))});
     Garage completionGarage(1);
-    TrafficManager completionManager(completionTopology, completionGarage);
+    SimulationStatistics completionStatistics;
+    TrafficManager completionManager(completionTopology, completionGarage, completionStatistics);
     double completionSimulationTimeSeconds = 0.0;
     Engine &completionEngine = *completionGarage.getIdleEngine();
     completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
@@ -144,6 +148,9 @@ int main()
     assert(completionTopology.getNodes()[1].getController().getExpectedArrivalCount() == 0);
     assert(completionGarage.getActiveEngineCount() == 0);
     assert(completionGarage.getIdleEnginesByStation().at(completionStationB.getId()).size() == 1);
+    assert(completionStatistics.getEngineStatistics().getPassengerTripCount() == 1);
+    assert(std::abs(completionStatistics.getEngineStatistics().getPassengerDistanceKilometers()
+                    - completionTopology.getLinks().first().getDistanceKilometers()) < 0.000001);
 
     const Node balanceStationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node balanceStationB(2, QStringLiteral("B"), 0.0, 0.00001);
@@ -161,7 +168,8 @@ int main()
     balanceFile.flush();
     assert(balanceTopology.loadWeights(balanceFile.fileName()));
     Garage balanceGarage(8);
-    TrafficManager balanceManager(balanceTopology, balanceGarage);
+    SimulationStatistics balanceStatistics;
+    TrafficManager balanceManager(balanceTopology, balanceGarage, balanceStatistics);
     TrafficBalancer balanceBalancer(balanceTopology, balanceGarage, balanceManager);
     for (Engine *engine : balanceGarage.getIdleEngines())
         balanceGarage.setIdleEngineParkingStation(*engine, balanceStationA.getId());
@@ -172,6 +180,7 @@ int main()
     assert(balanceGarage.getActiveEngines().back()->getPad().getTravelType() == EnginePad::TravelType::Rebalancing);
     assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 1);
     assert(std::abs(balanceBalancer.getNetworkBalancePercent() - 100.0) < 0.000001);
+    assert(balanceStatistics.getFailedRebalancingDispatchCount() == 0);
 
     const Node weightedStationA(1, QStringLiteral("A"), 0.0, 0.0);
     const Node weightedStationB(2, QStringLiteral("B"), 0.0, 0.00001);
@@ -194,7 +203,8 @@ int main()
     weightedFile.flush();
     assert(weightedTopology.loadWeights(weightedFile.fileName()));
     Garage weightedGarage(70);
-    TrafficManager weightedManager(weightedTopology, weightedGarage);
+    SimulationStatistics weightedStatistics;
+    TrafficManager weightedManager(weightedTopology, weightedGarage, weightedStatistics);
     TrafficBalancer weightedBalancer(weightedTopology, weightedGarage, weightedManager);
     int weightedIndex = 0;
     for (Engine *engine : weightedGarage.getIdleEngines())

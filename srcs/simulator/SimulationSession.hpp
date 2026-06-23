@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../garage/Garage.hpp"
+#include "../statistics/SimulationStatistics.hpp"
 #include "../topology/Topology.hpp"
 #include "../view/simulation/SimulationWidget.hpp"
 #include "TrafficBalancer.hpp"
@@ -26,12 +27,14 @@ public:
     const QString &getError() const;
     const QString &getTopologyFile() const;
     const QString &getWeightFile() const;
+    SimulationStatistics *getStatistics() const;
 
 private:
     QString topologyFile;
     QString weightFile;
     QString error;
     std::unique_ptr<Topology> topology;
+    std::unique_ptr<SimulationStatistics> statistics;
     std::unique_ptr<Garage> garage;
     std::unique_ptr<TrafficManager> trafficManager;
     std::unique_ptr<TrafficGenerator> trafficGenerator;

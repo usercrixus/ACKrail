@@ -16,6 +16,7 @@ public:
     void clear(QStackedWidget *centralStack, QWidget *emptyPage);
 
     bool isRunning() const;
+    SimulationStatistics *getStatistics() const;
     SimulationWidget *getSimulationPage() const;
     void setEngineVisibility(bool passengerEnginesVisible, bool rebalancingEnginesVisible);
     void setPassengerEnginesVisible(bool visible);

@@ -89,6 +89,11 @@ bool SimulationController::isRunning() const
     return simulationSession != nullptr;
 }
 
+SimulationStatistics *SimulationController::getStatistics() const
+{
+    return simulationSession == nullptr ? nullptr : simulationSession->getStatistics();
+}
+
 SimulationWidget *SimulationController::getSimulationPage() const
 {
     return simulationPage;

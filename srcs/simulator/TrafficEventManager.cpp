@@ -1,7 +1,8 @@
 #include "TrafficEventManager.hpp"
 
-TrafficEventManager::TrafficEventManager(Garage &garage)
-    : garage(garage)
+TrafficEventManager::TrafficEventManager(Garage &garage, SimulationStatistics &statistics)
+    : garage(garage),
+      statistics(statistics)
 {
 }
 
@@ -64,6 +65,14 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
     const qsizetype nextStep = event.contractStep + 1;
     if (nextStep >= route->getContract().size())
     {
+        double waitSeconds = 0.0;
+        for (const Route::ContractStep &step : route->getContract())
+            waitSeconds += step.waitSeconds;
+        statistics.getEngineStatistics().recordTrip(engine.getId(),
+                                                    pad.getTravelType(),
+                                                    route->getTotalDistanceKilometers(),
+                                                    pad.getTotalTrajectorySeconds(),
+                                                    waitSeconds);
         stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
         return;

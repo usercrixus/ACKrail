@@ -3,8 +3,10 @@
 #include "SimulationController.hpp"
 
 #include <QAction>
+#include <QDockWidget>
 #include <QMainWindow>
 #include <QMenu>
+#include <QPointer>
 #include <QStackedWidget>
 #include <QString>
 #include <QWidget>
@@ -19,8 +21,14 @@ private:
     void createFileMenu();
     void createSimulationMenu();
     void createSimulationViewMenu(QMenu *simulationMenu);
+    void createStatisticsViewMenu(QMenu *viewMenu);
     void createCentralView();
     void updateStatus();
+    void closeStatisticsDocks();
+    void showEngineStatistics();
+    void showStationStatistics();
+    void showDispatchStatistics();
+    QDockWidget *createStatisticsDock(const QString &title, QWidget *content);
 
     QString topologyFile = QStringLiteral(":/map/paris_metro.json");
     QString weightFile;
@@ -31,4 +39,10 @@ private:
     QAction *stopAction = nullptr;
     QAction *showPassengerEnginesAction = nullptr;
     QAction *showRebalancingEnginesAction = nullptr;
+    QAction *showEngineStatisticsAction = nullptr;
+    QAction *showStationStatisticsAction = nullptr;
+    QAction *showDispatchStatisticsAction = nullptr;
+    QPointer<QDockWidget> engineStatisticsDock;
+    QPointer<QDockWidget> stationStatisticsDock;
+    QPointer<QDockWidget> dispatchStatisticsDock;
 };

@@ -33,7 +33,7 @@ double TrafficGenerator::getSecondsUntilDispatch() const
 
 void TrafficGenerator::generate(double currentSimulationTimeSeconds)
 {
-    std::uniform_int_distribution<int> dispatchCountDistribution(50, 75);
+    std::uniform_int_distribution<int> dispatchCountDistribution(10, 25);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {

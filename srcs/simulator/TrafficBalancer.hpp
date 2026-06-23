@@ -14,6 +14,7 @@ public:
     void tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds);
     double getSecondsUntilRebalance() const;
     double getNetworkBalancePercent() const;
+    std::size_t getTargetEngineCountAtStation(int stationId) const;
 
 private:
     struct StationPressure
@@ -27,7 +28,6 @@ private:
     std::size_t getIdleEngineCountAtStation(int stationId) const;
     std::size_t getProjectedEngineCountAtStation(int stationId) const;
     std::size_t getBaseReserveCountPerStation() const;
-    std::size_t getTargetEngineCountAtStation(int stationId) const;
     std::size_t getTargetEngineCountAtStation(const StationPressure &stationPressure) const;
 
     const Topology &topology;

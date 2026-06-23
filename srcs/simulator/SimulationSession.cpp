@@ -27,11 +27,12 @@ bool SimulationSession::load()
         error = topology->getError();
         return false;
     }
-    garage = std::make_unique<Garage>(10000);
-    trafficManager = std::make_unique<TrafficManager>(*topology, *garage);
+    statistics = std::make_unique<SimulationStatistics>();
+    garage = std::make_unique<Garage>(50000);
+    trafficManager = std::make_unique<TrafficManager>(*topology, *garage, *statistics);
     trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *trafficManager);
     trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager);
-    trafficSimulator = std::make_unique<TrafficSimulator>(*trafficManager, *trafficGenerator, *trafficBalancer);
+    trafficSimulator = std::make_unique<TrafficSimulator>(*topology, *garage, *trafficManager, *trafficGenerator, *trafficBalancer, *statistics);
     error.clear();
     return true;
 }
@@ -65,4 +66,9 @@ const QString &SimulationSession::getTopologyFile() const
 const QString &SimulationSession::getWeightFile() const
 {
     return weightFile;
+}
+
+SimulationStatistics *SimulationSession::getStatistics() const
+{
+    return statistics.get();
 }

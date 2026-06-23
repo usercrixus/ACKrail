@@ -85,6 +85,12 @@ qt_add_executable(ackrail
     view/simulation/map/MapWidget.hpp
     view/simulation/topology/NodeRenderer.cpp
     view/simulation/topology/NodeRenderer.hpp
+    view/statistics/DispatchStatisticsWidget.cpp
+    view/statistics/DispatchStatisticsWidget.hpp
+    view/statistics/EngineStatisticsWidget.cpp
+    view/statistics/EngineStatisticsWidget.hpp
+    view/statistics/StationStatisticsWidget.cpp
+    view/statistics/StationStatisticsWidget.hpp
 )
 
 set_source_files_properties(map/paris_metro.json PROPERTIES
@@ -217,6 +223,14 @@ if(BUILD_TESTING)
         simulator/TrafficRouteManager.cpp
         simulator/TrafficRouteManager.hpp
         simulator/TrafficManagerTest.cpp
+        statistics/EngineStatistics.cpp
+        statistics/EngineStatistics.hpp
+        statistics/NumericSummary.cpp
+        statistics/NumericSummary.hpp
+        statistics/SimulationStatistics.cpp
+        statistics/SimulationStatistics.hpp
+        statistics/StationStatistics.cpp
+        statistics/StationStatistics.hpp
         topology/Link.cpp
         topology/Link.hpp
         topology/Node.cpp
