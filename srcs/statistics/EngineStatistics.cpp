@@ -2,11 +2,7 @@
 
 #include <algorithm>
 
-void EngineStatistics::recordTrip(int engineId,
-                                  EnginePad::TravelType travelType,
-                                  double distanceKilometers,
-                                  double travelTimeSeconds,
-                                  double waitSeconds)
+void EngineStatistics::recordTrip(int engineId, EnginePad::TravelType travelType, double distanceKilometers, double travelTimeSeconds, double waitSeconds)
 {
     EngineReport &report = reportsByEngineId[engineId];
     report.engineId = engineId;
@@ -15,11 +11,9 @@ void EngineStatistics::recordTrip(int engineId,
     report.totalTravelTimeSeconds += travelTimeSeconds;
     report.totalWaitSeconds += waitSeconds;
     report.maximumWaitSeconds = std::max(report.maximumWaitSeconds, waitSeconds);
-
     totalDistanceSummary.add(distanceKilometers);
     travelTimeSummary.add(travelTimeSeconds);
     waitTimeSummary.add(waitSeconds);
-
     if (travelType == EnginePad::TravelType::Passenger)
     {
         ++passengerTripCount;
@@ -34,7 +28,6 @@ void EngineStatistics::recordTrip(int engineId,
         report.rebalancingTimeSeconds += travelTimeSeconds;
         rebalancingDistanceSummary.add(distanceKilometers);
     }
-
     report.averageWaitSeconds = report.totalWaitSeconds / static_cast<double>(report.tripCount);
 }
 

@@ -2,7 +2,6 @@
 
 #include "../algorithm/Route.hpp"
 #include "../garage/Garage.hpp"
-#include "../statistics/SimulationStatistics.hpp"
 #include <optional>
 #include <queue>
 #include <vector>
@@ -10,11 +9,22 @@
 class TrafficEventManager
 {
 public:
-    TrafficEventManager(Garage &garage, SimulationStatistics &statistics);
+    struct CompletedTrip
+    {
+        int engineId;
+        int destinationStationId;
+        EnginePad::TravelType travelType;
+        double distanceKilometers;
+        double travelTimeSeconds;
+        double waitSeconds;
+    };
+
+    explicit TrafficEventManager(Garage &garage);
 
     void scheduleRouteEvents(const Engine &engine, const Route &route, double departureTimeSeconds);
     void processCurrentEvents(double currentSimulationTimeSeconds);
     std::optional<double> getNextEventTimeSeconds() const;
+    const std::vector<CompletedTrip> &getCompletedTrips() const;
 
 private:
     struct SimulationEvent
@@ -33,6 +43,6 @@ private:
     void processStepCompletion(const SimulationEvent &event);
 
     Garage &garage;
-    SimulationStatistics &statistics;
     std::priority_queue<SimulationEvent, std::vector<SimulationEvent>, EarlierSimulationEvent> events;
+    std::vector<CompletedTrip> completedTrips;
 };

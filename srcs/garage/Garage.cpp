@@ -30,6 +30,12 @@ const std::unordered_map<int, IndexedRandomPool<int, Engine *>> &Garage::getIdle
     return idleEnginesByStation;
 }
 
+std::size_t Garage::getIdleEngineCountAtStation(int stationId) const
+{
+    const auto station = idleEnginesByStation.find(stationId);
+    return station == idleEnginesByStation.end() ? 0 : station->second.size();
+}
+
 const IndexedRandomPool<int, Engine *> &Garage::getActiveEngines() const
 {
     return activeEngines;

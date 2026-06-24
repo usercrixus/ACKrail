@@ -55,6 +55,8 @@ qt_add_executable(ackrail
     statistics/NumericSummary.hpp
     statistics/SimulationStatistics.cpp
     statistics/SimulationStatistics.hpp
+    statistics/SimulationStatisticsCollector.cpp
+    statistics/SimulationStatisticsCollector.hpp
     statistics/StationStatistics.cpp
     statistics/StationStatistics.hpp
     topology/Link.cpp
@@ -235,6 +237,8 @@ if(BUILD_TESTING)
         statistics/NumericSummary.hpp
         statistics/SimulationStatistics.cpp
         statistics/SimulationStatistics.hpp
+        statistics/SimulationStatisticsCollector.cpp
+        statistics/SimulationStatisticsCollector.hpp
         statistics/StationStatistics.cpp
         statistics/StationStatistics.hpp
         topology/Link.cpp

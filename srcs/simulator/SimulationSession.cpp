@@ -27,13 +27,27 @@ bool SimulationSession::load()
         error = topology->getError();
         return false;
     }
-    statistics = std::make_unique<SimulationStatistics>();
     garage = std::make_unique<Garage>(70000);
-    trafficManager = std::make_unique<TrafficManager>(*topology, *garage, *statistics);
+    trafficManager = std::make_unique<TrafficManager>(*topology, *garage);
     passengerDispatcher = std::make_unique<PassengerDispatcher>(*garage, *trafficManager);
     trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *passengerDispatcher);
     trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager, passengerDispatcher.get());
-    trafficSimulator = std::make_unique<TrafficSimulator>(*topology, *garage, *trafficManager, *trafficGenerator, *passengerDispatcher, *trafficBalancer, *statistics);
+    statisticsCollector = std::make_unique<SimulationStatisticsCollector>(
+        *topology,
+        *garage,
+        *trafficManager,
+        *passengerDispatcher,
+        *trafficBalancer);
+    trafficSimulator = std::make_unique<TrafficSimulator>(
+        *trafficManager,
+        *trafficGenerator,
+        *passengerDispatcher,
+        *trafficBalancer);
+    trafficSimulator->setUpdateObserver(
+        [this](double currentSimulationTimeSeconds)
+        {
+            statisticsCollector->update(currentSimulationTimeSeconds);
+        });
     error.clear();
     return true;
 }
@@ -71,7 +85,9 @@ const QString &SimulationSession::getWeightFile() const
 
 SimulationStatistics *SimulationSession::getStatistics() const
 {
-    return statistics.get();
+    return statisticsCollector == nullptr
+        ? nullptr
+        : &statisticsCollector->getStatistics();
 }
 
 const Topology *SimulationSession::getTopology() const

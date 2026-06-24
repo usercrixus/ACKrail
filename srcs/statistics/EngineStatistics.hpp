@@ -23,11 +23,7 @@ public:
         double maximumWaitSeconds = 0.0;
     };
 
-    void recordTrip(int engineId,
-                    EnginePad::TravelType travelType,
-                    double distanceKilometers,
-                    double travelTimeSeconds,
-                    double waitSeconds);
+    void recordTrip(int engineId, EnginePad::TravelType travelType, double distanceKilometers, double travelTimeSeconds, double waitSeconds);
 
     const EngineReport *findEngineReport(int engineId) const;
 

@@ -48,6 +48,9 @@ public:
      */
     const std::unordered_map<int, IndexedRandomPool<int, Engine *>> &getIdleEnginesByStation() const;
 
+    /** @return Number of idle engines parked at the requested station. */
+    std::size_t getIdleEngineCountAtStation(int stationId) const;
+
     /**
      * Returns the engines currently executing a route.
      *

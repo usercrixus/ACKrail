@@ -1,8 +1,7 @@
 #include "TrafficEventManager.hpp"
 
-TrafficEventManager::TrafficEventManager(Garage &garage, SimulationStatistics &statistics)
-    : garage(garage),
-      statistics(statistics)
+TrafficEventManager::TrafficEventManager(Garage &garage)
+    : garage(garage)
 {
 }
 
@@ -33,6 +32,11 @@ std::optional<double> TrafficEventManager::getNextEventTimeSeconds() const
     if (events.empty())
         return std::nullopt;
     return events.top().timeSeconds;
+}
+
+const std::vector<TrafficEventManager::CompletedTrip> &TrafficEventManager::getCompletedTrips() const
+{
+    return completedTrips;
 }
 
 void TrafficEventManager::processDueEvents(double currentSimulationTimeSeconds)
@@ -68,12 +72,14 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
         double waitSeconds = 0.0;
         for (const Route::ContractStep &step : route->getContract())
             waitSeconds += step.waitSeconds;
-        statistics.getEngineStatistics().recordTrip(engine.getId(),
-                                                    pad.getTravelType(),
-                                                    route->getTotalDistanceKilometers(),
-                                                    pad.getTotalTrajectorySeconds(),
-                                                    waitSeconds);
-        statistics.getStationStatistics().recordArrival(stations.back()->getId());
+        completedTrips.push_back({
+            engine.getId(),
+            stations.back()->getId(),
+            pad.getTravelType(),
+            route->getTotalDistanceKilometers(),
+            pad.getTotalTrajectorySeconds(),
+            waitSeconds
+        });
         stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
         return;
