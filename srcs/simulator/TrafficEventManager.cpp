@@ -73,6 +73,7 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
                                                     route->getTotalDistanceKilometers(),
                                                     pad.getTotalTrajectorySeconds(),
                                                     waitSeconds);
+        statistics.getStationStatistics().recordArrival(stations.back()->getId());
         stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
         return;

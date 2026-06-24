@@ -8,6 +8,24 @@
 
 int main()
 {
+    StationStatistics stationStatistics;
+    stationStatistics.setTargetIdleEngines(1, 3.0);
+    stationStatistics.recordSnapshot(1, 2.0, 0.0);
+    stationStatistics.recordSnapshot(1, 4.0, 10.0);
+    stationStatistics.recordDeparture(1);
+    stationStatistics.recordArrival(1);
+    const StationStatistics::StationReport *stationReport =
+        stationStatistics.findStationReport(1);
+    assert(stationReport != nullptr);
+    assert(stationReport->currentIdleEngines == 4.0);
+    const StationStatistics::GlobalReport globalStationReport =
+        stationStatistics.getGlobalReport();
+    assert(globalStationReport.stationCount == 1);
+    assert(globalStationReport.currentIdleEngines == 4.0);
+    assert(globalStationReport.targetIdleEngines == 3.0);
+    assert(globalStationReport.departureCount == 1);
+    assert(globalStationReport.arrivalCount == 1);
+
     NodeController controller(1);
     controller.reserveEntry(1, 7, 0, 2.0, 3.0);
     controller.reserveEntry(2, 7, 1, 4.0, 3.0);
@@ -131,6 +149,11 @@ int main()
     completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
     assert(completionGarage.getIdleEnginesByStation().at(completionStationA.getId()).size() == 1);
     assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds, EnginePad::TravelType::Passenger));
+    const StationStatistics::StationReport *departureReport =
+        completionStatistics.getStationStatistics().findStationReport(completionStationA.getId());
+    assert(departureReport != nullptr);
+    assert(departureReport->departureCount == 1);
+    assert(departureReport->arrivalCount == 0);
     assert(completionTopology.getNodes()[1].getController().getExpectedArrivalCount() == 1);
     assert(completionGarage.getIdleEnginesByStation().find(completionStationA.getId()) == completionGarage.getIdleEnginesByStation().end());
     const double completionTraversalSeconds =
@@ -149,6 +172,12 @@ int main()
     assert(completionGarage.getActiveEngineCount() == 0);
     assert(completionGarage.getIdleEnginesByStation().at(completionStationB.getId()).size() == 1);
     assert(completionStatistics.getEngineStatistics().getPassengerTripCount() == 1);
+    const StationStatistics::StationReport *arrivalReport =
+        completionStatistics.getStationStatistics().findStationReport(completionStationB.getId());
+    assert(arrivalReport != nullptr);
+    assert(arrivalReport->departureCount == 0);
+    assert(arrivalReport->arrivalCount == 1);
+    assert(completionStatistics.getStationStatistics().getTotalMovementCount() == 2);
     assert(std::abs(completionStatistics.getEngineStatistics().getPassengerDistanceKilometers()
                     - completionTopology.getLinks().first().getDistanceKilometers()) < 0.000001);
 

@@ -101,7 +101,8 @@ void AckRailWindow::createStatisticsViewMenu(QMenu *viewMenu)
 void AckRailWindow::showStatistics()
 {
     SimulationStatistics *statistics = simulationController.getStatistics();
-    if (statistics == nullptr)
+    const Topology *topology = simulationController.getTopology();
+    if (statistics == nullptr || topology == nullptr)
         return;
 
     QWidget overlay(this);
@@ -112,7 +113,7 @@ void AckRailWindow::showStatistics()
     overlay.show();
     overlay.raise();
 
-    StatisticsDialog dialog(*statistics, this);
+    StatisticsDialog dialog(*statistics, *topology, this);
     dialog.exec();
 }
 

@@ -17,6 +17,7 @@ public:
 
     bool isRunning() const;
     SimulationStatistics *getStatistics() const;
+    const Topology *getTopology() const;
     SimulationWidget *getSimulationPage() const;
     void setEngineVisibility(bool passengerEnginesVisible, bool rebalancingEnginesVisible);
     void setPassengerEnginesVisible(bool visible);

@@ -87,10 +87,10 @@ qt_add_executable(ackrail
     view/simulation/map/MapWidget.hpp
     view/simulation/topology/NodeRenderer.cpp
     view/simulation/topology/NodeRenderer.hpp
-    view/statistics/DispatchStatisticsWidget.cpp
-    view/statistics/DispatchStatisticsWidget.hpp
     view/statistics/EngineStatisticsWidget.cpp
     view/statistics/EngineStatisticsWidget.hpp
+    view/statistics/GlobalStationStatisticsWidget.cpp
+    view/statistics/GlobalStationStatisticsWidget.hpp
     view/statistics/StationStatisticsWidget.cpp
     view/statistics/StationStatisticsWidget.hpp
 )

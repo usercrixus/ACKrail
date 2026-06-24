@@ -94,6 +94,11 @@ SimulationStatistics *SimulationController::getStatistics() const
     return simulationSession == nullptr ? nullptr : simulationSession->getStatistics();
 }
 
+const Topology *SimulationController::getTopology() const
+{
+    return simulationSession == nullptr ? nullptr : simulationSession->getTopology();
+}
+
 SimulationWidget *SimulationController::getSimulationPage() const
 {
     return simulationPage;

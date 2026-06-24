@@ -15,6 +15,7 @@ void StationStatistics::recordSnapshot(int stationId, double idleEngines, double
     closeInterval(report, simulationTimeSeconds);
 
     const double clampedIdleEngines = std::max(0.0, idleEngines);
+    report.report.currentIdleEngines = clampedIdleEngines;
     report.idleEngineSummary.add(clampedIdleEngines);
     report.targetGapSummary.add(std::abs(clampedIdleEngines - report.report.targetIdleEngines));
     report.lastIdleEngines = clampedIdleEngines;
@@ -23,12 +24,63 @@ void StationStatistics::recordSnapshot(int stationId, double idleEngines, double
     report.report = buildReport(report);
 }
 
+void StationStatistics::recordDeparture(int stationId)
+{
+    MutableStationReport &report = getOrCreateReport(stationId);
+    ++report.report.departureCount;
+    ++totalMovementCount;
+    ++totalDepartureCount;
+}
+
+void StationStatistics::recordArrival(int stationId)
+{
+    MutableStationReport &report = getOrCreateReport(stationId);
+    ++report.report.arrivalCount;
+    ++totalMovementCount;
+    ++totalArrivalCount;
+}
+
 const StationStatistics::StationReport *StationStatistics::findStationReport(int stationId) const
 {
     const auto report = reportsByStationId.find(stationId);
     if (report == reportsByStationId.end())
         return nullptr;
     return &report->second.report;
+}
+
+std::size_t StationStatistics::getTotalMovementCount() const
+{
+    return totalMovementCount;
+}
+
+StationStatistics::GlobalReport StationStatistics::getGlobalReport() const
+{
+    GlobalReport global;
+    global.stationCount = reportsByStationId.size();
+    global.departureCount = totalDepartureCount;
+    global.arrivalCount = totalArrivalCount;
+
+    for (const auto &entry : reportsByStationId)
+    {
+        const StationReport &station = entry.second.report;
+        global.currentIdleEngines += station.currentIdleEngines;
+        global.targetIdleEngines += station.targetIdleEngines;
+        global.averageIdleEnginesPerStation += station.averageIdleEngines;
+        global.averageTargetGap += station.averageTargetGap;
+        global.observedStationTimeSeconds += station.observedTimeSeconds;
+        global.timeWithNoIdleEngineSeconds += station.timeWithNoIdleEngineSeconds;
+        global.timeBelowTargetSeconds += station.timeBelowTargetSeconds;
+        if (station.currentIdleEngines <= 0.0)
+            ++global.stationsWithoutIdleEngine;
+    }
+
+    if (global.stationCount > 0)
+    {
+        const double stationCount = static_cast<double>(global.stationCount);
+        global.averageIdleEnginesPerStation /= stationCount;
+        global.averageTargetGap /= stationCount;
+    }
+    return global;
 }
 
 NumericSummary StationStatistics::getAverageIdleEngineSummary() const
@@ -74,6 +126,9 @@ double StationStatistics::getTotalTimeAboveTargetSeconds() const
 void StationStatistics::clear()
 {
     reportsByStationId.clear();
+    totalMovementCount = 0;
+    totalDepartureCount = 0;
+    totalArrivalCount = 0;
 }
 
 StationStatistics::MutableStationReport &StationStatistics::getOrCreateReport(int stationId)
@@ -89,6 +144,7 @@ void StationStatistics::closeInterval(MutableStationReport &report, double simul
         return;
 
     const double elapsedSeconds = simulationTimeSeconds - report.lastSnapshotTimeSeconds;
+    report.report.observedTimeSeconds += elapsedSeconds;
     if (report.lastIdleEngines <= 0.0)
         report.report.timeWithNoIdleEngineSeconds += elapsedSeconds;
     if (report.lastIdleEngines < report.report.targetIdleEngines)

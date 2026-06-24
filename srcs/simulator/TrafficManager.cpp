@@ -24,6 +24,7 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
     contractedRoute->route->getStations().back()->getController().addExpectedArrival();
     garage.activateEngine(&engine);
     eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
+    statistics.getStationStatistics().recordDeparture(fromStationId);
     return true;
 }
 
@@ -43,6 +44,7 @@ bool TrafficManager::contractPrecomputedRoute(Engine &engine, int fromStationId,
     contractedRoute->route->getStations().back()->getController().addExpectedArrival();
     garage.activateEngine(&engine);
     eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
+    statistics.getStationStatistics().recordDeparture(fromStationId);
     return true;
 }
 

@@ -28,6 +28,7 @@ public:
     const QString &getTopologyFile() const;
     const QString &getWeightFile() const;
     SimulationStatistics *getStatistics() const;
+    const Topology *getTopology() const;
 
 private:
     QString topologyFile;

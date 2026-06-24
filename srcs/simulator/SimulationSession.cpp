@@ -72,3 +72,8 @@ SimulationStatistics *SimulationSession::getStatistics() const
 {
     return statistics.get();
 }
+
+const Topology *SimulationSession::getTopology() const
+{
+    return topology.get();
+}
