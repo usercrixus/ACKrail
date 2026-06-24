@@ -1,9 +1,7 @@
 #include "AckRailWindow.hpp"
 
+#include "dialogs/StatisticsDialog.hpp"
 #include "simulation/EmptyPageWidget.hpp"
-#include "statistics/DispatchStatisticsWidget.hpp"
-#include "statistics/EngineStatisticsWidget.hpp"
-#include "statistics/StationStatisticsWidget.hpp"
 #include <QFileInfo>
 #include <QMenu>
 #include <QMenuBar>
@@ -56,7 +54,6 @@ void AckRailWindow::createSimulationMenu()
     launchAction = simulationMenu->addAction(QStringLiteral("&Launch Simulation"));
     QObject::connect(launchAction, &QAction::triggered, this, [this]()
                      {
-                         closeStatisticsDocks();
                          simulationController.launch(topologyFile, weightFile, centralStack, this);
                          simulationController.setEngineVisibility(showPassengerEnginesAction->isChecked(), showRebalancingEnginesAction->isChecked());
                          updateStatus();
@@ -65,7 +62,6 @@ void AckRailWindow::createSimulationMenu()
     stopAction = simulationMenu->addAction(QStringLiteral("&Stop Simulation"));
     QObject::connect(stopAction, &QAction::triggered, this, [this]()
                      {
-                         closeStatisticsDocks();
                          simulationController.clear(centralStack, emptyPage);
                          updateStatus();
                      });
@@ -97,70 +93,27 @@ void AckRailWindow::createSimulationViewMenu(QMenu *simulationMenu)
 
 void AckRailWindow::createStatisticsViewMenu(QMenu *viewMenu)
 {
-    QMenu *statisticsMenu = viewMenu->addMenu(QStringLiteral("&Statistics"));
-    showEngineStatisticsAction = statisticsMenu->addAction(QStringLiteral("&Engine Statistics"));
-    QObject::connect(showEngineStatisticsAction, &QAction::triggered, this, [this]()
-                     { showEngineStatistics(); });
-
-    showStationStatisticsAction = statisticsMenu->addAction(QStringLiteral("&Station Statistics"));
-    QObject::connect(showStationStatisticsAction, &QAction::triggered, this, [this]()
-                     { showStationStatistics(); });
-
-    showDispatchStatisticsAction = statisticsMenu->addAction(QStringLiteral("&Dispatch Statistics"));
-    QObject::connect(showDispatchStatisticsAction, &QAction::triggered, this, [this]()
-                     { showDispatchStatistics(); });
+    showStatisticsAction = viewMenu->addAction(QStringLiteral("&Statistics..."));
+    QObject::connect(showStatisticsAction, &QAction::triggered, this, [this]()
+                     { showStatistics(); });
 }
 
-void AckRailWindow::closeStatisticsDocks()
-{
-    if (engineStatisticsDock != nullptr)
-        delete engineStatisticsDock.data();
-    if (stationStatisticsDock != nullptr)
-        delete stationStatisticsDock.data();
-    if (dispatchStatisticsDock != nullptr)
-        delete dispatchStatisticsDock.data();
-}
-
-void AckRailWindow::showEngineStatistics()
+void AckRailWindow::showStatistics()
 {
     SimulationStatistics *statistics = simulationController.getStatistics();
     if (statistics == nullptr)
         return;
-    if (engineStatisticsDock == nullptr)
-        engineStatisticsDock = createStatisticsDock(QStringLiteral("Engine Statistics"), new EngineStatisticsWidget(*statistics, this));
-    engineStatisticsDock->show();
-    engineStatisticsDock->raise();
-}
 
-void AckRailWindow::showStationStatistics()
-{
-    SimulationStatistics *statistics = simulationController.getStatistics();
-    if (statistics == nullptr)
-        return;
-    if (stationStatisticsDock == nullptr)
-        stationStatisticsDock = createStatisticsDock(QStringLiteral("Station Statistics"), new StationStatisticsWidget(*statistics, this));
-    stationStatisticsDock->show();
-    stationStatisticsDock->raise();
-}
+    QWidget overlay(this);
+    overlay.setAttribute(Qt::WA_StyledBackground, true);
+    overlay.setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    overlay.setStyleSheet(QStringLiteral("background-color: rgba(0, 0, 0, 150);"));
+    overlay.setGeometry(rect());
+    overlay.show();
+    overlay.raise();
 
-void AckRailWindow::showDispatchStatistics()
-{
-    SimulationStatistics *statistics = simulationController.getStatistics();
-    if (statistics == nullptr)
-        return;
-    if (dispatchStatisticsDock == nullptr)
-        dispatchStatisticsDock = createStatisticsDock(QStringLiteral("Dispatch Statistics"), new DispatchStatisticsWidget(*statistics, this));
-    dispatchStatisticsDock->show();
-    dispatchStatisticsDock->raise();
-}
-
-QDockWidget *AckRailWindow::createStatisticsDock(const QString &title, QWidget *content)
-{
-    auto *dock = new QDockWidget(title, this);
-    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    dock->setWidget(content);
-    addDockWidget(Qt::RightDockWidgetArea, dock);
-    return dock;
+    StatisticsDialog dialog(*statistics, this);
+    dialog.exec();
 }
 
 void AckRailWindow::updateStatus()
@@ -174,10 +127,6 @@ void AckRailWindow::updateStatus()
     if (stopAction != nullptr)
         stopAction->setEnabled(simulationController.isRunning());
     const bool statisticsAvailable = simulationController.getStatistics() != nullptr;
-    if (showEngineStatisticsAction != nullptr)
-        showEngineStatisticsAction->setEnabled(statisticsAvailable);
-    if (showStationStatisticsAction != nullptr)
-        showStationStatisticsAction->setEnabled(statisticsAvailable);
-    if (showDispatchStatisticsAction != nullptr)
-        showDispatchStatisticsAction->setEnabled(statisticsAvailable);
+    if (showStatisticsAction != nullptr)
+        showStatisticsAction->setEnabled(statisticsAvailable);
 }

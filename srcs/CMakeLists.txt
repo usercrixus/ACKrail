@@ -65,6 +65,8 @@ qt_add_executable(ackrail
     view/AckRailWindow.hpp
     view/dialogs/SimulationConfigDialog.cpp
     view/dialogs/SimulationConfigDialog.hpp
+    view/dialogs/StatisticsDialog.cpp
+    view/dialogs/StatisticsDialog.hpp
     view/SimulationController.cpp
     view/SimulationController.hpp
     view/simulation/SimulationWidget.cpp
