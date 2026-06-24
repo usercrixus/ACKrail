@@ -39,6 +39,7 @@ GlobalStationStatisticsWidget::GlobalStationStatisticsWidget(
     stationCount = addValue(QStringLiteral("Stations"));
     currentIdle = addValue(QStringLiteral("Current idle engines"));
     targetIdle = addValue(QStringLiteral("Target idle engines"));
+    waitingPassengers = addValue(QStringLiteral("Waiting passengers"));
     stationsWithoutIdle = addValue(QStringLiteral("Stations without idle engines"));
     departures = addValue(QStringLiteral("Trip departures"));
     arrivals = addValue(QStringLiteral("Trip arrivals"));
@@ -66,6 +67,7 @@ void GlobalStationStatisticsWidget::refresh()
     stationCount->setText(formatCount(report.stationCount));
     currentIdle->setText(formatEngines(report.currentIdleEngines));
     targetIdle->setText(formatEngines(report.targetIdleEngines));
+    waitingPassengers->setText(formatCount(report.currentWaitingPassengers));
     stationsWithoutIdle->setText(
         QStringLiteral("%1 / %2")
             .arg(formatCount(report.stationsWithoutIdleEngine),

@@ -3,6 +3,7 @@
 #include "TrafficBalancer.hpp"
 #include "TrafficGenerator.hpp"
 #include "TrafficManager.hpp"
+#include "PassengerDispatcher.hpp"
 #include "../garage/Garage.hpp"
 #include "../statistics/SimulationStatistics.hpp"
 #include "../topology/Topology.hpp"
@@ -16,6 +17,7 @@ public:
                      const Garage &garage,
                      TrafficManager &trafficManager,
                      TrafficGenerator &trafficGenerator,
+                     PassengerDispatcher &passengerDispatcher,
                      TrafficBalancer &trafficBalancer,
                      SimulationStatistics &statistics,
                      QObject *parent = nullptr);
@@ -31,6 +33,7 @@ private:
     const Garage &garage;
     TrafficManager &trafficManager;
     TrafficGenerator &trafficGenerator;
+    PassengerDispatcher &passengerDispatcher;
     TrafficBalancer &trafficBalancer;
     SimulationStatistics &statistics;
     QElapsedTimer simulationClock;

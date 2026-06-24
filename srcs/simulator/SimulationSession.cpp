@@ -28,11 +28,12 @@ bool SimulationSession::load()
         return false;
     }
     statistics = std::make_unique<SimulationStatistics>();
-    garage = std::make_unique<Garage>(50000);
+    garage = std::make_unique<Garage>(70000);
     trafficManager = std::make_unique<TrafficManager>(*topology, *garage, *statistics);
-    trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *trafficManager);
-    trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager);
-    trafficSimulator = std::make_unique<TrafficSimulator>(*topology, *garage, *trafficManager, *trafficGenerator, *trafficBalancer, *statistics);
+    passengerDispatcher = std::make_unique<PassengerDispatcher>(*garage, *trafficManager);
+    trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *passengerDispatcher);
+    trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager, passengerDispatcher.get());
+    trafficSimulator = std::make_unique<TrafficSimulator>(*topology, *garage, *trafficManager, *trafficGenerator, *passengerDispatcher, *trafficBalancer, *statistics);
     error.clear();
     return true;
 }

@@ -2,10 +2,12 @@
 
 #include <chrono>
 
-TrafficGenerator::TrafficGenerator(const Topology &topology, Garage &garage, TrafficManager &trafficManager)
+TrafficGenerator::TrafficGenerator(const Topology &topology,
+                                   Garage &garage,
+                                   PassengerDispatcher &passengerDispatcher)
     : topology(topology),
       garage(garage),
-      trafficManager(trafficManager),
+      passengerDispatcher(passengerDispatcher),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count())),
       arrivalStationDistribution(topology.getArrivalWeights().begin(), topology.getArrivalWeights().end()),
       departureStationDistribution(topology.getDepartureWeights().begin(), topology.getDepartureWeights().end())
@@ -37,18 +39,16 @@ void TrafficGenerator::generate(double currentSimulationTimeSeconds)
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
-        if (!dispatchPassengerRoute(currentSimulationTimeSeconds))
-            break;
-        else
-            --remainingDispatches;
+        generatePassengerRequest(currentSimulationTimeSeconds);
+        --remainingDispatches;
     }
 }
 
-bool TrafficGenerator::dispatchPassengerRoute(double currentSimulationTimeSeconds)
+void TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
-    if (stations.size() < 2 || garage.getIdleEngines().empty())
-        return false;
+    if (stations.size() < 2)
+        return;
 
     for (int attempt = 0; attempt < 20; ++attempt)
     {
@@ -56,16 +56,12 @@ bool TrafficGenerator::dispatchPassengerRoute(double currentSimulationTimeSecond
         const Node &toStation = stations[static_cast<qsizetype>(arrivalStationDistribution(randomGenerator))];
         if (fromStation.getId() != toStation.getId())
         {
-            const auto stationPool = garage.getIdleEnginesByStation().find(fromStation.getId());
-            if (stationPool != garage.getIdleEnginesByStation().end() && !stationPool->second.empty())
-            {
-                Engine *engine = stationPool->second[0];
-                if (trafficManager.contractRoute(*engine, fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
-                    return true;
-            }
+            passengerDispatcher.enqueue(fromStation.getId(),
+                                        toStation.getId(),
+                                        currentSimulationTimeSeconds);
+            return;
         }
     }
-    return false;
 }
 
 void TrafficGenerator::initializeEngineParkingStations()

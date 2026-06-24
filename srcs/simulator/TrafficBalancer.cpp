@@ -1,14 +1,19 @@
 #include "TrafficBalancer.hpp"
+#include "PassengerDispatcher.hpp"
 
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
 
-TrafficBalancer::TrafficBalancer(const Topology &topology, Garage &garage, TrafficManager &trafficManager)
+TrafficBalancer::TrafficBalancer(const Topology &topology,
+                                 Garage &garage,
+                                 TrafficManager &trafficManager,
+                                 const PassengerDispatcher *passengerDispatcher)
     : topology(topology),
       garage(garage),
       trafficManager(trafficManager),
+      passengerDispatcher(passengerDispatcher),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()))
 {
     initializeStationPressuresFromTopology();
@@ -85,30 +90,86 @@ void TrafficBalancer::initializeStationPressuresFromTopology()
 void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
-    if (stations.size() < 2 || garage.getIdleEngines().empty() || totalDeficitPressure <= 0.0 || deficitStations.empty() || surplusStations.empty())
+    if (stations.size() < 2 || garage.getIdleEngines().empty())
         return;
 
     const std::size_t baseReserveCount = getBaseReserveCountPerStation();
-
-    for (const StationPressure &deficitStation : deficitStations)
+    std::vector<const Node *> destinationStations;
+    destinationStations.reserve(static_cast<std::size_t>(stations.size()));
+    for (const Node &station : stations)
     {
-        const std::size_t targetEngineCount = getTargetEngineCountAtStation(deficitStation);
-        std::vector<const StationPressure *> surplusStationsByCost;
-        surplusStationsByCost.reserve(surplusStations.size());
-        for (const StationPressure &surplusStation : surplusStations)
-            surplusStationsByCost.push_back(&surplusStation);
-        std::sort(surplusStationsByCost.begin(), surplusStationsByCost.end(), [this, &deficitStation](const StationPressure *left, const StationPressure *right)
-                  { return trafficManager.getStaticRouteDistanceKilometers(left->stationId, deficitStation.stationId) < trafficManager.getStaticRouteDistanceKilometers(right->stationId, deficitStation.stationId); });
+        if (getProjectedEngineCountAtStation(station.getId())
+                < getTargetEngineCountAtStation(station.getId())
+            || (passengerDispatcher != nullptr
+                && passengerDispatcher->getQueueSizeAtStation(station.getId()) > 0))
+            destinationStations.push_back(&station);
+    }
+    std::sort(destinationStations.begin(), destinationStations.end(),
+              [this, currentSimulationTimeSeconds](const Node *left, const Node *right)
+              {
+                  const std::size_t leftQueue = passengerDispatcher == nullptr
+                      ? 0
+                      : passengerDispatcher->getQueueSizeAtStation(left->getId());
+                  const std::size_t rightQueue = passengerDispatcher == nullptr
+                      ? 0
+                      : passengerDispatcher->getQueueSizeAtStation(right->getId());
+                  if (leftQueue != rightQueue)
+                      return leftQueue > rightQueue;
+                  const double leftWait = passengerDispatcher == nullptr
+                      ? 0.0
+                      : passengerDispatcher->getOldestWaitSecondsAtStation(
+                            left->getId(), currentSimulationTimeSeconds);
+                  const double rightWait = passengerDispatcher == nullptr
+                      ? 0.0
+                      : passengerDispatcher->getOldestWaitSecondsAtStation(
+                            right->getId(), currentSimulationTimeSeconds);
+                  return leftWait > rightWait;
+              });
 
-        for (const StationPressure *surplusStation : surplusStationsByCost)
+    for (const Node *destinationStation : destinationStations)
+    {
+        const int destinationStationId = destinationStation->getId();
+        const std::size_t targetEngineCount =
+            getTargetEngineCountAtStation(destinationStationId);
+        std::vector<const Node *> sourceStations;
+        sourceStations.reserve(static_cast<std::size_t>(stations.size()));
+        for (const Node &sourceStation : stations)
         {
-            while (getProjectedEngineCountAtStation(deficitStation.stationId) < targetEngineCount && getIdleEngineCountAtStation(surplusStation->stationId) > baseReserveCount)
+            if (sourceStation.getId() != destinationStationId)
+                sourceStations.push_back(&sourceStation);
+        }
+        std::sort(sourceStations.begin(), sourceStations.end(),
+                  [this, destinationStationId](const Node *left, const Node *right)
+                  {
+                      return trafficManager.getStaticRouteDistanceKilometers(
+                                 left->getId(), destinationStationId)
+                          < trafficManager.getStaticRouteDistanceKilometers(
+                                 right->getId(), destinationStationId);
+                  });
+
+        for (const Node *sourceStation : sourceStations)
+        {
+            const int sourceStationId = sourceStation->getId();
+            const bool sourceHasWaitingPassengers =
+                passengerDispatcher != nullptr
+                && passengerDispatcher->getQueueSizeAtStation(sourceStationId) > 0;
+            if (sourceHasWaitingPassengers)
+                continue;
+
+            while (getProjectedEngineCountAtStation(destinationStationId) < targetEngineCount
+                   && getIdleEngineCountAtStation(sourceStationId) > baseReserveCount)
             {
-                const auto stationPool = garage.getIdleEnginesByStation().find(surplusStation->stationId);
+                const auto stationPool =
+                    garage.getIdleEnginesByStation().find(sourceStationId);
                 if (stationPool == garage.getIdleEnginesByStation().end() || stationPool->second.empty())
                     break;
                 Engine *engine = stationPool->second.random(randomGenerator);
-                if (!trafficManager.contractPrecomputedRoute(*engine, surplusStation->stationId, deficitStation.stationId, currentSimulationTimeSeconds, EnginePad::TravelType::Rebalancing))
+                if (!trafficManager.contractPrecomputedRoute(
+                        *engine,
+                        sourceStationId,
+                        destinationStationId,
+                        currentSimulationTimeSeconds,
+                        EnginePad::TravelType::Rebalancing))
                     break;
                 if (garage.getIdleEngines().empty())
                     return;
@@ -145,12 +206,25 @@ std::size_t TrafficBalancer::getBaseReserveCountPerStation() const
 
 std::size_t TrafficBalancer::getTargetEngineCountAtStation(int stationId) const
 {
+    std::size_t targetEngineCount = getBaseReserveCountPerStation();
     for (const StationPressure &deficitStation : deficitStations)
     {
         if (deficitStation.stationId == stationId)
-            return getTargetEngineCountAtStation(deficitStation);
+        {
+            targetEngineCount = getTargetEngineCountAtStation(deficitStation);
+            break;
+        }
     }
-    return getBaseReserveCountPerStation();
+
+    if (passengerDispatcher != nullptr)
+    {
+        const std::size_t waitingPassengers =
+            passengerDispatcher->getQueueSizeAtStation(stationId);
+        targetEngineCount = std::min(
+            garage.getEngineCount(),
+            targetEngineCount + waitingPassengers);
+    }
+    return targetEngineCount;
 }
 
 std::size_t TrafficBalancer::getTargetEngineCountAtStation(const StationPressure &stationPressure) const

@@ -6,10 +6,15 @@
 #include <random>
 #include <vector>
 
+class PassengerDispatcher;
+
 class TrafficBalancer
 {
 public:
-    TrafficBalancer(const Topology &topology, Garage &garage, TrafficManager &trafficManager);
+    TrafficBalancer(const Topology &topology,
+                    Garage &garage,
+                    TrafficManager &trafficManager,
+                    const PassengerDispatcher *passengerDispatcher = nullptr);
 
     void tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds);
     double getSecondsUntilRebalance() const;
@@ -33,6 +38,7 @@ private:
     const Topology &topology;
     Garage &garage;
     TrafficManager &trafficManager;
+    const PassengerDispatcher *passengerDispatcher;
     std::mt19937 randomGenerator;
     std::vector<StationPressure> deficitStations;
     std::vector<StationPressure> surplusStations;

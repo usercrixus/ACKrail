@@ -8,6 +8,7 @@ TrafficSimulator::TrafficSimulator(const Topology &topology,
                                    const Garage &garage,
                                    TrafficManager &trafficManager,
                                    TrafficGenerator &trafficGenerator,
+                                   PassengerDispatcher &passengerDispatcher,
                                    TrafficBalancer &trafficBalancer,
                                    SimulationStatistics &statistics,
                                    QObject *parent)
@@ -16,6 +17,7 @@ TrafficSimulator::TrafficSimulator(const Topology &topology,
       garage(garage),
       trafficManager(trafficManager),
       trafficGenerator(trafficGenerator),
+      passengerDispatcher(passengerDispatcher),
       trafficBalancer(trafficBalancer),
       statistics(statistics)
 {
@@ -45,9 +47,10 @@ double TrafficSimulator::getCurrentSimulationTimeSeconds() const
 void TrafficSimulator::processScheduledWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
-    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
-    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
     trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
+    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
+    passengerDispatcher.dispatchWaitingPassengers(currentSimulationTimeSeconds);
+    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
     recordStationSnapshots(currentSimulationTimeSeconds);
     lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
     lastBalancerUpdateSeconds = currentSimulationTimeSeconds;
@@ -64,6 +67,9 @@ void TrafficSimulator::recordStationSnapshots(double currentSimulationTimeSecond
         const auto stationPool = garage.getIdleEnginesByStation().find(station.getId());
         const std::size_t idleEngineCount = stationPool == garage.getIdleEnginesByStation().end() ? 0 : stationPool->second.size();
         statistics.getStationStatistics().setTargetIdleEngines(station.getId(), static_cast<double>(trafficBalancer.getTargetEngineCountAtStation(station.getId())));
+        statistics.getStationStatistics().setWaitingPassengerCount(
+            station.getId(),
+            passengerDispatcher.getQueueSizeAtStation(station.getId()));
         statistics.getStationStatistics().recordSnapshot(station.getId(), static_cast<double>(idleEngineCount), currentSimulationTimeSeconds);
     }
     lastStationStatisticsUpdateSeconds = currentSimulationTimeSeconds;

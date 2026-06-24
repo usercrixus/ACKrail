@@ -61,6 +61,7 @@ StationStatisticsWidget::StationStatisticsWidget(const SimulationStatistics &sta
     arrivals = addValue(QStringLiteral("Trip arrivals"));
     netFlow = addValue(QStringLiteral("Net engine flow"));
     currentIdle = addValue(QStringLiteral("Current idle engines"));
+    waitingPassengers = addValue(QStringLiteral("Waiting passengers"));
     averageIdle = addValue(QStringLiteral("Average idle engines"));
     idleRange = addValue(QStringLiteral("Idle engine range"));
     targetIdle = addValue(QStringLiteral("Target idle engines"));
@@ -133,6 +134,7 @@ void StationStatisticsWidget::refresh()
     netFlow->setText(QString::number(static_cast<qlonglong>(report->arrivalCount)
                                     - static_cast<qlonglong>(report->departureCount)));
     currentIdle->setText(formatEngines(report->currentIdleEngines));
+    waitingPassengers->setText(formatCount(report->currentWaitingPassengers));
     averageIdle->setText(formatEngines(report->averageIdleEngines));
     idleRange->setText(QStringLiteral("%1 – %2")
                            .arg(formatEngines(report->minimumIdleEngines),
@@ -156,6 +158,7 @@ void StationStatisticsWidget::clearDetails()
     arrivals->setText(placeholder);
     netFlow->setText(placeholder);
     currentIdle->setText(placeholder);
+    waitingPassengers->setText(placeholder);
     averageIdle->setText(placeholder);
     idleRange->setText(placeholder);
     targetIdle->setText(placeholder);

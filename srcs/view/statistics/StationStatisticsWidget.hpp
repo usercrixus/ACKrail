@@ -24,6 +24,7 @@ private:
     QLabel *arrivals = nullptr;
     QLabel *netFlow = nullptr;
     QLabel *currentIdle = nullptr;
+    QLabel *waitingPassengers = nullptr;
     QLabel *averageIdle = nullptr;
     QLabel *idleRange = nullptr;
     QLabel *targetIdle = nullptr;

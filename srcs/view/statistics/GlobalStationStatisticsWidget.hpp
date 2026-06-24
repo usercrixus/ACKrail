@@ -17,6 +17,7 @@ private:
     QLabel *stationCount = nullptr;
     QLabel *currentIdle = nullptr;
     QLabel *targetIdle = nullptr;
+    QLabel *waitingPassengers = nullptr;
     QLabel *stationsWithoutIdle = nullptr;
     QLabel *departures = nullptr;
     QLabel *arrivals = nullptr;

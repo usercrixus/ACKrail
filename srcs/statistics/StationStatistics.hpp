@@ -12,6 +12,7 @@ public:
         int stationId = -1;
         double targetIdleEngines = 0.0;
         double currentIdleEngines = 0.0;
+        std::size_t currentWaitingPassengers = 0;
         double averageIdleEngines = 0.0;
         double minimumIdleEngines = 0.0;
         double maximumIdleEngines = 0.0;
@@ -30,6 +31,7 @@ public:
         std::size_t stationsWithoutIdleEngine = 0;
         std::size_t departureCount = 0;
         std::size_t arrivalCount = 0;
+        std::size_t currentWaitingPassengers = 0;
         double currentIdleEngines = 0.0;
         double targetIdleEngines = 0.0;
         double averageIdleEnginesPerStation = 0.0;
@@ -40,6 +42,7 @@ public:
     };
 
     void setTargetIdleEngines(int stationId, double targetIdleEngines);
+    void setWaitingPassengerCount(int stationId, std::size_t waitingPassengerCount);
     void recordSnapshot(int stationId, double idleEngines, double simulationTimeSeconds);
     void recordDeparture(int stationId);
     void recordArrival(int stationId);

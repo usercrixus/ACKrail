@@ -1,5 +1,6 @@
 #include "TrafficManager.hpp"
 #include "TrafficBalancer.hpp"
+#include "PassengerDispatcher.hpp"
 #include "../statistics/SimulationStatistics.hpp"
 
 #include <QTemporaryFile>
@@ -25,6 +26,65 @@ int main()
     assert(globalStationReport.targetIdleEngines == 3.0);
     assert(globalStationReport.departureCount == 1);
     assert(globalStationReport.arrivalCount == 1);
+
+    const Node queueStationA(1, QStringLiteral("Queue A"), 0.0, 0.0);
+    const Node queueStationB(2, QStringLiteral("Queue B"), 0.0, 0.00001);
+    Topology queueTopology(
+        {queueStationA, queueStationB},
+        {Link(1,
+              queueStationA,
+              queueStationB,
+              QStringLiteral("Queue"),
+              QStringLiteral("#000000"))});
+    Garage queueGarage(1);
+    SimulationStatistics queueStatistics;
+    TrafficManager queueManager(queueTopology, queueGarage, queueStatistics);
+    PassengerDispatcher queueDispatcher(queueGarage, queueManager);
+    Engine &queuedEngine = *queueGarage.getIdleEngine();
+    queueGarage.setIdleEngineParkingStation(queuedEngine, queueStationB.getId());
+    queueDispatcher.enqueue(queueStationA.getId(), queueStationB.getId(), 2.0);
+    queueDispatcher.dispatchWaitingPassengers(5.0);
+    assert(queueDispatcher.getQueueSizeAtStation(queueStationA.getId()) == 1);
+    assert(queueDispatcher.getTotalQueueSize() == 1);
+    assert(queueDispatcher.getOldestWaitSecondsAtStation(queueStationA.getId(), 5.0) == 3.0);
+    queueGarage.setIdleEngineParkingStation(queuedEngine, queueStationA.getId());
+    queueDispatcher.dispatchWaitingPassengers(6.0);
+    assert(queueDispatcher.getQueueSizeAtStation(queueStationA.getId()) == 0);
+    assert(queueDispatcher.getTotalQueueSize() == 0);
+    assert(queueGarage.getActiveEngineCount() == 1);
+
+    const Node queueBalanceStationA(1, QStringLiteral("Queue balance A"), 0.0, 0.0);
+    const Node queueBalanceStationB(2, QStringLiteral("Queue balance B"), 0.0, 0.00001);
+    Topology queueBalanceTopology(
+        {queueBalanceStationA, queueBalanceStationB},
+        {Link(1,
+              queueBalanceStationA,
+              queueBalanceStationB,
+              QStringLiteral("Queue balance"),
+              QStringLiteral("#000000"))});
+    Garage queueBalanceGarage(4);
+    SimulationStatistics queueBalanceStatistics;
+    TrafficManager queueBalanceManager(
+        queueBalanceTopology, queueBalanceGarage, queueBalanceStatistics);
+    PassengerDispatcher queueBalanceDispatcher(queueBalanceGarage, queueBalanceManager);
+    TrafficBalancer queueBalanceBalancer(
+        queueBalanceTopology,
+        queueBalanceGarage,
+        queueBalanceManager,
+        &queueBalanceDispatcher);
+    for (Engine *engine : queueBalanceGarage.getIdleEngines())
+        queueBalanceGarage.setIdleEngineParkingStation(
+            *engine, queueBalanceStationB.getId());
+    queueBalanceDispatcher.enqueue(
+        queueBalanceStationA.getId(), queueBalanceStationB.getId(), 0.0);
+    queueBalanceDispatcher.enqueue(
+        queueBalanceStationA.getId(), queueBalanceStationB.getId(), 0.0);
+    queueBalanceBalancer.tryRebalance(5.0, 5.0);
+    assert(queueBalanceGarage.getActiveEngineCount() == 3);
+    assert(queueBalanceGarage.getIdleEnginesByStation()
+               .at(queueBalanceStationB.getId())
+               .size()
+           == 1);
 
     NodeController controller(1);
     controller.reserveEntry(1, 7, 0, 2.0, 3.0);

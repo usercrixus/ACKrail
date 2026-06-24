@@ -9,6 +9,12 @@ void StationStatistics::setTargetIdleEngines(int stationId, double targetIdleEng
     report.report.targetIdleEngines = std::max(0.0, targetIdleEngines);
 }
 
+void StationStatistics::setWaitingPassengerCount(int stationId, std::size_t waitingPassengerCount)
+{
+    MutableStationReport &report = getOrCreateReport(stationId);
+    report.report.currentWaitingPassengers = waitingPassengerCount;
+}
+
 void StationStatistics::recordSnapshot(int stationId, double idleEngines, double simulationTimeSeconds)
 {
     MutableStationReport &report = getOrCreateReport(stationId);
@@ -64,6 +70,7 @@ StationStatistics::GlobalReport StationStatistics::getGlobalReport() const
     {
         const StationReport &station = entry.second.report;
         global.currentIdleEngines += station.currentIdleEngines;
+        global.currentWaitingPassengers += station.currentWaitingPassengers;
         global.targetIdleEngines += station.targetIdleEngines;
         global.averageIdleEnginesPerStation += station.averageIdleEngines;
         global.averageTargetGap += station.averageTargetGap;
