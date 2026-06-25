@@ -18,7 +18,10 @@ std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contrac
     Route *route = dijkstra.findRoute(fromStationId, toStationId, currentSimulationTimeSeconds, engine.getPad().getMaximumSpeedKilometersPerHour(), entrySeparationSeconds);
     if (route == nullptr)
         return std::nullopt;
-    return contractRouteTiming(engine, route, currentSimulationTimeSeconds, travelType);
+    std::optional<ContractedRoute> contractedRoute = contractRouteTiming(engine, route, currentSimulationTimeSeconds, travelType);
+    if (contractedRoute.has_value())
+        routeDispatches.push_back({fromStationId, travelType});
+    return contractedRoute;
 }
 
 std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
@@ -30,7 +33,10 @@ std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contrac
     Route *route = staticRouteCostMatrix.findRoute(fromStationId, toStationId, currentSimulationTimeSeconds, engine.getPad().getMaximumSpeedKilometersPerHour(), entrySeparationSeconds);
     if (route == nullptr)
         return std::nullopt;
-    return contractRouteTiming(engine, route, currentSimulationTimeSeconds, travelType);
+    std::optional<ContractedRoute> contractedRoute = contractRouteTiming(engine, route, currentSimulationTimeSeconds, travelType);
+    if (contractedRoute.has_value())
+        routeDispatches.push_back({fromStationId, travelType});
+    return contractedRoute;
 }
 
 std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractRouteTiming(Engine &engine, Route *route, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
@@ -57,4 +63,9 @@ std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contrac
 double TrafficRouteManager::getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const
 {
     return staticRouteCostMatrix.getDistanceKilometers(fromStationId, toStationId);
+}
+
+const std::vector<TrafficRouteManager::RouteDispatch> &TrafficRouteManager::getRouteDispatches() const
+{
+    return routeDispatches;
 }

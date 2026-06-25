@@ -46,7 +46,6 @@ private:
         int engineId;
         std::size_t contractStep;
     };
-
     int nodeId;
     std::size_t expectedArrivalCount = 0;
     std::unordered_map<int, std::vector<Reservation>> reservationsByLinkId;

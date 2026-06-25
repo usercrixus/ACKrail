@@ -5,7 +5,6 @@
 #include "TrafficRouteManager.hpp"
 #include "../topology/Topology.hpp"
 #include <optional>
-#include <vector>
 
 /**
  * Advances and manages engine simulation.
@@ -13,11 +12,7 @@
 class TrafficManager
 {
 public:
-    struct RouteDispatch
-    {
-        int fromStationId;
-        EnginePad::TravelType travelType;
-    };
+    using RouteDispatch = TrafficRouteManager::RouteDispatch;
 
     /**
      * Creates a traffic manager for a garage.
@@ -43,10 +38,7 @@ public:
     const std::vector<CompletedTrip> &getCompletedTrips() const;
 
 private:
-    void recordRouteDispatch(int fromStationId, EnginePad::TravelType travelType);
-
     Garage &garage;
     TrafficRouteManager routeManager;
     TrafficEventManager eventManager;
-    std::vector<RouteDispatch> routeDispatches;
 };

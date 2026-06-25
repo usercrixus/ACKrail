@@ -17,7 +17,6 @@ bool TrafficManager::contractOptimizedRoute(Engine &engine, int fromStationId, i
     contractedRoute->route->getStations().back()->getController().addExpectedArrival();
     garage.activateEngine(&engine);
     eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
-    recordRouteDispatch(fromStationId, travelType);
     return true;
 }
 
@@ -31,7 +30,6 @@ bool TrafficManager::contractPrecomputedRoute(Engine &engine, int fromStationId,
     contractedRoute->route->getStations().back()->getController().addExpectedArrival();
     garage.activateEngine(&engine);
     eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
-    recordRouteDispatch(fromStationId, travelType);
     return true;
 }
 
@@ -52,15 +50,10 @@ std::optional<double> TrafficManager::getNextEventTimeSeconds() const
 
 const std::vector<TrafficManager::RouteDispatch> &TrafficManager::getRouteDispatches() const
 {
-    return routeDispatches;
+    return routeManager.getRouteDispatches();
 }
 
 const std::vector<CompletedTrip> &TrafficManager::getCompletedTrips() const
 {
     return eventManager.getCompletedTrips();
-}
-
-void TrafficManager::recordRouteDispatch(int fromStationId, EnginePad::TravelType travelType)
-{
-    routeDispatches.push_back({fromStationId, travelType});
 }

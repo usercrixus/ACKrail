@@ -72,14 +72,7 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
         double waitSeconds = 0.0;
         for (const Route::ContractStep &step : route->getContract())
             waitSeconds += step.waitSeconds;
-        completedTrips.push_back({
-            engine.getId(),
-            stations.back()->getId(),
-            pad.getTravelType(),
-            route->getTotalDistanceKilometers(),
-            pad.getTotalTrajectorySeconds(),
-            waitSeconds
-        });
+        completedTrips.push_back({engine.getId(), stations.back()->getId(), pad.getTravelType(), route->getTotalDistanceKilometers(), pad.getTotalTrajectorySeconds(), waitSeconds});
         stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
         return;

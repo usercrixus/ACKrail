@@ -11,7 +11,6 @@ class TrafficEventManager
 {
 public:
     explicit TrafficEventManager(Garage &garage);
-
     void scheduleRouteEvents(const Engine &engine, const Route &route, double departureTimeSeconds);
     void processCurrentEvents(double currentSimulationTimeSeconds);
     std::optional<double> getNextEventTimeSeconds() const;

@@ -16,12 +16,9 @@ public:
         int toStationId;
         double createdAtSeconds;
     };
-
     PassengerDispatcher(Garage &garage, TrafficManager &trafficManager);
-
     void enqueue(int fromStationId, int toStationId, double currentSimulationTimeSeconds);
     void dispatchWaitingPassengers(double currentSimulationTimeSeconds);
-
     std::size_t getQueueSizeAtStation(int stationId) const;
     std::size_t getTotalQueueSize() const;
     double getOldestWaitSecondsAtStation(int stationId, double currentSimulationTimeSeconds) const;
