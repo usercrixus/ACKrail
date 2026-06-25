@@ -46,7 +46,7 @@ void StationStatistics::recordArrival(int stationId)
     ++totalArrivalCount;
 }
 
-const StationStatistics::StationReport *StationStatistics::findStationReport(int stationId) const
+const StationReport *StationStatistics::findStationReport(int stationId) const
 {
     const auto report = reportsByStationId.find(stationId);
     if (report == reportsByStationId.end())
@@ -59,9 +59,9 @@ std::size_t StationStatistics::getTotalMovementCount() const
     return totalMovementCount;
 }
 
-StationStatistics::GlobalReport StationStatistics::getGlobalReport() const
+StationsGlobalReport StationStatistics::getGlobalReport() const
 {
-    GlobalReport global;
+    StationsGlobalReport global;
     global.stationCount = reportsByStationId.size();
     global.departureCount = totalDepartureCount;
     global.arrivalCount = totalArrivalCount;
@@ -160,7 +160,7 @@ void StationStatistics::closeInterval(MutableStationReport &report, double simul
         report.report.timeAboveTargetSeconds += elapsedSeconds;
 }
 
-StationStatistics::StationReport StationStatistics::buildReport(const MutableStationReport &report) const
+StationReport StationStatistics::buildReport(const MutableStationReport &report) const
 {
     StationReport stationReport = report.report;
     stationReport.averageIdleEngines = report.idleEngineSummary.getAverage();

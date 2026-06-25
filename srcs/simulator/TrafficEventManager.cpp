@@ -34,7 +34,7 @@ std::optional<double> TrafficEventManager::getNextEventTimeSeconds() const
     return events.top().timeSeconds;
 }
 
-const std::vector<TrafficEventManager::CompletedTrip> &TrafficEventManager::getCompletedTrips() const
+const std::vector<CompletedTrip> &TrafficEventManager::getCompletedTrips() const
 {
     return completedTrips;
 }

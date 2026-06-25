@@ -1,28 +1,14 @@
 #pragma once
 
 #include "../garage/engine/EnginePad.hpp"
-#include "NumericSummary.hpp"
+#include "helper/EngineReport.hpp"
+#include "helper/NumericSummary.hpp"
 #include <cstddef>
 #include <unordered_map>
 
 class EngineStatistics
 {
 public:
-    struct EngineReport
-    {
-        int engineId = -1;
-        std::size_t tripCount = 0;
-        double passengerDistanceKilometers = 0.0;
-        double rebalancingDistanceKilometers = 0.0;
-        double totalDistanceKilometers = 0.0;
-        double passengerTimeSeconds = 0.0;
-        double rebalancingTimeSeconds = 0.0;
-        double totalTravelTimeSeconds = 0.0;
-        double totalWaitSeconds = 0.0;
-        double averageWaitSeconds = 0.0;
-        double maximumWaitSeconds = 0.0;
-    };
-
     void recordTrip(int engineId, EnginePad::TravelType travelType, double distanceKilometers, double travelTimeSeconds, double waitSeconds);
 
     const EngineReport *findEngineReport(int engineId) const;

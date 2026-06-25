@@ -2,6 +2,7 @@
 
 #include "../algorithm/Route.hpp"
 #include "../garage/Garage.hpp"
+#include "../statistics/helper/CompletedTrip.hpp"
 #include <optional>
 #include <queue>
 #include <vector>
@@ -9,16 +10,6 @@
 class TrafficEventManager
 {
 public:
-    struct CompletedTrip
-    {
-        int engineId;
-        int destinationStationId;
-        EnginePad::TravelType travelType;
-        double distanceKilometers;
-        double travelTimeSeconds;
-        double waitSeconds;
-    };
-
     explicit TrafficEventManager(Garage &garage);
 
     void scheduleRouteEvents(const Engine &engine, const Route &route, double departureTimeSeconds);

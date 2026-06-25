@@ -5,6 +5,7 @@
 #include "../simulator/TrafficBalancer.hpp"
 #include "../simulator/TrafficManager.hpp"
 #include "../topology/Topology.hpp"
+#include "helper/CompletedTrip.hpp"
 
 SimulationStatisticsCollector::SimulationStatisticsCollector(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, const PassengerDispatcher &passengerDispatcher, const TrafficBalancer &trafficBalancer)
     : topology(topology),
@@ -36,15 +37,14 @@ void SimulationStatisticsCollector::collectEvents()
     const auto &routeDispatches = trafficManager.getRouteDispatches();
     while (collectedRouteDispatchCount < routeDispatches.size())
     {
-        statistics.getStationStatistics().recordDeparture(
-            routeDispatches[collectedRouteDispatchCount].fromStationId);
+        statistics.getStationStatistics().recordDeparture(routeDispatches[collectedRouteDispatchCount].fromStationId);
         ++collectedRouteDispatchCount;
     }
 
     const auto &completedTrips = trafficManager.getCompletedTrips();
     while (collectedCompletedTripCount < completedTrips.size())
     {
-        const TrafficEventManager::CompletedTrip &trip =
+        const CompletedTrip &trip =
             completedTrips[collectedCompletedTripCount];
         statistics.getEngineStatistics().recordTrip(
             trip.engineId,

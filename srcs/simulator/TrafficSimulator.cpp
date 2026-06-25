@@ -5,11 +5,7 @@
 #include <cmath>
 #include <utility>
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager,
-                                   TrafficGenerator &trafficGenerator,
-                                   PassengerDispatcher &passengerDispatcher,
-                                   TrafficBalancer &trafficBalancer,
-                                   QObject *parent)
+TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, PassengerDispatcher &passengerDispatcher, TrafficBalancer &trafficBalancer, QObject *parent)
     : QObject(parent),
       trafficManager(trafficManager),
       trafficGenerator(trafficGenerator),

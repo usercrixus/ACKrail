@@ -15,11 +15,11 @@ int main()
     stationStatistics.recordSnapshot(1, 4.0, 10.0);
     stationStatistics.recordDeparture(1);
     stationStatistics.recordArrival(1);
-    const StationStatistics::StationReport *stationReport =
+    const StationReport *stationReport =
         stationStatistics.findStationReport(1);
     assert(stationReport != nullptr);
     assert(stationReport->currentIdleEngines == 4.0);
-    const StationStatistics::GlobalReport globalStationReport =
+    const StationsGlobalReport globalStationReport =
         stationStatistics.getGlobalReport();
     assert(globalStationReport.stationCount == 1);
     assert(globalStationReport.currentIdleEngines == 4.0);
@@ -218,7 +218,7 @@ int main()
     completionStatisticsCollector.update(completionSimulationTimeSeconds);
     const SimulationStatistics &completionStatistics =
         completionStatisticsCollector.getStatistics();
-    const StationStatistics::StationReport *departureReport =
+    const StationReport *departureReport =
         completionStatistics.getStationStatistics().findStationReport(completionStationA.getId());
     assert(departureReport != nullptr);
     assert(departureReport->departureCount == 1);
@@ -243,7 +243,7 @@ int main()
     assert(completionGarage.getActiveEngineCount() == 0);
     assert(completionGarage.getIdleEnginesByStation().at(completionStationB.getId()).size() == 1);
     assert(completionStatistics.getEngineStatistics().getPassengerTripCount() == 1);
-    const StationStatistics::StationReport *arrivalReport =
+    const StationReport *arrivalReport =
         completionStatistics.getStationStatistics().findStationReport(completionStationB.getId());
     assert(arrivalReport != nullptr);
     assert(arrivalReport->departureCount == 0);

@@ -1,46 +1,14 @@
 #pragma once
 
-#include "NumericSummary.hpp"
+#include "helper/NumericSummary.hpp"
+#include "helper/StationReport.hpp"
+#include "helper/StationsGlobalReport.hpp"
 #include <cstddef>
 #include <unordered_map>
 
 class StationStatistics
 {
 public:
-    struct StationReport
-    {
-        int stationId = -1;
-        double targetIdleEngines = 0.0;
-        double currentIdleEngines = 0.0;
-        std::size_t currentWaitingPassengers = 0;
-        double averageIdleEngines = 0.0;
-        double minimumIdleEngines = 0.0;
-        double maximumIdleEngines = 0.0;
-        double timeWithNoIdleEngineSeconds = 0.0;
-        double timeBelowTargetSeconds = 0.0;
-        double timeAboveTargetSeconds = 0.0;
-        double averageTargetGap = 0.0;
-        double observedTimeSeconds = 0.0;
-        std::size_t departureCount = 0;
-        std::size_t arrivalCount = 0;
-    };
-
-    struct GlobalReport
-    {
-        std::size_t stationCount = 0;
-        std::size_t stationsWithoutIdleEngine = 0;
-        std::size_t departureCount = 0;
-        std::size_t arrivalCount = 0;
-        std::size_t currentWaitingPassengers = 0;
-        double currentIdleEngines = 0.0;
-        double targetIdleEngines = 0.0;
-        double averageIdleEnginesPerStation = 0.0;
-        double averageTargetGap = 0.0;
-        double observedStationTimeSeconds = 0.0;
-        double timeWithNoIdleEngineSeconds = 0.0;
-        double timeBelowTargetSeconds = 0.0;
-    };
-
     void setTargetIdleEngines(int stationId, double targetIdleEngines);
     void setWaitingPassengerCount(int stationId, std::size_t waitingPassengerCount);
     void recordSnapshot(int stationId, double idleEngines, double simulationTimeSeconds);
@@ -48,7 +16,7 @@ public:
     void recordArrival(int stationId);
     const StationReport *findStationReport(int stationId) const;
     std::size_t getTotalMovementCount() const;
-    GlobalReport getGlobalReport() const;
+    StationsGlobalReport getGlobalReport() const;
 
     NumericSummary getAverageIdleEngineSummary() const;
     NumericSummary getTargetGapSummary() const;

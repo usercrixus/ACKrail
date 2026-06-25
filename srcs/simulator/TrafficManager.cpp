@@ -11,7 +11,7 @@ bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStat
 {
     if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
-    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
+    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractOptimizedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
     if (!contractedRoute.has_value())
         return false;
     contractedRoute->route->getStations().back()->getController().addExpectedArrival();
@@ -55,7 +55,7 @@ const std::vector<TrafficManager::RouteDispatch> &TrafficManager::getRouteDispat
     return routeDispatches;
 }
 
-const std::vector<TrafficEventManager::CompletedTrip> &TrafficManager::getCompletedTrips() const
+const std::vector<CompletedTrip> &TrafficManager::getCompletedTrips() const
 {
     return eventManager.getCompletedTrips();
 }

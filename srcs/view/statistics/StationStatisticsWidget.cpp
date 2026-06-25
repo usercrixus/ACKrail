@@ -121,7 +121,7 @@ void StationStatisticsWidget::refresh()
         return;
 
     const StationStatistics &stationStatistics = statistics.getStationStatistics();
-    const StationStatistics::StationReport *report =
+    const StationReport *report =
         stationStatistics.findStationReport(selectedStationId);
     if (report == nullptr)
     {

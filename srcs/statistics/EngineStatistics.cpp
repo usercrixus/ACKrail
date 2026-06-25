@@ -31,7 +31,7 @@ void EngineStatistics::recordTrip(int engineId, EnginePad::TravelType travelType
     report.averageWaitSeconds = report.totalWaitSeconds / static_cast<double>(report.tripCount);
 }
 
-const EngineStatistics::EngineReport *EngineStatistics::findEngineReport(int engineId) const
+const EngineReport *EngineStatistics::findEngineReport(int engineId) const
 {
     const auto report = reportsByEngineId.find(engineId);
     return report == reportsByEngineId.end() ? nullptr : &report->second;

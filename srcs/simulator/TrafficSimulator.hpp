@@ -11,11 +11,7 @@
 class TrafficSimulator : public QObject
 {
 public:
-    TrafficSimulator(TrafficManager &trafficManager,
-                     TrafficGenerator &trafficGenerator,
-                     PassengerDispatcher &passengerDispatcher,
-                     TrafficBalancer &trafficBalancer,
-                     QObject *parent = nullptr);
+    TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, PassengerDispatcher &passengerDispatcher, TrafficBalancer &trafficBalancer, QObject *parent = nullptr);
     void start();
     double getCurrentSimulationTimeSeconds() const;
     void setUpdateObserver(std::function<void(double)> observer);

@@ -40,7 +40,7 @@ public:
     /** @return Time of the next scheduled event, or empty when none exists. */
     std::optional<double> getNextEventTimeSeconds() const;
     const std::vector<RouteDispatch> &getRouteDispatches() const;
-    const std::vector<TrafficEventManager::CompletedTrip> &getCompletedTrips() const;
+    const std::vector<CompletedTrip> &getCompletedTrips() const;
 
 private:
     void recordRouteDispatch(int fromStationId, EnginePad::TravelType travelType);

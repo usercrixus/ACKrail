@@ -61,7 +61,7 @@ GlobalStationStatisticsWidget::GlobalStationStatisticsWidget(
 
 void GlobalStationStatisticsWidget::refresh()
 {
-    const StationStatistics::GlobalReport report =
+    const StationsGlobalReport report =
         statistics.getStationStatistics().getGlobalReport();
 
     stationCount->setText(formatCount(report.stationCount));

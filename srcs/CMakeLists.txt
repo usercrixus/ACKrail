@@ -51,8 +51,12 @@ qt_add_executable(ackrail
     simulator/TrafficSimulator.hpp
     statistics/EngineStatistics.cpp
     statistics/EngineStatistics.hpp
-    statistics/NumericSummary.cpp
-    statistics/NumericSummary.hpp
+    statistics/helper/CompletedTrip.hpp
+    statistics/helper/EngineReport.hpp
+    statistics/helper/NumericSummary.cpp
+    statistics/helper/NumericSummary.hpp
+    statistics/helper/StationReport.hpp
+    statistics/helper/StationsGlobalReport.hpp
     statistics/SimulationStatistics.cpp
     statistics/SimulationStatistics.hpp
     statistics/SimulationStatisticsCollector.cpp
@@ -233,8 +237,12 @@ if(BUILD_TESTING)
         simulator/TrafficManagerTest.cpp
         statistics/EngineStatistics.cpp
         statistics/EngineStatistics.hpp
-        statistics/NumericSummary.cpp
-        statistics/NumericSummary.hpp
+        statistics/helper/CompletedTrip.hpp
+        statistics/helper/EngineReport.hpp
+        statistics/helper/NumericSummary.cpp
+        statistics/helper/NumericSummary.hpp
+        statistics/helper/StationReport.hpp
+        statistics/helper/StationsGlobalReport.hpp
         statistics/SimulationStatistics.cpp
         statistics/SimulationStatistics.hpp
         statistics/SimulationStatisticsCollector.cpp

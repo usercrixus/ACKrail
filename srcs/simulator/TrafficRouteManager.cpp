@@ -9,7 +9,7 @@ TrafficRouteManager::TrafficRouteManager(Topology &topology)
 {
 }
 
-std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
+std::optional<TrafficRouteManager::ContractedRoute> TrafficRouteManager::contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
     if (engine.getPad().isActive())
         return std::nullopt;
