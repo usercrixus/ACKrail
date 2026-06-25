@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../garage/Garage.hpp"
-#include "TrafficManager.hpp"
+#include "TrafficOperations.hpp"
 
 #include <cstddef>
 #include <deque>
 #include <unordered_map>
 
-class PassengerDispatcher
+class TrafficManager;
+
+class TrafficPassenger
 {
 public:
     struct PassengerRequest
@@ -16,7 +18,8 @@ public:
         int toStationId;
         double createdAtSeconds;
     };
-    PassengerDispatcher(Garage &garage, TrafficManager &trafficManager);
+    TrafficPassenger(Garage &garage, TrafficOperations &trafficOperations);
+    TrafficPassenger(Garage &garage, TrafficManager &trafficManager);
     void enqueue(int fromStationId, int toStationId, double currentSimulationTimeSeconds);
     void dispatchWaitingPassengers(double currentSimulationTimeSeconds);
     std::size_t getQueueSizeAtStation(int stationId) const;
@@ -25,7 +28,7 @@ public:
 
 private:
     Garage &garage;
-    TrafficManager &trafficManager;
+    TrafficOperations &trafficOperations;
     std::unordered_map<int, std::deque<PassengerRequest>> queuesByStationId;
     std::size_t totalQueueSize = 0;
 };

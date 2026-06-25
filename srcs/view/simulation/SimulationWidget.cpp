@@ -4,10 +4,9 @@
 SimulationWidget::SimulationWidget(const Topology &topology,
                                    const Garage &garage,
                                    const TrafficManager &trafficManager,
-                                   const TrafficBalancer &trafficBalancer,
                                    QWidget *parent)
     : QWidget(parent),
-      headerWidget(new HeaderWidget(topology, garage, trafficBalancer, this)),
+      headerWidget(new HeaderWidget(topology, garage, trafficManager.getTrafficBalancer(), this)),
       mapWidget(new MapWidget(topology, garage, trafficManager, this))
 {
     setWindowTitle(QStringLiteral("ACKrail"));

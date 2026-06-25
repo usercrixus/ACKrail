@@ -1,6 +1,6 @@
 #include "TrafficManager.hpp"
 #include "TrafficBalancer.hpp"
-#include "PassengerDispatcher.hpp"
+#include "TrafficPassenger.hpp"
 #include "../statistics/SimulationStatisticsCollector.hpp"
 
 #include <QTemporaryFile>
@@ -38,7 +38,7 @@ int main()
               QStringLiteral("#000000"))});
     Garage queueGarage(1);
     TrafficManager queueManager(queueTopology, queueGarage);
-    PassengerDispatcher queueDispatcher(queueGarage, queueManager);
+    TrafficPassenger queueDispatcher(queueGarage, queueManager);
     Engine &queuedEngine = *queueGarage.getIdleEngine();
     queueGarage.setIdleEngineParkingStation(queuedEngine, queueStationB.getId());
     queueDispatcher.enqueue(queueStationA.getId(), queueStationB.getId(), 2.0);
@@ -63,12 +63,12 @@ int main()
               QStringLiteral("#000000"))});
     Garage queueBalanceGarage(4);
     TrafficManager queueBalanceManager(queueBalanceTopology, queueBalanceGarage);
-    PassengerDispatcher queueBalanceDispatcher(queueBalanceGarage, queueBalanceManager);
+    TrafficPassenger queueBalanceDispatcher(queueBalanceGarage, queueBalanceManager);
     TrafficBalancer queueBalanceBalancer(
         queueBalanceTopology,
         queueBalanceGarage,
         queueBalanceManager,
-        &queueBalanceDispatcher);
+        queueBalanceDispatcher);
     for (Engine *engine : queueBalanceGarage.getIdleEngines())
         queueBalanceGarage.setIdleEngineParkingStation(
             *engine, queueBalanceStationB.getId());
@@ -198,18 +198,10 @@ int main()
         {Link(1, completionStationA, completionStationB, QStringLiteral("Direct"), QStringLiteral("#000000"))});
     Garage completionGarage(1);
     TrafficManager completionManager(completionTopology, completionGarage);
-    PassengerDispatcher completionDispatcher(completionGarage, completionManager);
-    TrafficBalancer completionBalancer(
-        completionTopology,
-        completionGarage,
-        completionManager,
-        &completionDispatcher);
     SimulationStatisticsCollector completionStatisticsCollector(
         completionTopology,
         completionGarage,
-        completionManager,
-        completionDispatcher,
-        completionBalancer);
+        completionManager);
     double completionSimulationTimeSeconds = 0.0;
     Engine &completionEngine = *completionGarage.getIdleEngine();
     completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
@@ -270,7 +262,8 @@ int main()
     assert(balanceTopology.loadWeights(balanceFile.fileName()));
     Garage balanceGarage(8);
     TrafficManager balanceManager(balanceTopology, balanceGarage);
-    TrafficBalancer balanceBalancer(balanceTopology, balanceGarage, balanceManager);
+    TrafficPassenger balancePassenger(balanceGarage, balanceManager);
+    TrafficBalancer balanceBalancer(balanceTopology, balanceGarage, balanceManager, balancePassenger);
     for (Engine *engine : balanceGarage.getIdleEngines())
         balanceGarage.setIdleEngineParkingStation(*engine, balanceStationA.getId());
     assert(balanceGarage.getIdleEnginesByStation().at(balanceStationA.getId()).size() == 8);
@@ -303,7 +296,8 @@ int main()
     assert(weightedTopology.loadWeights(weightedFile.fileName()));
     Garage weightedGarage(70);
     TrafficManager weightedManager(weightedTopology, weightedGarage);
-    TrafficBalancer weightedBalancer(weightedTopology, weightedGarage, weightedManager);
+    TrafficPassenger weightedPassenger(weightedGarage, weightedManager);
+    TrafficBalancer weightedBalancer(weightedTopology, weightedGarage, weightedManager, weightedPassenger);
     int weightedIndex = 0;
     for (Engine *engine : weightedGarage.getIdleEngines())
     {

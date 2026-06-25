@@ -5,12 +5,9 @@
 #include <cmath>
 #include <utility>
 
-TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, TrafficGenerator &trafficGenerator, PassengerDispatcher &passengerDispatcher, TrafficBalancer &trafficBalancer, QObject *parent)
+TrafficSimulator::TrafficSimulator(TrafficManager &trafficManager, QObject *parent)
     : QObject(parent),
-      trafficManager(trafficManager),
-      trafficGenerator(trafficGenerator),
-      passengerDispatcher(passengerDispatcher),
-      trafficBalancer(trafficBalancer)
+      trafficManager(trafficManager)
 {
 }
 
@@ -19,10 +16,9 @@ void TrafficSimulator::start()
     if (started)
         return;
     started = true;
-    lastGeneratorUpdateSeconds = 0.0;
-    lastBalancerUpdateSeconds = 0.0;
+    lastUpdateSeconds = 0.0;
     simulationClock.start();
-    trafficManager.processCurrentEvents(0.0);
+    trafficManager.update(0.0, 0.0);
     if (updateObserver)
         updateObserver(0.0);
     scheduleNextWork();
@@ -43,24 +39,17 @@ void TrafficSimulator::setUpdateObserver(std::function<void(double)> observer)
 void TrafficSimulator::processScheduledWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
-    trafficManager.processCurrentEvents(currentSimulationTimeSeconds);
-    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastGeneratorUpdateSeconds);
-    passengerDispatcher.dispatchWaitingPassengers(currentSimulationTimeSeconds);
-    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastBalancerUpdateSeconds);
+    trafficManager.update(currentSimulationTimeSeconds, currentSimulationTimeSeconds - lastUpdateSeconds);
     if (updateObserver)
         updateObserver(currentSimulationTimeSeconds);
-    lastGeneratorUpdateSeconds = currentSimulationTimeSeconds;
-    lastBalancerUpdateSeconds = currentSimulationTimeSeconds;
+    lastUpdateSeconds = currentSimulationTimeSeconds;
     scheduleNextWork();
 }
 
 void TrafficSimulator::scheduleNextWork()
 {
     const double currentSimulationTimeSeconds = getCurrentSimulationTimeSeconds();
-    double delaySeconds = std::min(trafficGenerator.getSecondsUntilDispatch(), trafficBalancer.getSecondsUntilRebalance());
-    const std::optional<double> nextEventTimeSeconds = trafficManager.getNextEventTimeSeconds();
-    if (nextEventTimeSeconds.has_value())
-        delaySeconds = std::min(delaySeconds, std::max(0.0, *nextEventTimeSeconds - currentSimulationTimeSeconds));
+    const double delaySeconds = trafficManager.getSecondsUntilNextWork(currentSimulationTimeSeconds);
     const int delayMilliseconds = std::max(0, static_cast<int>(std::ceil(delaySeconds * 1000.0)));
     QTimer::singleShot(delayMilliseconds, this, [this]()
                        { processScheduledWork(); });

@@ -1,18 +1,14 @@
 #include "SimulationStatisticsCollector.hpp"
 
 #include "../garage/Garage.hpp"
-#include "../simulator/PassengerDispatcher.hpp"
-#include "../simulator/TrafficBalancer.hpp"
 #include "../simulator/TrafficManager.hpp"
 #include "../topology/Topology.hpp"
 #include "helper/CompletedTrip.hpp"
 
-SimulationStatisticsCollector::SimulationStatisticsCollector(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, const PassengerDispatcher &passengerDispatcher, const TrafficBalancer &trafficBalancer)
+SimulationStatisticsCollector::SimulationStatisticsCollector(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager)
     : topology(topology),
       garage(garage),
-      trafficManager(trafficManager),
-      passengerDispatcher(passengerDispatcher),
-      trafficBalancer(trafficBalancer)
+      trafficManager(trafficManager)
 {
 }
 
@@ -71,10 +67,10 @@ void SimulationStatisticsCollector::collectStationSnapshots(
         stationStatistics.setTargetIdleEngines(
             stationId,
             static_cast<double>(
-                trafficBalancer.getTargetEngineCountAtStation(stationId)));
+                trafficManager.getTrafficBalancer().getTargetEngineCountAtStation(stationId)));
         stationStatistics.setWaitingPassengerCount(
             stationId,
-            passengerDispatcher.getQueueSizeAtStation(stationId));
+            trafficManager.getTrafficPassenger().getQueueSizeAtStation(stationId));
         stationStatistics.recordSnapshot(
             stationId,
             static_cast<double>(garage.getIdleEngineCountAtStation(stationId)),

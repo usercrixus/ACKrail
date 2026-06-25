@@ -2,7 +2,7 @@
 
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
-#include "PassengerDispatcher.hpp"
+#include "TrafficPassenger.hpp"
 #include <random>
 
 class TrafficGenerator
@@ -14,7 +14,10 @@ public:
      * @param topology Network used to generate trips and routes.
      * @param garage Garage that owns engines used for generated trips.
      */
-    TrafficGenerator(const Topology &topology, Garage &garage, PassengerDispatcher &passengerDispatcher);
+    TrafficGenerator(const Topology &topology, Garage &garage, TrafficPassenger &trafficPassenger);
+
+    /** Assigns initial parking stations to engines that do not have one. */
+    void initialize();
 
     /**
      * Advances the generation schedule and dispatches traffic when due.
@@ -42,9 +45,10 @@ private:
 
     const Topology &topology;
     Garage &garage;
-    PassengerDispatcher &passengerDispatcher;
+    TrafficPassenger &trafficPassenger;
     std::mt19937 randomGenerator;
     std::discrete_distribution<int> arrivalStationDistribution;
     std::discrete_distribution<int> departureStationDistribution;
     double secondsUntilDispatch = 0.10;
+    bool initialized = false;
 };

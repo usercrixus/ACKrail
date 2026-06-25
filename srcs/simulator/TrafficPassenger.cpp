@@ -1,14 +1,20 @@
-#include "PassengerDispatcher.hpp"
+#include "TrafficPassenger.hpp"
+#include "TrafficManager.hpp"
 
 #include <algorithm>
 
-PassengerDispatcher::PassengerDispatcher(Garage &garage, TrafficManager &trafficManager)
+TrafficPassenger::TrafficPassenger(Garage &garage, TrafficOperations &trafficOperations)
     : garage(garage),
-      trafficManager(trafficManager)
+      trafficOperations(trafficOperations)
 {
 }
 
-void PassengerDispatcher::enqueue(int fromStationId, int toStationId, double currentSimulationTimeSeconds)
+TrafficPassenger::TrafficPassenger(Garage &garage, TrafficManager &trafficManager)
+    : TrafficPassenger(garage, trafficManager.getTrafficOperations())
+{
+}
+
+void TrafficPassenger::enqueue(int fromStationId, int toStationId, double currentSimulationTimeSeconds)
 {
     if (fromStationId == toStationId)
         return;
@@ -16,7 +22,7 @@ void PassengerDispatcher::enqueue(int fromStationId, int toStationId, double cur
     ++totalQueueSize;
 }
 
-void PassengerDispatcher::dispatchWaitingPassengers(double currentSimulationTimeSeconds)
+void TrafficPassenger::dispatchWaitingPassengers(double currentSimulationTimeSeconds)
 {
     for (auto queuePosition = queuesByStationId.begin(); queuePosition != queuesByStationId.end();)
     {
@@ -30,7 +36,7 @@ void PassengerDispatcher::dispatchWaitingPassengers(double currentSimulationTime
                 break;
             Engine *engine = stationPool->second[0];
             const PassengerRequest &request = queue.front();
-            if (!trafficManager.contractOptimizedRoute(*engine, request.fromStationId, request.toStationId, currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
+            if (!trafficOperations.contractOptimizedRoute(*engine, request.fromStationId, request.toStationId, currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
                 break;
             queue.pop_front();
             --totalQueueSize;
@@ -42,18 +48,18 @@ void PassengerDispatcher::dispatchWaitingPassengers(double currentSimulationTime
     }
 }
 
-std::size_t PassengerDispatcher::getQueueSizeAtStation(int stationId) const
+std::size_t TrafficPassenger::getQueueSizeAtStation(int stationId) const
 {
     const auto queue = queuesByStationId.find(stationId);
     return queue == queuesByStationId.end() ? 0 : queue->second.size();
 }
 
-std::size_t PassengerDispatcher::getTotalQueueSize() const
+std::size_t TrafficPassenger::getTotalQueueSize() const
 {
     return totalQueueSize;
 }
 
-double PassengerDispatcher::getOldestWaitSecondsAtStation(int stationId, double currentSimulationTimeSeconds) const
+double TrafficPassenger::getOldestWaitSecondsAtStation(int stationId, double currentSimulationTimeSeconds) const
 {
     const auto queue = queuesByStationId.find(stationId);
     if (queue == queuesByStationId.end() || queue->second.empty())

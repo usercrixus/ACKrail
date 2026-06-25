@@ -1,59 +1,79 @@
 #include "TrafficManager.hpp"
 
+#include <algorithm>
+
 TrafficManager::TrafficManager(Topology &topology, Garage &garage)
-    : garage(garage),
-      routeManager(topology),
-      eventManager(garage)
+    : trafficOperations(topology, garage),
+      trafficPassenger(garage, trafficOperations),
+      trafficGenerator(topology, garage, trafficPassenger),
+      trafficBalancer(topology, garage, trafficOperations, trafficPassenger)
 {
+}
+
+void TrafficManager::update(double currentSimulationTimeSeconds, double elapsedSeconds)
+{
+    trafficGenerator.initialize();
+    trafficOperations.processCurrentEvents(currentSimulationTimeSeconds);
+    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, elapsedSeconds);
+    trafficPassenger.dispatchWaitingPassengers(currentSimulationTimeSeconds);
+    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, elapsedSeconds);
+}
+
+double TrafficManager::getSecondsUntilNextWork(double currentSimulationTimeSeconds) const
+{
+    double delaySeconds = std::min(trafficGenerator.getSecondsUntilDispatch(), trafficBalancer.getSecondsUntilRebalance());
+    const std::optional<double> nextEventTimeSeconds = trafficOperations.getNextEventTimeSeconds();
+    if (nextEventTimeSeconds.has_value())
+        delaySeconds = std::min(delaySeconds, std::max(0.0, *nextEventTimeSeconds - currentSimulationTimeSeconds));
+    return delaySeconds;
 }
 
 bool TrafficManager::contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
-    if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
-        return false;
-    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractOptimizedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
-    if (!contractedRoute.has_value())
-        return false;
-    contractedRoute->route->getStations().back()->getController().addExpectedArrival();
-    garage.activateEngine(&engine);
-    eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
-    return true;
+    return trafficOperations.contractOptimizedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
 }
 
 bool TrafficManager::contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
-    if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
-        return false;
-    const std::optional<TrafficRouteManager::ContractedRoute> contractedRoute = routeManager.contractPrecomputedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
-    if (!contractedRoute.has_value())
-        return false;
-    contractedRoute->route->getStations().back()->getController().addExpectedArrival();
-    garage.activateEngine(&engine);
-    eventManager.scheduleRouteEvents(*contractedRoute->engine, *contractedRoute->route, contractedRoute->departureTimeSeconds);
-    return true;
+    return trafficOperations.contractPrecomputedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
 }
 
 double TrafficManager::getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const
 {
-    return routeManager.getStaticRouteDistanceKilometers(fromStationId, toStationId);
+    return trafficOperations.getStaticRouteDistanceKilometers(fromStationId, toStationId);
 }
 
 void TrafficManager::processCurrentEvents(double currentSimulationTimeSeconds)
 {
-    eventManager.processCurrentEvents(currentSimulationTimeSeconds);
+    trafficOperations.processCurrentEvents(currentSimulationTimeSeconds);
 }
 
 std::optional<double> TrafficManager::getNextEventTimeSeconds() const
 {
-    return eventManager.getNextEventTimeSeconds();
+    return trafficOperations.getNextEventTimeSeconds();
 }
 
-const std::vector<TrafficManager::RouteDispatch> &TrafficManager::getRouteDispatches() const
+const std::vector<TrafficRouteManager::RouteDispatch> &TrafficManager::getRouteDispatches() const
 {
-    return routeManager.getRouteDispatches();
+    return trafficOperations.getRouteDispatches();
 }
 
 const std::vector<CompletedTrip> &TrafficManager::getCompletedTrips() const
 {
-    return eventManager.getCompletedTrips();
+    return trafficOperations.getCompletedTrips();
+}
+
+const TrafficPassenger &TrafficManager::getTrafficPassenger() const
+{
+    return trafficPassenger;
+}
+
+const TrafficBalancer &TrafficManager::getTrafficBalancer() const
+{
+    return trafficBalancer;
+}
+
+TrafficOperations &TrafficManager::getTrafficOperations()
+{
+    return trafficOperations;
 }

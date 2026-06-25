@@ -29,20 +29,8 @@ bool SimulationSession::load()
     }
     garage = std::make_unique<Garage>(70000);
     trafficManager = std::make_unique<TrafficManager>(*topology, *garage);
-    passengerDispatcher = std::make_unique<PassengerDispatcher>(*garage, *trafficManager);
-    trafficGenerator = std::make_unique<TrafficGenerator>(*topology, *garage, *passengerDispatcher);
-    trafficBalancer = std::make_unique<TrafficBalancer>(*topology, *garage, *trafficManager, passengerDispatcher.get());
-    statisticsCollector = std::make_unique<SimulationStatisticsCollector>(
-        *topology,
-        *garage,
-        *trafficManager,
-        *passengerDispatcher,
-        *trafficBalancer);
-    trafficSimulator = std::make_unique<TrafficSimulator>(
-        *trafficManager,
-        *trafficGenerator,
-        *passengerDispatcher,
-        *trafficBalancer);
+    statisticsCollector = std::make_unique<SimulationStatisticsCollector>(*topology, *garage, *trafficManager);
+    trafficSimulator = std::make_unique<TrafficSimulator>(*trafficManager);
     trafficSimulator->setUpdateObserver(
         [this](double currentSimulationTimeSeconds)
         {
@@ -54,9 +42,9 @@ bool SimulationSession::load()
 
 SimulationWidget *SimulationSession::createWidget(QWidget *parent)
 {
-    if (topology == nullptr || garage == nullptr || trafficManager == nullptr || trafficBalancer == nullptr)
+    if (topology == nullptr || garage == nullptr || trafficManager == nullptr)
         return nullptr;
-    simulationWidget = new SimulationWidget(*topology, *garage, *trafficManager, *trafficBalancer, parent);
+    simulationWidget = new SimulationWidget(*topology, *garage, *trafficManager, parent);
     return simulationWidget;
 }
 
@@ -86,8 +74,8 @@ const QString &SimulationSession::getWeightFile() const
 SimulationStatistics *SimulationSession::getStatistics() const
 {
     return statisticsCollector == nullptr
-        ? nullptr
-        : &statisticsCollector->getStatistics();
+               ? nullptr
+               : &statisticsCollector->getStatistics();
 }
 
 const Topology *SimulationSession::getTopology() const

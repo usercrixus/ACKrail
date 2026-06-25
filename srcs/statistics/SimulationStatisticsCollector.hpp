@@ -4,15 +4,13 @@
 #include <cstddef>
 
 class Garage;
-class PassengerDispatcher;
 class Topology;
-class TrafficBalancer;
 class TrafficManager;
 
 class SimulationStatisticsCollector
 {
 public:
-    SimulationStatisticsCollector(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager, const PassengerDispatcher &passengerDispatcher, const TrafficBalancer &trafficBalancer);
+    SimulationStatisticsCollector(const Topology &topology, const Garage &garage, const TrafficManager &trafficManager);
 
     void update(double currentSimulationTimeSeconds);
     SimulationStatistics &getStatistics();
@@ -25,8 +23,6 @@ private:
     const Topology &topology;
     const Garage &garage;
     const TrafficManager &trafficManager;
-    const PassengerDispatcher &passengerDispatcher;
-    const TrafficBalancer &trafficBalancer;
     SimulationStatistics statistics;
     std::size_t collectedRouteDispatchCount = 0;
     std::size_t collectedCompletedTripCount = 0;

@@ -1,44 +1,35 @@
 #pragma once
 
-#include "../garage/Garage.hpp"
-#include "TrafficEventManager.hpp"
-#include "TrafficRouteManager.hpp"
-#include "../topology/Topology.hpp"
-#include <optional>
+#include "TrafficPassenger.hpp"
+#include "TrafficBalancer.hpp"
+#include "TrafficGenerator.hpp"
+#include "TrafficOperations.hpp"
 
 /**
- * Advances and manages engine simulation.
+ * Owns and coordinates the traffic simulation subsystem.
  */
 class TrafficManager
 {
 public:
-    using RouteDispatch = TrafficRouteManager::RouteDispatch;
-
-    /**
-     * Creates a traffic manager for a garage.
-     *
-     * @param topology Topology whose nodes control directional link entries.
-     * @param garage Garage containing the simulated engines.
-     */
     TrafficManager(Topology &topology, Garage &garage);
 
-    /**
-     * Finds and commits the earliest-arrival route contract for an engine.
-     */
+    void update(double currentSimulationTimeSeconds, double elapsedSeconds);
+    double getSecondsUntilNextWork(double currentSimulationTimeSeconds) const;
+
     bool contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
     bool contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
     double getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const;
-
-    /** Processes every scheduled event due at the current simulation time. */
     void processCurrentEvents(double currentSimulationTimeSeconds);
-
-    /** @return Time of the next scheduled event, or empty when none exists. */
     std::optional<double> getNextEventTimeSeconds() const;
-    const std::vector<RouteDispatch> &getRouteDispatches() const;
+    const std::vector<TrafficRouteManager::RouteDispatch> &getRouteDispatches() const;
     const std::vector<CompletedTrip> &getCompletedTrips() const;
+    const TrafficPassenger &getTrafficPassenger() const;
+    const TrafficBalancer &getTrafficBalancer() const;
+    TrafficOperations &getTrafficOperations();
 
 private:
-    Garage &garage;
-    TrafficRouteManager routeManager;
-    TrafficEventManager eventManager;
+    TrafficOperations trafficOperations;
+    TrafficPassenger trafficPassenger;
+    TrafficGenerator trafficGenerator;
+    TrafficBalancer trafficBalancer;
 };

@@ -4,14 +4,21 @@
 
 TrafficGenerator::TrafficGenerator(const Topology &topology,
                                    Garage &garage,
-                                   PassengerDispatcher &passengerDispatcher)
+                                   TrafficPassenger &trafficPassenger)
     : topology(topology),
       garage(garage),
-      passengerDispatcher(passengerDispatcher),
+      trafficPassenger(trafficPassenger),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count())),
       arrivalStationDistribution(topology.getArrivalWeights().begin(), topology.getArrivalWeights().end()),
       departureStationDistribution(topology.getDepartureWeights().begin(), topology.getDepartureWeights().end())
 {
+}
+
+void TrafficGenerator::initialize()
+{
+    if (initialized)
+        return;
+    initialized = true;
     initializeEngineParkingStations();
 }
 
@@ -56,7 +63,7 @@ void TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeco
         const Node &toStation = stations[static_cast<qsizetype>(arrivalStationDistribution(randomGenerator))];
         if (fromStation.getId() != toStation.getId())
         {
-            passengerDispatcher.enqueue(fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds);
+            trafficPassenger.enqueue(fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds);
             return;
         }
     }
@@ -69,5 +76,8 @@ void TrafficGenerator::initializeEngineParkingStations()
         return;
 
     for (Engine *engine : garage.getIdleEngines())
-        garage.setIdleEngineParkingStation(*engine, stations[static_cast<qsizetype>(departureStationDistribution(randomGenerator))].getId());
+    {
+        if (!engine->getPad().hasParkingStation())
+            garage.setIdleEngineParkingStation(*engine, stations[static_cast<qsizetype>(departureStationDistribution(randomGenerator))].getId());
+    }
 }

@@ -1,5 +1,6 @@
 #include "TrafficBalancer.hpp"
-#include "PassengerDispatcher.hpp"
+#include "TrafficPassenger.hpp"
+#include "TrafficManager.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -8,15 +9,23 @@
 
 TrafficBalancer::TrafficBalancer(const Topology &topology,
                                  Garage &garage,
-                                 TrafficManager &trafficManager,
-                                 const PassengerDispatcher *passengerDispatcher)
+                                 TrafficOperations &trafficOperations,
+                                 const TrafficPassenger &trafficPassenger)
     : topology(topology),
       garage(garage),
-      trafficManager(trafficManager),
-      passengerDispatcher(passengerDispatcher),
+      trafficOperations(trafficOperations),
+      trafficPassenger(trafficPassenger),
       randomGenerator(static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count()))
 {
     initializeStationPressuresFromTopology();
+}
+
+TrafficBalancer::TrafficBalancer(const Topology &topology,
+                                 Garage &garage,
+                                 TrafficManager &trafficManager,
+                                 const TrafficPassenger &trafficPassenger)
+    : TrafficBalancer(topology, garage, trafficManager.getTrafficOperations(), trafficPassenger)
+{
 }
 
 void TrafficBalancer::tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds)
@@ -100,29 +109,20 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
     {
         if (getProjectedEngineCountAtStation(station.getId())
                 < getTargetEngineCountAtStation(station.getId())
-            || (passengerDispatcher != nullptr
-                && passengerDispatcher->getQueueSizeAtStation(station.getId()) > 0))
+            || trafficPassenger.getQueueSizeAtStation(station.getId()) > 0)
             destinationStations.push_back(&station);
     }
     std::sort(destinationStations.begin(), destinationStations.end(),
               [this, currentSimulationTimeSeconds](const Node *left, const Node *right)
               {
-                  const std::size_t leftQueue = passengerDispatcher == nullptr
-                      ? 0
-                      : passengerDispatcher->getQueueSizeAtStation(left->getId());
-                  const std::size_t rightQueue = passengerDispatcher == nullptr
-                      ? 0
-                      : passengerDispatcher->getQueueSizeAtStation(right->getId());
+                  const std::size_t leftQueue = trafficPassenger.getQueueSizeAtStation(left->getId());
+                  const std::size_t rightQueue = trafficPassenger.getQueueSizeAtStation(right->getId());
                   if (leftQueue != rightQueue)
                       return leftQueue > rightQueue;
-                  const double leftWait = passengerDispatcher == nullptr
-                      ? 0.0
-                      : passengerDispatcher->getOldestWaitSecondsAtStation(
-                            left->getId(), currentSimulationTimeSeconds);
-                  const double rightWait = passengerDispatcher == nullptr
-                      ? 0.0
-                      : passengerDispatcher->getOldestWaitSecondsAtStation(
-                            right->getId(), currentSimulationTimeSeconds);
+                  const double leftWait = trafficPassenger.getOldestWaitSecondsAtStation(
+                      left->getId(), currentSimulationTimeSeconds);
+                  const double rightWait = trafficPassenger.getOldestWaitSecondsAtStation(
+                      right->getId(), currentSimulationTimeSeconds);
                   return leftWait > rightWait;
               });
 
@@ -141,9 +141,9 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
         std::sort(sourceStations.begin(), sourceStations.end(),
                   [this, destinationStationId](const Node *left, const Node *right)
                   {
-                      return trafficManager.getStaticRouteDistanceKilometers(
+                      return trafficOperations.getStaticRouteDistanceKilometers(
                                  left->getId(), destinationStationId)
-                          < trafficManager.getStaticRouteDistanceKilometers(
+                          < trafficOperations.getStaticRouteDistanceKilometers(
                                  right->getId(), destinationStationId);
                   });
 
@@ -151,8 +151,7 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
         {
             const int sourceStationId = sourceStation->getId();
             const bool sourceHasWaitingPassengers =
-                passengerDispatcher != nullptr
-                && passengerDispatcher->getQueueSizeAtStation(sourceStationId) > 0;
+                trafficPassenger.getQueueSizeAtStation(sourceStationId) > 0;
             if (sourceHasWaitingPassengers)
                 continue;
 
@@ -164,7 +163,7 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
                 if (stationPool == garage.getIdleEnginesByStation().end() || stationPool->second.empty())
                     break;
                 Engine *engine = stationPool->second.random(randomGenerator);
-                if (!trafficManager.contractPrecomputedRoute(
+                if (!trafficOperations.contractPrecomputedRoute(
                         *engine,
                         sourceStationId,
                         destinationStationId,
@@ -216,14 +215,11 @@ std::size_t TrafficBalancer::getTargetEngineCountAtStation(int stationId) const
         }
     }
 
-    if (passengerDispatcher != nullptr)
-    {
-        const std::size_t waitingPassengers =
-            passengerDispatcher->getQueueSizeAtStation(stationId);
-        targetEngineCount = std::min(
-            garage.getEngineCount(),
-            targetEngineCount + waitingPassengers);
-    }
+    const std::size_t waitingPassengers =
+        trafficPassenger.getQueueSizeAtStation(stationId);
+    targetEngineCount = std::min(
+        garage.getEngineCount(),
+        targetEngineCount + waitingPassengers);
     return targetEngineCount;
 }
 

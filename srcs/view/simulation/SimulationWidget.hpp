@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../garage/Garage.hpp"
-#include "../../simulator/TrafficBalancer.hpp"
 #include "../../simulator/TrafficManager.hpp"
 #include "../../topology/Topology.hpp"
 #include "header/HeaderWidget.hpp"
@@ -14,7 +13,6 @@ public:
     explicit SimulationWidget(const Topology &topology,
                               const Garage &garage,
                               const TrafficManager &trafficManager,
-                              const TrafficBalancer &trafficBalancer,
                               QWidget *parent = nullptr);
     void refresh(double simulationTimeSeconds);
     void setPassengerEnginesVisible(bool visible);
