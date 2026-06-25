@@ -8,15 +8,11 @@ PassengerDispatcher::PassengerDispatcher(Garage &garage, TrafficManager &traffic
 {
 }
 
-void PassengerDispatcher::enqueue(int fromStationId,
-                                  int toStationId,
-                                  double currentSimulationTimeSeconds)
+void PassengerDispatcher::enqueue(int fromStationId, int toStationId, double currentSimulationTimeSeconds)
 {
     if (fromStationId == toStationId)
         return;
-
-    queuesByStationId[fromStationId].push_back(
-        {fromStationId, toStationId, currentSimulationTimeSeconds});
+    queuesByStationId[fromStationId].push_back({fromStationId, toStationId, currentSimulationTimeSeconds});
     ++totalQueueSize;
 }
 
@@ -32,20 +28,13 @@ void PassengerDispatcher::dispatchWaitingPassengers(double currentSimulationTime
             const auto stationPool = garage.getIdleEnginesByStation().find(stationId);
             if (stationPool == garage.getIdleEnginesByStation().end() || stationPool->second.empty())
                 break;
-
             Engine *engine = stationPool->second[0];
             const PassengerRequest &request = queue.front();
-            if (!trafficManager.contractRoute(*engine,
-                                              request.fromStationId,
-                                              request.toStationId,
-                                              currentSimulationTimeSeconds,
-                                              EnginePad::TravelType::Passenger))
+            if (!trafficManager.contractOptimizedRoute(*engine, request.fromStationId, request.toStationId, currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
                 break;
-
             queue.pop_front();
             --totalQueueSize;
         }
-
         if (queue.empty())
             queuePosition = queuesByStationId.erase(queuePosition);
         else
@@ -64,9 +53,7 @@ std::size_t PassengerDispatcher::getTotalQueueSize() const
     return totalQueueSize;
 }
 
-double PassengerDispatcher::getOldestWaitSecondsAtStation(
-    int stationId,
-    double currentSimulationTimeSeconds) const
+double PassengerDispatcher::getOldestWaitSecondsAtStation(int stationId, double currentSimulationTimeSeconds) const
 {
     const auto queue = queuesByStationId.find(stationId);
     if (queue == queuesByStationId.end() || queue->second.empty())

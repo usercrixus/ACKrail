@@ -105,7 +105,7 @@ int main()
     double headwaySimulationTimeSeconds = 0.0;
     Engine &headwayLeader = *headwayGarage.getIdleEngine();
     assert(headwayGarage.getIdleEngines().at(headwayLeader.getId()) == &headwayLeader);
-    assert(headwayManager.contractRoute(
+    assert(headwayManager.contractOptimizedRoute(
         headwayLeader,
         headwayStationA.getId(),
         headwayStationB.getId(),
@@ -113,7 +113,7 @@ int main()
         EnginePad::TravelType::Passenger));
     assert(headwayGarage.getActiveEngines().at(headwayLeader.getId()) == &headwayLeader);
     Engine &headwayFollower = *headwayGarage.getIdleEngine();
-    assert(headwayManager.contractRoute(
+    assert(headwayManager.contractOptimizedRoute(
         headwayFollower,
         headwayStationA.getId(),
         headwayStationB.getId(),
@@ -159,16 +159,16 @@ int main()
 
     assert(firstEngine.getLengthMeters() == 3.0);
     assert(firstEngine.getSecurityDistanceMeters() == 3.0);
-    assert(trafficManager.contractRoute(firstEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
+    assert(trafficManager.contractOptimizedRoute(firstEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
     assert(firstEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(firstEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);
 
     Engine &secondEngine = *garage.getIdleEngine();
-    assert(trafficManager.contractRoute(secondEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
+    assert(trafficManager.contractOptimizedRoute(secondEngine, stationA.getId(), stationB.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
     assert(secondEngine.getPad().getTrajectory()->getLinks().first()->getId() == 2);
 
     Engine &reverseEngine = *garage.getIdleEngine();
-    assert(trafficManager.contractRoute(reverseEngine, stationB.getId(), stationA.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
+    assert(trafficManager.contractOptimizedRoute(reverseEngine, stationB.getId(), stationA.getId(), simulationTimeSeconds, EnginePad::TravelType::Passenger));
     assert(reverseEngine.getPad().getTrajectory()->getLinks().first()->getId() == 1);
     assert(reverseEngine.getPad().getTrajectory()->getContract().first().waitSeconds == 0.0);
 
@@ -214,7 +214,7 @@ int main()
     Engine &completionEngine = *completionGarage.getIdleEngine();
     completionGarage.setIdleEngineParkingStation(completionEngine, completionStationA.getId());
     assert(completionGarage.getIdleEnginesByStation().at(completionStationA.getId()).size() == 1);
-    assert(completionManager.contractRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds, EnginePad::TravelType::Passenger));
+    assert(completionManager.contractOptimizedRoute(completionEngine, completionStationA.getId(), completionStationB.getId(), completionSimulationTimeSeconds, EnginePad::TravelType::Passenger));
     completionStatisticsCollector.update(completionSimulationTimeSeconds);
     const SimulationStatistics &completionStatistics =
         completionStatisticsCollector.getStatistics();

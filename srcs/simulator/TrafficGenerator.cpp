@@ -56,9 +56,7 @@ void TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeco
         const Node &toStation = stations[static_cast<qsizetype>(arrivalStationDistribution(randomGenerator))];
         if (fromStation.getId() != toStation.getId())
         {
-            passengerDispatcher.enqueue(fromStation.getId(),
-                                        toStation.getId(),
-                                        currentSimulationTimeSeconds);
+            passengerDispatcher.enqueue(fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds);
             return;
         }
     }

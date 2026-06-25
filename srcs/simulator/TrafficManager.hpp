@@ -30,7 +30,7 @@ public:
     /**
      * Finds and commits the earliest-arrival route contract for an engine.
      */
-    bool contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
+    bool contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
     bool contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
     double getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const;
 

@@ -7,7 +7,7 @@ TrafficManager::TrafficManager(Topology &topology, Garage &garage)
 {
 }
 
-bool TrafficManager::contractRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
+bool TrafficManager::contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
     if (engine.getPad().isActive() || !garage.isIdleEngine(engine))
         return false;
