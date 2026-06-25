@@ -3,6 +3,7 @@
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
 #include "TrafficPassenger.hpp"
+#include "TrafficResults.hpp"
 #include <random>
 
 class TrafficGenerator
@@ -25,7 +26,7 @@ public:
      * @param currentSimulationTimeSeconds Current simulation time in seconds.
      * @param elapsedSeconds Elapsed real time in seconds.
      */
-    void tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds);
+    PassengerGenerationResult tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds);
 
     /** @return Seconds before the next generated traffic dispatch. */
     double getSecondsUntilDispatch() const;
@@ -35,10 +36,10 @@ private:
     /**
      * Sends idle engines on random trips.
      */
-    void generate(double currentSimulationTimeSeconds);
+    PassengerGenerationResult generate(double currentSimulationTimeSeconds);
 
     /** Adds one weighted passenger request to its departure-station queue. */
-    void generatePassengerRequest(double currentSimulationTimeSeconds);
+    bool generatePassengerRequest(double currentSimulationTimeSeconds);
 
     /** Parks idle engines evenly across topology stations. */
     void initializeEngineParkingStations();

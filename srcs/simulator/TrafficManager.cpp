@@ -13,10 +13,10 @@ TrafficManager::TrafficManager(Topology &topology, Garage &garage)
 void TrafficManager::update(double currentSimulationTimeSeconds, double elapsedSeconds)
 {
     trafficGenerator.initialize();
-    trafficOperations.processCurrentEvents(currentSimulationTimeSeconds);
-    trafficGenerator.tryGenerate(currentSimulationTimeSeconds, elapsedSeconds);
-    trafficPassenger.dispatchWaitingPassengers(currentSimulationTimeSeconds);
-    trafficBalancer.tryRebalance(currentSimulationTimeSeconds, elapsedSeconds);
+    data.record(trafficOperations.processCurrentEvents(currentSimulationTimeSeconds));
+    data.record(trafficGenerator.tryGenerate(currentSimulationTimeSeconds, elapsedSeconds));
+    data.record(trafficPassenger.dispatchWaitingPassengers(currentSimulationTimeSeconds));
+    data.record(trafficBalancer.tryRebalance(currentSimulationTimeSeconds, elapsedSeconds));
 }
 
 double TrafficManager::getSecondsUntilNextWork(double currentSimulationTimeSeconds) const
@@ -30,12 +30,28 @@ double TrafficManager::getSecondsUntilNextWork(double currentSimulationTimeSecon
 
 bool TrafficManager::contractOptimizedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
-    return trafficOperations.contractOptimizedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
+    const bool contracted = trafficOperations.contractOptimizedRoute(
+        engine,
+        fromStationId,
+        toStationId,
+        currentSimulationTimeSeconds,
+        travelType);
+    if (contracted)
+        data.record(RouteDispatch{fromStationId, travelType});
+    return contracted;
 }
 
 bool TrafficManager::contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType)
 {
-    return trafficOperations.contractPrecomputedRoute(engine, fromStationId, toStationId, currentSimulationTimeSeconds, travelType);
+    const bool contracted = trafficOperations.contractPrecomputedRoute(
+        engine,
+        fromStationId,
+        toStationId,
+        currentSimulationTimeSeconds,
+        travelType);
+    if (contracted)
+        data.record(RouteDispatch{fromStationId, travelType});
+    return contracted;
 }
 
 double TrafficManager::getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const
@@ -45,7 +61,7 @@ double TrafficManager::getStaticRouteDistanceKilometers(int fromStationId, int t
 
 void TrafficManager::processCurrentEvents(double currentSimulationTimeSeconds)
 {
-    trafficOperations.processCurrentEvents(currentSimulationTimeSeconds);
+    data.record(trafficOperations.processCurrentEvents(currentSimulationTimeSeconds));
 }
 
 std::optional<double> TrafficManager::getNextEventTimeSeconds() const
@@ -53,14 +69,19 @@ std::optional<double> TrafficManager::getNextEventTimeSeconds() const
     return trafficOperations.getNextEventTimeSeconds();
 }
 
-const std::vector<TrafficRouteManager::RouteDispatch> &TrafficManager::getRouteDispatches() const
+const TrafficData &TrafficManager::getData() const
 {
-    return trafficOperations.getRouteDispatches();
+    return data;
+}
+
+const std::vector<RouteDispatch> &TrafficManager::getRouteDispatches() const
+{
+    return data.getRouteDispatches();
 }
 
 const std::vector<CompletedTrip> &TrafficManager::getCompletedTrips() const
 {
-    return trafficOperations.getCompletedTrips();
+    return data.getCompletedTrips();
 }
 
 const TrafficPassenger &TrafficManager::getTrafficPassenger() const

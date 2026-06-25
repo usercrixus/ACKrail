@@ -3,6 +3,7 @@
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
 #include "TrafficEventManager.hpp"
+#include "TrafficResults.hpp"
 #include "TrafficRouteManager.hpp"
 #include <optional>
 
@@ -18,10 +19,8 @@ public:
     bool contractPrecomputedRoute(Engine &engine, int fromStationId, int toStationId, double currentSimulationTimeSeconds, EnginePad::TravelType travelType);
     double getStaticRouteDistanceKilometers(int fromStationId, int toStationId) const;
 
-    void processCurrentEvents(double currentSimulationTimeSeconds);
+    EventProcessingResult processCurrentEvents(double currentSimulationTimeSeconds);
     std::optional<double> getNextEventTimeSeconds() const;
-    const std::vector<TrafficRouteManager::RouteDispatch> &getRouteDispatches() const;
-    const std::vector<CompletedTrip> &getCompletedTrips() const;
 
 private:
     Garage &garage;

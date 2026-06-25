@@ -38,22 +38,12 @@ double TrafficOperations::getStaticRouteDistanceKilometers(int fromStationId, in
     return routeManager.getStaticRouteDistanceKilometers(fromStationId, toStationId);
 }
 
-void TrafficOperations::processCurrentEvents(double currentSimulationTimeSeconds)
+EventProcessingResult TrafficOperations::processCurrentEvents(double currentSimulationTimeSeconds)
 {
-    eventManager.processCurrentEvents(currentSimulationTimeSeconds);
+    return eventManager.processCurrentEvents(currentSimulationTimeSeconds);
 }
 
 std::optional<double> TrafficOperations::getNextEventTimeSeconds() const
 {
     return eventManager.getNextEventTimeSeconds();
-}
-
-const std::vector<TrafficRouteManager::RouteDispatch> &TrafficOperations::getRouteDispatches() const
-{
-    return routeManager.getRouteDispatches();
-}
-
-const std::vector<CompletedTrip> &TrafficOperations::getCompletedTrips() const
-{
-    return eventManager.getCompletedTrips();
 }

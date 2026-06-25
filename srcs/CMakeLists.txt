@@ -35,6 +35,8 @@ qt_add_executable(ackrail
     simulator/SimulationSession.hpp
     simulator/TrafficBalancer.cpp
     simulator/TrafficBalancer.hpp
+    simulator/TrafficData.cpp
+    simulator/TrafficData.hpp
     simulator/TrafficGenerator.cpp
     simulator/TrafficGenerator.hpp
     simulator/TrafficEventManager.cpp
@@ -49,6 +51,7 @@ qt_add_executable(ackrail
     simulator/TrafficOperations.hpp
     simulator/TrafficRouteManager.cpp
     simulator/TrafficRouteManager.hpp
+    simulator/TrafficResults.hpp
     simulator/TrafficSimulator.cpp
     simulator/TrafficSimulator.hpp
     statistics/EngineStatistics.cpp
@@ -232,6 +235,8 @@ if(BUILD_TESTING)
         simulator/TrafficEventManager.hpp
         simulator/TrafficBalancer.cpp
         simulator/TrafficBalancer.hpp
+        simulator/TrafficData.cpp
+        simulator/TrafficData.hpp
         simulator/TrafficGenerator.cpp
         simulator/TrafficGenerator.hpp
         simulator/TrafficManager.cpp
@@ -240,6 +245,7 @@ if(BUILD_TESTING)
         simulator/TrafficOperations.hpp
         simulator/TrafficRouteManager.cpp
         simulator/TrafficRouteManager.hpp
+        simulator/TrafficResults.hpp
         simulator/TrafficManagerTest.cpp
         statistics/EngineStatistics.cpp
         statistics/EngineStatistics.hpp

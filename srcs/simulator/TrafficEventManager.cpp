@@ -21,10 +21,11 @@ void TrafficEventManager::scheduleRouteEvents(const Engine &engine, const Route 
     }
 }
 
-void TrafficEventManager::processCurrentEvents(double currentSimulationTimeSeconds)
+EventProcessingResult TrafficEventManager::processCurrentEvents(double currentSimulationTimeSeconds)
 {
-    processDueEvents(currentSimulationTimeSeconds);
+    EventProcessingResult result = processDueEvents(currentSimulationTimeSeconds);
     garage.recycleInactiveEngines();
+    return result;
 }
 
 std::optional<double> TrafficEventManager::getNextEventTimeSeconds() const
@@ -34,32 +35,31 @@ std::optional<double> TrafficEventManager::getNextEventTimeSeconds() const
     return events.top().timeSeconds;
 }
 
-const std::vector<CompletedTrip> &TrafficEventManager::getCompletedTrips() const
+EventProcessingResult TrafficEventManager::processDueEvents(double currentSimulationTimeSeconds)
 {
-    return completedTrips;
-}
-
-void TrafficEventManager::processDueEvents(double currentSimulationTimeSeconds)
-{
+    EventProcessingResult result;
     while (!events.empty() && events.top().timeSeconds <= currentSimulationTimeSeconds)
     {
         const SimulationEvent event = events.top();
         events.pop();
-        processStepCompletion(event);
+        const std::optional<CompletedTrip> completedTrip = processStepCompletion(event);
+        if (completedTrip.has_value())
+            result.completedTrips.push_back(*completedTrip);
     }
+    return result;
 }
 
-void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
+std::optional<CompletedTrip> TrafficEventManager::processStepCompletion(const SimulationEvent &event)
 {
     Engine *const *enginePosition = garage.getActiveEngines().find(event.engineId);
     if (enginePosition == nullptr)
-        return;
+        return std::nullopt;
 
     Engine &engine = **enginePosition;
     EnginePad &pad = engine.getPad();
     const Route *route = pad.getTrajectory();
     if (route == nullptr || event.contractStep >= route->getLinks().size())
-        return;
+        return std::nullopt;
 
     const QVector<Node *> &stations = route->getStations();
     const QVector<Link *> &links = route->getLinks();
@@ -72,13 +72,20 @@ void TrafficEventManager::processStepCompletion(const SimulationEvent &event)
         double waitSeconds = 0.0;
         for (const Route::ContractStep &step : route->getContract())
             waitSeconds += step.waitSeconds;
-        completedTrips.push_back({engine.getId(), stations.back()->getId(), pad.getTravelType(), route->getTotalDistanceKilometers(), pad.getTotalTrajectorySeconds(), waitSeconds});
+        const CompletedTrip completedTrip{
+            engine.getId(),
+            stations.back()->getId(),
+            pad.getTravelType(),
+            route->getTotalDistanceKilometers(),
+            pad.getTotalTrajectorySeconds(),
+            waitSeconds};
         stations.back()->getController().removeExpectedArrival();
         pad.finishContractedTrajectory(event.timeSeconds);
-        return;
+        return completedTrip;
     }
 
     const double entryTimeSeconds = event.timeSeconds + route->getContract()[nextStep].waitSeconds;
     const double exitTimeSeconds = entryTimeSeconds + route->getContract()[nextStep].traversalSeconds;
     pad.enterContractStep(nextStep, entryTimeSeconds, exitTimeSeconds);
+    return std::nullopt;
 }

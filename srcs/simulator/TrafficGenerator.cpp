@@ -22,17 +22,21 @@ void TrafficGenerator::initialize()
     initializeEngineParkingStations();
 }
 
-void TrafficGenerator::tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds)
+PassengerGenerationResult TrafficGenerator::tryGenerate(double currentSimulationTimeSeconds, double elapsedSeconds)
 {
+    PassengerGenerationResult result;
     if (elapsedSeconds > 0.0)
     {
         secondsUntilDispatch -= elapsedSeconds;
         while (secondsUntilDispatch <= 0.0)
         {
-            generate(currentSimulationTimeSeconds);
+            const PassengerGenerationResult generation =
+                generate(currentSimulationTimeSeconds);
+            result.generatedPassengerCount += generation.generatedPassengerCount;
             secondsUntilDispatch += 0.10;
         }
     }
+    return result;
 }
 
 double TrafficGenerator::getSecondsUntilDispatch() const
@@ -40,22 +44,25 @@ double TrafficGenerator::getSecondsUntilDispatch() const
     return secondsUntilDispatch;
 }
 
-void TrafficGenerator::generate(double currentSimulationTimeSeconds)
+PassengerGenerationResult TrafficGenerator::generate(double currentSimulationTimeSeconds)
 {
+    PassengerGenerationResult result;
     std::uniform_int_distribution<int> dispatchCountDistribution(10, 25);
     int remainingDispatches = dispatchCountDistribution(randomGenerator);
     while (remainingDispatches > 0)
     {
-        generatePassengerRequest(currentSimulationTimeSeconds);
+        if (generatePassengerRequest(currentSimulationTimeSeconds))
+            ++result.generatedPassengerCount;
         --remainingDispatches;
     }
+    return result;
 }
 
-void TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeconds)
+bool TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeconds)
 {
     const QVector<Node> &stations = topology.getNodes();
     if (stations.size() < 2)
-        return;
+        return false;
 
     for (int attempt = 0; attempt < 20; ++attempt)
     {
@@ -64,9 +71,10 @@ void TrafficGenerator::generatePassengerRequest(double currentSimulationTimeSeco
         if (fromStation.getId() != toStation.getId())
         {
             trafficPassenger.enqueue(fromStation.getId(), toStation.getId(), currentSimulationTimeSeconds);
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 void TrafficGenerator::initializeEngineParkingStations()

@@ -3,6 +3,7 @@
 #include "../garage/Garage.hpp"
 #include "../topology/Topology.hpp"
 #include "TrafficOperations.hpp"
+#include "TrafficResults.hpp"
 #include <random>
 #include <vector>
 
@@ -21,7 +22,7 @@ public:
                     TrafficManager &trafficManager,
                     const TrafficPassenger &trafficPassenger);
 
-    void tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds);
+    RebalanceResult tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds);
     double getSecondsUntilRebalance() const;
     double getNetworkBalancePercent() const;
     std::size_t getTargetEngineCountAtStation(int stationId) const;
@@ -34,7 +35,7 @@ private:
     };
 
     void initializeStationPressuresFromTopology();
-    void rebalance(double currentSimulationTimeSeconds);
+    RebalanceResult rebalance(double currentSimulationTimeSeconds);
     std::size_t getIdleEngineCountAtStation(int stationId) const;
     std::size_t getProjectedEngineCountAtStation(int stationId) const;
     std::size_t getBaseReserveCountPerStation() const;

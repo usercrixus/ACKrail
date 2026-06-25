@@ -28,17 +28,24 @@ TrafficBalancer::TrafficBalancer(const Topology &topology,
 {
 }
 
-void TrafficBalancer::tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds)
+RebalanceResult TrafficBalancer::tryRebalance(double currentSimulationTimeSeconds, double elapsedSeconds)
 {
+    RebalanceResult result;
     if (elapsedSeconds > 0.0)
     {
         secondsUntilRebalance -= elapsedSeconds;
         while (secondsUntilRebalance <= 0.0)
         {
-            rebalance(currentSimulationTimeSeconds);
+            RebalanceResult rebalanceResult =
+                rebalance(currentSimulationTimeSeconds);
+            result.routeDispatches.insert(
+                result.routeDispatches.end(),
+                rebalanceResult.routeDispatches.begin(),
+                rebalanceResult.routeDispatches.end());
             secondsUntilRebalance += 5.0;
         }
     }
+    return result;
 }
 
 double TrafficBalancer::getSecondsUntilRebalance() const
@@ -96,11 +103,12 @@ void TrafficBalancer::initializeStationPressuresFromTopology()
     std::sort(surplusStations.begin(), surplusStations.end(), byPressureDescending);
 }
 
-void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
+RebalanceResult TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
 {
+    RebalanceResult result;
     const QVector<Node> &stations = topology.getNodes();
     if (stations.size() < 2 || garage.getIdleEngines().empty())
-        return;
+        return result;
 
     const std::size_t baseReserveCount = getBaseReserveCountPerStation();
     std::vector<const Node *> destinationStations;
@@ -170,11 +178,14 @@ void TrafficBalancer::rebalance(double currentSimulationTimeSeconds)
                         currentSimulationTimeSeconds,
                         EnginePad::TravelType::Rebalancing))
                     break;
+                result.routeDispatches.push_back(
+                    {sourceStationId, EnginePad::TravelType::Rebalancing});
                 if (garage.getIdleEngines().empty())
-                    return;
+                    return result;
             }
         }
     }
+    return result;
 }
 
 std::size_t TrafficBalancer::getIdleEngineCountAtStation(int stationId) const

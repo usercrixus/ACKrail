@@ -30,14 +30,17 @@ const SimulationStatistics &SimulationStatisticsCollector::getStatistics() const
 
 void SimulationStatisticsCollector::collectEvents()
 {
-    const auto &routeDispatches = trafficManager.getRouteDispatches();
+    const TrafficData &trafficData = trafficManager.getData();
+    const std::vector<RouteDispatch> &routeDispatches =
+        trafficData.getRouteDispatches();
     while (collectedRouteDispatchCount < routeDispatches.size())
     {
         statistics.getStationStatistics().recordDeparture(routeDispatches[collectedRouteDispatchCount].fromStationId);
         ++collectedRouteDispatchCount;
     }
 
-    const auto &completedTrips = trafficManager.getCompletedTrips();
+    const std::vector<CompletedTrip> &completedTrips =
+        trafficData.getCompletedTrips();
     while (collectedCompletedTripCount < completedTrips.size())
     {
         const CompletedTrip &trip =

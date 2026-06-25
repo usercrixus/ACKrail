@@ -19,11 +19,11 @@ void TrafficPassenger::enqueue(int fromStationId, int toStationId, double curren
     if (fromStationId == toStationId)
         return;
     queuesByStationId[fromStationId].push_back({fromStationId, toStationId, currentSimulationTimeSeconds});
-    ++totalQueueSize;
 }
 
-void TrafficPassenger::dispatchWaitingPassengers(double currentSimulationTimeSeconds)
+PassengerDispatchResult TrafficPassenger::dispatchWaitingPassengers(double currentSimulationTimeSeconds)
 {
+    PassengerDispatchResult result;
     for (auto queuePosition = queuesByStationId.begin(); queuePosition != queuesByStationId.end();)
     {
         std::deque<PassengerRequest> &queue = queuePosition->second;
@@ -38,14 +38,16 @@ void TrafficPassenger::dispatchWaitingPassengers(double currentSimulationTimeSec
             const PassengerRequest &request = queue.front();
             if (!trafficOperations.contractOptimizedRoute(*engine, request.fromStationId, request.toStationId, currentSimulationTimeSeconds, EnginePad::TravelType::Passenger))
                 break;
+            result.routeDispatches.push_back(
+                {request.fromStationId, EnginePad::TravelType::Passenger});
             queue.pop_front();
-            --totalQueueSize;
         }
         if (queue.empty())
             queuePosition = queuesByStationId.erase(queuePosition);
         else
             ++queuePosition;
     }
+    return result;
 }
 
 std::size_t TrafficPassenger::getQueueSizeAtStation(int stationId) const
@@ -56,6 +58,9 @@ std::size_t TrafficPassenger::getQueueSizeAtStation(int stationId) const
 
 std::size_t TrafficPassenger::getTotalQueueSize() const
 {
+    std::size_t totalQueueSize = 0;
+    for (const auto &queue : queuesByStationId)
+        totalQueueSize += queue.second.size();
     return totalQueueSize;
 }
 

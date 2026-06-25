@@ -9,6 +9,15 @@
 
 int main()
 {
+    TrafficData trafficData;
+    trafficData.record(PassengerGenerationResult{3});
+    trafficData.record(PassengerDispatchResult{{
+        {1, EnginePad::TravelType::Passenger},
+        {1, EnginePad::TravelType::Passenger},
+    }});
+    assert(trafficData.getTotalQueueSize() == 1);
+    assert(trafficData.getRouteDispatches().size() == 2);
+
     StationStatistics stationStatistics;
     stationStatistics.setTargetIdleEngines(1, 3.0);
     stationStatistics.recordSnapshot(1, 2.0, 0.0);
